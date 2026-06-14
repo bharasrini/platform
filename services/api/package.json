@@ -1,16 +1,20 @@
 {
-  "name": "api",
-  "version": "1.0.0",
-  "main": "src/index.js",
-  "scripts": 
-  {
-    "dev": "node --watch src/index.js",
-    "start": "node src/index.js"
-  },
-  "dependencies":
-  {
-    "@fyle-ops/common": "workspace:*",
-    "cors": "^2.8.5",
-    "express": "^4.21.0"
-  }
+    "name": "api",
+    "version": "1.0.0",
+    "main": "src/index.js",
+    "scripts": 
+    {
+        "dev": "node --watch src/index.js",
+        "start": "node src/index.js"
+    },
+    "dependencies":
+    {
+        "@fyle-ops/common": "workspace:*",
+        "@fyle-ops/freshsuccess": "workspace:*",
+        "@fyle-ops/billing": "workspace:*",
+        "@fyle-ops/account_mapping": "workspace:*",
+        "@fyle-ops/freshdesk": "workspace:*",
+        "cors": "^2.8.5",
+        "express": "^4.21.0"
+    }
 }

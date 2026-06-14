@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,21 +14,21 @@ Inputs: url_path - API endpoint path,
         include - Additional data to include in the response
 Output: Parsed JSON response from the API
 */
-async function fetchFreshdeskData
-({
-  url_path,
-  current_page,
-  per_page,
-  updated_since,
-  include,
+async function fetchFreshdeskData(
+{
+    url_path,
+    current_page,
+    per_page,
+    updated_since,
+    include,
 }) 
 {
     // Get the function name for logging
     const fn = fetchFreshdeskData.name;
 
     // Read environment variables
-    var api_key_orig = process.env.FRESHDESK_API_KEY;
-    var this_host = process.env.FRESHDESK_HOST;
+    const api_key_orig = process.env.FRESHDESK_API_KEY;
+    const this_host = process.env.FRESHDESK_HOST;
 
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
     const api_key_base64 = Buffer.from(`${api_key_orig}:X`).toString("base64");
@@ -73,19 +72,19 @@ Inputs: url_path - API endpoint path,
         data_load - The data to be sent
 Output: Parsed JSON response from the API
 */
-async function sendFreshdeskData
-({
-  url_path,
-  method,
-  data_load
+async function sendFreshdeskData(
+{
+    url_path,
+    method,
+    data_load
 }) 
 {
     // Get the function name for logging
     const fn = sendFreshdeskData.name;
 
     // Read environment variables
-    var api_key_orig = process.env.FRESHDESK_API_KEY;
-    var this_host = process.env.FRESHDESK_HOST;
+    const api_key_orig = process.env.FRESHDESK_API_KEY;
+    const this_host = process.env.FRESHDESK_HOST;
 
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
     const api_key_base64 = Buffer.from(`${api_key_orig}:X`).toString("base64");
@@ -128,10 +127,10 @@ Inputs: path - API endpoint path,
         data_load - The data to be posted
 Output: Parsed JSON response from the API
 */
-async function postFreshdeskData
-({
-  url_path,
-  data_load
+async function postFreshdeskData(
+{
+    url_path,
+    data_load
 }) 
 {
     // Get the function name for logging
@@ -149,10 +148,10 @@ Inputs: url_path - API endpoint path,
         data_load - The data to be put
 Output: Parsed JSON response from the API
 */
-async function putFreshdeskData
-({
-  url_path,
-  data_load
+async function putFreshdeskData(
+{
+    url_path,
+    data_load
 }) 
 {
     // Get the function name for logging

@@ -3,7 +3,7 @@ const mime = require("mime-types");
 const fs = require("fs/promises");
 const path = require("path");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData, postFyleData } = require("./fyle_common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -85,57 +85,58 @@ async function _getReceiptList(fyle_receipt)
     // Get the function name for logging
     const fn = _getReceiptList.name;
     
-    // Loop variables
-    var i = 0, j = 0;
-
     // Get a reference to the fyle_acc instance
-    var fyle_acc = fyle_receipt.fyle_acc;
+    const fyle_acc = fyle_receipt.fyle_acc;
 
     // If there were no expenses found in the fyle_acc instance, let's try to fetch the expenses for the last 1 month and then proceed to fetch the receipts
     if(fyle_acc.expenses.num_expenses == 0)
     {
         common.statusMessage(fn, "No expenses found in fyle_acc instance. Invoking getExpenses() for all expenses created in the last 1 month.");
-        var users = null; // all users
-        var states = null; // all states
-        var event = "created_at";
-        var after = common.getNMonthsAgo(new Date(), 1).getTime(); // 1 month ago
-        var before = formatInTimeZone(new Date(), "yyyy-MM-dd", "UTC");
+        const users = null; // all users
+        const states = null; // all states
+        const event = "created_at";
+        const after = common.getNMonthsAgo(new Date(), 1).getTime(); // 1 month ago
+        const before = formatInTimeZone(new Date(), "yyyy-MM-dd", "UTC");
         await fyle_acc.expenses.getExpenses(users, states, event, after, before); // Let's try to fetch the expenses here itself and then proceed to fetch the receipts
     }
 
+    // Always reset the receipt list and count so that there is no stale data from previous calls
+    fyle_acc.receipts.receipt_list = [];
+    fyle_acc.receipts.num_receipts = 0;
+
     // Loop through all expenses and get the receipts
-    for(i = 0; i < fyle_acc.expenses.num_expenses; i++)
+    for(let i = 0; i < fyle_acc.expenses.num_expenses; i++)
     {
-        var this_expense = fyle_acc.expenses.expense_list[i];
+        const this_expense = fyle_acc.expenses.expense_list[i];
 
         // Record receipt details for this expense
-        for(j = 0; j < this_expense.files.length; j++)
+        for(let j = 0; j < this_expense.files.length; j++)
         {
-            var type = this_expense.files[j].type;
+            const type = this_expense.files[j].type;
             if(type == "RECEIPT")
             {
-                var expense_id = this_expense.id;
-                var content_type = this_expense.files[j].content_type;
-                var receipt_id = this_expense.files[j].id;
-                var name = this_expense.files[j].name;
-                var user_id = this_expense.user_id;
-                var org_user_id = this_expense.employee_id;
+                const expense_id = this_expense.id;
+                const content_type = this_expense.files[j].content_type;
+                const receipt_id = this_expense.files[j].id;
+                const name = this_expense.files[j].name;
+                const user_id = this_expense.user_id;
+                const org_user_id = this_expense.employee_id;
 
                 //  Let's create an structure to capture the receipt information
-                var this_receipt = {};
-
-                // Add the file details as well
-                this_receipt.expense_id = expense_id;
-                this_receipt.id = receipt_id;
-                this_receipt.name = name;
-                this_receipt.type = type;
-                this_receipt.content_type = content_type;
-                this_receipt.user_id = user_id;
-                this_receipt.org_user_id = org_user_id;
-                this_receipt.download_url = ""; // We will populate this when we fetch the receipt links using the function _getReceiptLinks
-                this_receipt.link_issued_at = null; // We will populate this when we fetch the receipt links using the function _getReceiptLinks
-                this_receipt.link_expires_at = null; // We will populate this when we fetch the receipt links using the function _getReceiptLinks
-                this_receipt.blob = null;  // We will populate this when we fetch the receipt using the function _getReceipt
+                const this_receipt = 
+                {
+                    expense_id: expense_id,
+                    id: receipt_id,
+                    name: name,
+                    type: type,
+                    content_type: content_type,
+                    user_id: user_id,
+                    org_user_id: org_user_id,
+                    download_url: "", // We will populate this when we fetch the receipt links using the function _getReceiptLinks
+                    link_issued_at: null, // We will populate this when we fetch the receipt links using the function _getReceiptLinks
+                    link_expires_at: null, // We will populate this when we fetch the receipt links using the function _getReceiptLinks
+                    blob: null  // We will populate this when we fetch the receipt using the function _getReceipt
+                };
 
                 // Attach this to the receipt_details list
                 fyle_acc.receipts.receipt_list.push(this_receipt);
@@ -151,7 +152,8 @@ async function _getReceiptList(fyle_receipt)
     common.statusMessage(fn, "Finished retrieving receipt list for all expenses. Total receipts found : " , fyle_acc.receipts.num_receipts);
 
      // As a test, export the receipts to an Excel file in the downloads folder
-    await common.exportToExcelFile(fyle_acc.receipts.receipt_list, process.env.DOWNLOADS_FOLDER, "receipts.xlsx", "Receipts");
+    const downloads_folder = process.env.DOWNLOADS_FOLDER;
+    await common.exportToExcelFile(fyle_acc.receipts.receipt_list, downloads_folder, "receipts.xlsx", "Receipts");
 
     return 0;
 }
@@ -172,12 +174,11 @@ async function _getReceiptLinks(fyle_receipt)
     const fn = _getReceiptLinks.name;
 
     // Point back to the fyle_acc instance
-    var fyle_acc = fyle_receipt.fyle_acc;
+    const fyle_acc = fyle_receipt.fyle_acc;
 
     // Initialize loop variables and constants
-    var i = 0, j = 0;
-    var processed = 0;
-    const limit = 200;
+    let processed = 0;
+    const limit = Number(process.env.FYLE_MAX_RECEIPT_LINKS_PER_CALL);
 
     // Sanity check
     if(fyle_acc.receipts.num_receipts == 0)
@@ -187,35 +188,35 @@ async function _getReceiptLinks(fyle_receipt)
     }
 
     // Get the total count of receipts to be processed
-    var total_count = fyle_acc.receipts.receipt_list.length;
+    const total_count = fyle_acc.receipts.receipt_list.length;
 
     // Process 200 receipt links at a time
     do
     {
+        const num_receipts_this_time = processed + limit > total_count ? total_count - processed : limit;
+
         try
         {
-            var payload = 
+            const payload = 
             {
                 "data": []
-            };
-
-            var num_receipts_this_time = processed + limit > total_count ? total_count - processed : limit;
+            };            
 
             // Load all receipt data to the payload
-            for(i = processed; i < processed + num_receipts_this_time; i++)
+            for(let i = processed; i < processed + num_receipts_this_time; i++)
             {
-                var this_receipt = 
+                const this_receipt = 
                 {
                     "method": "GET",
-                    "path": "/platform/v1/admin/files/download",
+                    "path": process.env.FYLE_RECEIPT_LINKS_PATH,
                     "query_params": "id="+fyle_acc.receipts.receipt_list[i].id,
                     "org_user_id": fyle_acc.receipts.receipt_list[i].org_user_id
                 };
                 payload.data.push(this_receipt);
             }
 
-            const {headers,data} = await postFyleData
-            ({
+            const {headers,data} = await postFyleData(
+            {
                 url: fyle_acc.access_params.cluster_domain + "/auth/signed_url/bulk",
                 access_token: fyle_acc.access_params.access_token,
                 data_load: payload.data
@@ -223,16 +224,16 @@ async function _getReceiptLinks(fyle_receipt)
 
             
             // Load all transactions received in this response back to receipt_list
-            for(i = 0; i < data.data.length; i++)
+            for(let i = 0; i < data.data.length; i++)
             {
-                var signed_url = data.data[i].signed_url;
+                const signed_url = data.data[i].signed_url;
                 const [base_url, queryString] = signed_url.split('?');
                 const params = new URLSearchParams(queryString)
 
-                var id = params.has("id") ? params.get("id") : null;
+                const id = params.has("id") ? params.get("id") : null;
 
                 // Search through the receipt list and attach link information
-                for(j = processed; j < processed + num_receipts_this_time; j++)
+                for(let j = processed; j < processed + num_receipts_this_time; j++)
                 {
                     if(id == fyle_acc.receipts.receipt_list[j].id)
                     {
@@ -260,7 +261,8 @@ async function _getReceiptLinks(fyle_receipt)
     common.statusMessage(fn, "Finished retrieving links for all receipts. Total receipt links : " , total_count);
 
     // As a test, export the receipts to an Excel file in the downloads folder
-    await common.exportToExcelFile(fyle_acc.receipts.receipt_list, process.env.DOWNLOADS_FOLDER, "receipt links.xlsx", "Receipt Links");
+    const downloads_folder = process.env.DOWNLOADS_FOLDER;
+    await common.exportToExcelFile(fyle_acc.receipts.receipt_list, downloads_folder, "receipt links.xlsx", "Receipt Links");
 
     return 0;
 }
@@ -279,10 +281,9 @@ function _getReceiptObject(fyle_receipt, receipt_id)
     // Get the function name for logging
     const fn = _getReceiptObject.name;
 
-    var i = 0;
-    var fyle_acc = fyle_receipt.fyle_acc;
+    const fyle_acc = fyle_receipt.fyle_acc;
 
-    for(i = 0; i < fyle_acc.receipts.num_receipts; i++)
+    for(let i = 0; i < fyle_acc.receipts.num_receipts; i++)
     {
         if(fyle_acc.receipts.receipt_list[i].id == receipt_id)
         {
@@ -305,14 +306,11 @@ async function _getReceiptFile(fyle_receipt, receipt_id)
     // Get the function name for logging
     const fn = _getReceiptFile.name;
     
-    // Loop variables
-    var i = 0;
-
     // Point back to the fyle_acc instance
-    var fyle_acc = fyle_receipt.fyle_acc;
+    const fyle_acc = fyle_receipt.fyle_acc;
 
     // Get the receipt object for the given receipt_id
-    var receipt_obj = fyle_receipt.getReceiptObject(receipt_id);
+    const receipt_obj = fyle_receipt.getReceiptObject(receipt_id);
     if(receipt_obj == null)
     {
         common.statusMessage(fn, "Receipt not found for receipt_id: " , receipt_id);
@@ -321,17 +319,17 @@ async function _getReceiptFile(fyle_receipt, receipt_id)
 
     // Path to dowload the receipt file
     const url_path = "/platform/v1/admin/files/download";
-    var url = new URL(fyle_acc.access_params.cluster_domain + url_path);
+    const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
     // Build the 'include' parameter for the API call based on the input parameters
-    var include = [{"id": receipt_id}];
+    const include = [{"id": receipt_id}];
 
     try
     {
         // Fetch data for the receipt from Fyle using the API
-        const {headers, data} = await fetchFyleData
-        ({
+        const {headers, data} = await fetchFyleData(
+        {
             url: url.toString(),
             access_token: fyle_acc.access_params.access_token,
             offset: null,
@@ -353,7 +351,8 @@ async function _getReceiptFile(fyle_receipt, receipt_id)
             receipt_obj.blob = data;
 
             const base_path = process.cwd();
-            const output_dir = path.join(base_path, process.env.DOWNLOADS_FOLDER, "blobs");
+            const downloads_folder = process.env.DOWNLOADS_FOLDER;
+            const output_dir = path.join(base_path, downloads_folder, "blobs");
             await common.createFolder(output_dir);
 
             const file_ext = mime.extension(receipt_obj.content_type) || "bin";

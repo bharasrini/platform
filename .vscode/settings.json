@@ -6,17 +6,20 @@
         "**/dist/**": true,
         "**/build/**": true
     },
+
     "search.exclude":
     {
         "**/node_modules": true,
         "**/.pnpm": true,
         "**/dist": true
     },
+    
     "files.exclude":
     {
         "**/.pnpm": true
     },
-    {
-        "typescript.tsserver.maxTsServerMemory": 4096
-    }
+    
+    "js/ts.tsserver.maxMemory": 8192,
+    "js/ts.tsserver.automaticTypeAcquisition.enabled": false,
+    "js/ts.tsserver.experimental.enableProjectDiagnostics": false
 }

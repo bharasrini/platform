@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFreshdeskData, postFreshdeskData, putFreshdeskData } = require('./fd_common');
+const { fetchFreshdeskData, putFreshdeskData } = require('./fd_common');
 
 // Importing the ticket field mapping from fd_ticket_field_map.json
 const ticket_field_map = require("../data/fd_ticket_field_map.json");
@@ -23,13 +22,13 @@ async function checkAndSetDataLoad(ticket_id, field_name, field_value, data_load
     const fn = checkAndSetDataLoad.name;
 
     // URL path for the API endpoint to get the list of ticket fields
-    var url_path = "tickets/" + ticket_id.toString();
+    const url_path = process.env.FRESHDESK_TICKETS_URL_PATH + "/" + ticket_id.toString();
 
     // First get the ticket data from Freshdesk for the provided ticket_id to check which mandatory fields are blank and need to be set in the data_load {}
     try
     {
-        const {headers,data} = await fetchFreshdeskData
-        ({
+        const {headers,data} = await fetchFreshdeskData(
+        {
             url_path: url_path,
             current_page: null,
             per_page: null,
@@ -37,15 +36,12 @@ async function checkAndSetDataLoad(ticket_id, field_name, field_value, data_load
             include: null
         });
 
-        // Initialize loop counters
-        var i = 0;
-
         // Read through the ticket_field_map to check which mandatory fields are blank in the ticket data and set them in the data_load {} so that we can successfully update the field using setTicketField() routine
-        for(i = 0; i < ticket_field_map.length; i++)
+        for(let i = 0; i < ticket_field_map.length; i++)
         {
-            var this_hierarchy = (ticket_field_map[i].hierarchy).toString().trim();
-            var this_field_name = ticket_field_map[i].fd_field;
-            var this_field_val = ticket_field_map[i].default_value;
+            const this_hierarchy = (ticket_field_map[i].hierarchy).toString().trim();
+            const this_field_name = ticket_field_map[i].fd_field;
+            let this_field_val = ticket_field_map[i].default_value;
 
             // Set the appropriate fd field for the field_name being passed in
             if(this_field_name == field_name)
@@ -71,15 +67,15 @@ async function checkAndSetDataLoad(ticket_id, field_name, field_value, data_load
             }
 
             // Check if all other mandatory fields have been also set
-            var this_settable = ticket_field_map[i].settable;
-            var this_mandatory = ticket_field_map[i].mandatory;
+            const this_settable = ticket_field_map[i].settable;
+            const this_mandatory = ticket_field_map[i].mandatory;
 
             // If the field is settable and mandatory, check if we have a blank val in the ticket data and set it to the default value
             if((this_settable == "yes") && (this_mandatory == "yes"))
             {
                 if(this_hierarchy == "")
                 {
-                    var field_val_from_fd = data[this_field_name] ? (data[this_field_name]).toString().trim() : "";
+                    const field_val_from_fd = data[this_field_name] ? (data[this_field_name]).toString().trim() : "";
                     if(field_val_from_fd == "")
                     {
                         data_load[this_field_name] = this_field_val;
@@ -87,7 +83,7 @@ async function checkAndSetDataLoad(ticket_id, field_name, field_value, data_load
                 }
                 else
                 {
-                    var field_val_from_fd = data[this_hierarchy] && data[this_hierarchy][this_field_name] ? (data[this_hierarchy][this_field_name]).toString().trim() : "";
+                    const field_val_from_fd = data[this_hierarchy] && data[this_hierarchy][this_field_name] ? (data[this_hierarchy][this_field_name]).toString().trim() : "";
                     if(field_val_from_fd == "")
                     {
                         if(!data_load[this_hierarchy])
@@ -103,7 +99,7 @@ async function checkAndSetDataLoad(ticket_id, field_name, field_value, data_load
         }
 
         // set a sleep here for 100 ms so that we don't exceed the throttle
-        common.sleep(100);
+        await common.sleep(100);
 
     }
     catch(e)
@@ -129,18 +125,18 @@ function verifyValueSet(data, field_name, field_value)
     // Get the function name for logging
     const fn = verifyValueSet.name;
 
-    var i = 0;
-    var ret = false;
+    let ret = false;
 
-    for(i = 0; i < ticket_field_map.length; i++)
+    for(let i = 0; i < ticket_field_map.length; i++)
     {
-        var this_hierarchy = (ticket_field_map[i].hierarchy).toString().trim();
-        var this_field_name = ticket_field_map[i].fd_field;
-        var this_field_val;
+        const this_hierarchy = (ticket_field_map[i].hierarchy).toString().trim();
+        const this_field_name = ticket_field_map[i].fd_field;    
 
         // Set the appropriate fd field for the field_name being passed in
         if(this_field_name == field_name)
         {
+            let this_field_val;
+
             // Check the appropriate field in the data {}
             if(this_hierarchy == "")
             {
@@ -176,10 +172,10 @@ async function setTicketField(ticket_id, field_name, field_value, ret)
     const fn = setTicketField.name;
 
     // URL path for the API endpoint to set the ticket fields
-    var url_path = "tickets/" + ticket_id.toString();
+    const url_path = process.env.FRESHDESK_TICKETS_URL_PATH + "/" + ticket_id.toString();
 
     // There are some mandatory fields that need to be set in Freshdesk without which the provided field setting will not go through. We'll need to check this
-    var data_load = {};
+    const data_load = {};
     if(await checkAndSetDataLoad(ticket_id, field_name, field_value, data_load) < 0)
     {
         common.statusMessage(fn, "Failed to set data load for field_name: " , field_name , " value: " , field_value , " for ticket ID: " , ticket_id , ".");
@@ -189,8 +185,8 @@ async function setTicketField(ticket_id, field_name, field_value, ret)
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path,
             data_load
         });

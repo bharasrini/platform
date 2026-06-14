@@ -1,0 +1,14 @@
+{
+    "name": "update_accounts_on_freshdesk",
+    "private": true,
+    "type": "commonjs",
+    "dependencies": 
+    {
+        "@fyle-ops/common": "workspace:*",
+        "@fyle-ops/freshsuccess": "workspace:*",
+        "@fyle-ops/billing": "workspace:*",
+        "@fyle-ops/account_mapping": "workspace:*",
+        "@fyle-ops/freshdesk": "workspace:*"
+    }
+}
+

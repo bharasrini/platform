@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData } = require('./fd_common');
 
@@ -82,20 +81,20 @@ async function _getAgents(agent)
     const fn = _getAgents.name;
 
     // URL path for fetching agents
-    const url_path = "agents";
+    const url_path = process.env.FRESHDESK_AGENT_URL_PATH;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_AGENTS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_AGENTS_PER_PAGE);
+    let link = "";
 
     do
     {
         // Fetch data for the current page
         try
         {
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -107,13 +106,10 @@ async function _getAgents(agent)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0;  
-
             // Load all accounts received in this response to the account_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var agent_info = 
+                const agent_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "name": data[i]["contact"] && data[i]["contact"]["name"]? data[i]["contact"]["name"] : "",
@@ -137,7 +133,7 @@ async function _getAgents(agent)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {
@@ -165,8 +161,7 @@ function _getAgentName(agent, agent_id)
     // Get the function name for logging
     const fn = _getAgentName.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
@@ -176,7 +171,7 @@ function _getAgentName(agent, agent_id)
     }
 
     // Loop through the agent list to find the matching Freshdesk agent id and return the name
-    for(i = 0; i < agent.num_agents; i++)
+    for(let i = 0; i < agent.num_agents; i++)
     {
         if(agent.agent_list[i].id == agent_id)
         {
@@ -201,8 +196,7 @@ function _getAgentEmail(agent, agent_id)
     // Get the function name for logging
     const fn = _getAgentEmail.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
@@ -212,7 +206,7 @@ function _getAgentEmail(agent, agent_id)
     }
 
     // Loop through the agent list to find the matching Freshdesk agent id and return the email
-    for(i = 0; i < agent.num_agents; i++)
+    for(let i = 0; i < agent.num_agents; i++)
     {
         if(agent.agent_list[i].id == agent_id)
         {
@@ -237,8 +231,7 @@ function _getAgentId(agent, agent_email)
     // Get the function name for logging
     const fn = _getAgentId.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
@@ -248,7 +241,7 @@ function _getAgentId(agent, agent_email)
     }
 
     // Loop through the agent list to find the matching Freshdesk agent email and return the id
-    for(i = 0; i < agent.num_agents; i++)
+    for(let i = 0; i < agent.num_agents; i++)
     {
         if(agent.agent_list[i].email == agent_email)
         {

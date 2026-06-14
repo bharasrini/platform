@@ -19,10 +19,7 @@ function returnFDCSMNameForEmail(email)
     // Get the function name for logging
     const fn = returnFDCSMNameForEmail.name;
 
-    // Initialize the index variable
-    var i = 0;
-
-    for(i = 0; i < CSM_MAP.length; i++)
+    for(let i = 0; i < CSM_MAP.length; i++)
     {
         if(email == CSM_MAP[i].csm_email_from_fs)
         {
@@ -45,10 +42,7 @@ function returnEmailForFDCSMName(csm_name)
     // Get the function name for logging
     const fn = returnEmailForFDCSMName.name;
 
-    // Initialize the index variable
-    var i = 0;
-
-    for(i = 0; i < CSM_MAP.length; i++)
+    for(let i = 0; i < CSM_MAP.length; i++)
     {
         if(csm_name == CSM_MAP[i].csm_name_from_fd)
         {

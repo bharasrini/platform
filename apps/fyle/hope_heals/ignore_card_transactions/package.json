@@ -1,0 +1,19 @@
+{
+    "name": "ignore_card_transactions",
+    "private": true,
+    "type": "commonjs",
+    "dependencies": 
+    {
+        "@fyle-ops/common": "workspace:*",
+        "@fyle-ops/freshsuccess": "workspace:*",
+        "@fyle-ops/billing": "workspace:*",
+        "@fyle-ops/account_mapping": "workspace:*",
+        "@fyle-ops/freshdesk": "workspace:*",
+        "@fyle-ops/sales_checklist": "workspace:*",
+        "@fyle-ops/account_folders": "workspace:*",
+        "@fyle-ops/csm_mapping": "workspace:*",
+        "@fyle-ops/fyle_api": "workspace:*",
+        "@fyle-ops/fyle_ignore_card_transactions": "workspace:*"
+    }
+}
+

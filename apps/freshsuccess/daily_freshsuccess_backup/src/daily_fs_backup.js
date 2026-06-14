@@ -27,8 +27,7 @@ async function fs_write_common_data(account, file_name)
         "customer_requests"
     ];
     
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -58,8 +57,7 @@ async function fs_write_implementation_data(account, file_name)
         "milestones", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -88,8 +86,7 @@ async function fs_write_billing_data(account, file_name)
         "billing", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -135,8 +132,7 @@ async function fs_write_account_setup_data(account, file_name)
         "account_setup.branding", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -170,8 +166,7 @@ async function fs_write_engagement_data(account, file_name)
         "engagement_advocacy.referrals", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -193,14 +188,11 @@ function account_filter_churn(account_list)
     // Get the function name for logging purposes
     const fn = account_filter_churn.name;
 
-    // Initialize variables
-    var i = 0;
-
     // Array to hold the final set of filtered accounts
     const filtered_accounts = [];
 
     // Loop through the accounts and filter out the ones which are in "Inactive" stage in common_params
-    for(i = 0; i < account_list.length; i++)
+    for(let i = 0; i < account_list.length; i++)
     {
         if(account_list[i]["common_params"] && account_list[i]["common_params"]["is_churned"] && account_list[i]["common_params"]["is_churned"] === true)
         {
@@ -230,8 +222,7 @@ async function fs_write_churn_data(account, file_name)
         "churn_info", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -254,14 +245,11 @@ function account_filter_future_churn(account_list)
     // Get the function name for logging purposes
     const fn = account_filter_future_churn.name;
 
-    // Initialize variables
-    var i = 0;
-
     // Array to hold the final set of filtered accounts
     const filtered_accounts = [];
 
     // Loop through the accounts and filter out the ones which are in "Inactive" stage in common_params
-    for(i = 0; i < account_list.length; i++)
+    for(let i = 0; i < account_list.length; i++)
     {
         if(account_list[i]["common_params"] && account_list[i]["common_params"]["current_stage"] && account_list[i]["common_params"]["current_stage"] === "Inactive")
         {
@@ -290,8 +278,7 @@ async function fs_write_future_churn_data(account, file_name)
         "churn_info", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -320,8 +307,7 @@ async function fs_write_risk_management_data(account, file_name)
         "risk_management", 
     ];
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         account.account_list, 
         process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -346,7 +332,7 @@ async function takeFreshsuccessBackup()
     common.statusMessage(fn, " ****************** Freshsuccess Backup Start ****************** ");
 
     // Create FS Account instance
-    var account = new fs_account();
+    const account = new fs_account();
 
     // Get list of all accounts
     await account.getAccounts();
@@ -365,8 +351,8 @@ async function takeFreshsuccessBackup()
     common.statusMessage(fn, "Successfully retrieved Verified users metrics, going to get Account Contacts");
 
      // Create a new file every day in the My Drive -> Tooling -> Freshsuccess -> Data Backup folder
-    var today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd");
-    var file_name = process.env.FRESHSUCCESS_DATA_BACKUP_FILE_PREFIX + today_date;
+    const today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd");
+    const file_name = process.env.FRESHSUCCESS_DATA_BACKUP_FILE_PREFIX + today_date;
     
     // Write out the common data to the sheet
     await fs_write_common_data(account, file_name);
@@ -400,7 +386,9 @@ async function takeFreshsuccessBackup()
     common.statusMessage(fn, "Successfully wrote 'Risk Management' details, going to cleanup and exit");
 
     // Delete "Sheet1" that was created by default in the backup sheet
-    common.deleteSheetInGoogleSpreadsheet(process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID, file_name, process.env.FRESHSUCCESS_DATA_BACKUP_DEFAULT_SHEET_TO_DELETE);
+    const folder_id = process.env.FRESHSUCCESS_DATA_BACKUP_FOLDER_ID;
+    const sheet_to_delete = process.env.FRESHSUCCESS_DATA_BACKUP_DEFAULT_SHEET_TO_DELETE;
+    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
     common.statusMessage(fn, " ****************** Freshsuccess Backup End ****************** ");
 
@@ -412,3 +400,4 @@ module.exports =
 {
     takeFreshsuccessBackup
 }
+

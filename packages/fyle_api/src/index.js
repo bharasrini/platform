@@ -12,7 +12,7 @@ const { fyle_receipt } = require("./fyle_receipt");
 const { fyle_card_transaction } = require("./fyle_card_transaction");
 const { fyle_feature_config } = require("./fyle_feature_config");
 const { fyle_account } = require("./fyle_account");
-const { associateProjectWithCategories, associateProjectWithCategoriesInBulk } = require("./fyle_project_category_mapping");
+const { associateProjectWithCategories, associateProjectsWithCategoriesInBulk } = require("./fyle_project_category_mapping");
 
 module.exports = 
 {
@@ -28,6 +28,5 @@ module.exports =
     fyle_card_transaction,
     fyle_feature_config,
     fyle_account,
-    associateProjectWithCategories, associateProjectWithCategoriesInBulk
-
+    associateProjectWithCategories, associateProjectsWithCategoriesInBulk
 };

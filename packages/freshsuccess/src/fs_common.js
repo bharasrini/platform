@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,8 +14,8 @@ Inputs: url_path - API endpoint path,
         include - Additional related data to include
 Output: Parsed JSON response from the API
 */
-async function fetchFreshsuccessData
-({
+async function fetchFreshsuccessData(
+{
     url_path,
     current_page,
     include_inactive,
@@ -30,8 +29,8 @@ async function fetchFreshsuccessData
     const fn = fetchFreshsuccessData.name;
 
     // Read environment variables
-    var api_key_orig = process.env.FRESHSUCCESS_API_KEY;
-    var this_host = process.env.FRESHSUCCESS_HOST;
+    const api_key_orig = process.env.FRESHSUCCESS_API_KEY;
+    const this_host = process.env.FRESHSUCCESS_HOST;
 
     // Construct the URL
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
@@ -64,6 +63,7 @@ async function fetchFreshsuccessData
             const body = await res.text();
             throw new Error(`Freshsuccess ${res.status}: ${body}`);
         }
+
         const json = await res.json();
         return {headers: res.headers, data: json}; // parsed JSON body
     });
@@ -79,8 +79,8 @@ Inputs: url_path - API endpoint path,
         data_load - Data to be sent in the request body
 Output: Parsed JSON response from the API
 */
-async function sendFreshsuccessData
-({
+async function sendFreshsuccessData(
+{
     url_path,
     method,
     data_load
@@ -90,8 +90,8 @@ async function sendFreshsuccessData
     const fn = sendFreshsuccessData.name;
     
     // Read environment variables
-    var api_key_orig = process.env.FRESHSUCCESS_API_KEY;
-    var this_host = process.env.FRESHSUCCESS_HOST;
+    const api_key_orig = process.env.FRESHSUCCESS_API_KEY;
+    const this_host = process.env.FRESHSUCCESS_HOST;
 
     // Construct the URL
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
@@ -130,16 +130,16 @@ async function sendFreshsuccessData
         
         // Check for errors in the response body
         const data = await res.json();
-        var req_status = (data.status_is_ok != true)? "status_not_ok":"status_is_ok";
+        const req_status = (data.status_is_ok != true)? "status_not_ok":"status_is_ok";
         
         if(data.status_is_ok != true)
         {
             if(data.failed_results)
             {
-                var status_detail = "";
-                var err_count = data.failed_results.length;
+                let status_detail = "";
+                const err_count = data.failed_results.length;
 
-                for(var i = 0; i < err_count; i++)
+                for(let i = 0; i < err_count; i++)
                 {
                     status_detail += "[" + i + "]. Account ID: " + data.failed_results[i].account_id + " message = " + data.failed_results[i].message;
                     if(i < (err_count - 1)) status_detail += "\n";
@@ -165,8 +165,8 @@ Inputs: url_path - API endpoint path,
         data_load - Data to be sent in the request body
 Output: Parsed JSON response from the API
 */
-async function postFreshsuccessData
-({
+async function postFreshsuccessData(
+{
     url_path,
     data_load
 })
@@ -174,8 +174,8 @@ async function postFreshsuccessData
     // Get the function name for logging purposes
     const fn = postFreshsuccessData.name;
 
-    return await sendFreshsuccessData
-    ({
+    return await sendFreshsuccessData(
+    {
         url_path: url_path,
         method: "POST",
         data_load: data_load
@@ -191,8 +191,8 @@ Inputs: url_path - API endpoint path,
         data_load - Data to be sent in the request body
 Output: Parsed JSON response from the API
 */
-async function putFreshsuccessData
-({
+async function putFreshsuccessData(
+{
     url_path,
     data_load
 })
@@ -200,8 +200,8 @@ async function putFreshsuccessData
     // Get the function name for logging purposes
     const fn = putFreshsuccessData.name;
     
-    return await sendFreshsuccessData
-    ({
+    return await sendFreshsuccessData(
+    {
         url_path: url_path,
         method: "PUT",
         data_load: data_load
@@ -216,16 +216,16 @@ Inputs: url_path - API endpoint path,
         data_load - Data to be sent in the request body
 Output: Parsed JSON response from the API
 */
-async function deleteFreshsuccessData
-({
+async function deleteFreshsuccessData(
+{
     url_path,
 })
 {
     // Get the function name for logging purposes
     const fn = deleteFreshsuccessData.name;
 
-    return await sendFreshsuccessData
-    ({
+    return await sendFreshsuccessData(
+    {
         url_path: url_path,
         method: "DELETE",
         data_load: null

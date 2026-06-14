@@ -1,0 +1,81 @@
+[
+    {
+        "org_code": "ORG_1",
+        "categories":
+        [
+            "PROJECT - EQUIPMENT RENTAL & EXPENSE",
+            "PROJECT - FUEL & LUBE EXPENSE",
+            "PROJECT - PROFESSIONAL SERVICES",
+            "PROJECT - MEALS & GROCERIES - JOB RELATED",
+            "PROJECT - MEDICAL",
+            "PROJECT - PORT EXPENSES",
+            "PROJECT - SHIP STORES",
+            "PROJECT - TRAVEL & LODGING COSTS",
+            "PROJECT - FREIGHT",
+            "PROJECT - CERTIFICATIONS",
+            "PROJECT - COMMUNICATIONS",
+            "PROJECT - LICENSES & INSPECTIONS",
+            "PROJECT - MATERIALS & SUPPLIES",
+            "PROJECT - REPAIRS & MAINTENANCE"
+        ]
+    },
+    {
+        "org_code": "ORG_2",
+        "categories":
+        [
+            "PROJECT - EQUIPMENT RENTAL & EXPENSE",
+            "PROJECT - FUEL & LUBE EXPENSE",
+            "PROJECT - PROFESSIONAL SERVICES",
+            "PROJECT - MEALS & GROCERIES - JOB RELATED",
+            "PROJECT - MEDICAL",
+            "PROJECT - PORT EXPENSES",
+            "PROJECT - SHIP STORES",
+            "PROJECT - TRAVEL & LODGING COSTS",
+            "PROJECT - FREIGHT",
+            "PROJECT - CERTIFICATIONS",
+            "PROJECT - COMMUNICATIONS",
+            "PROJECT - LICENSES & INSPECTIONS",
+            "PROJECT - MATERIALS & SUPPLIES",
+            "PROJECT - REPAIRS & MAINTENANCE"
+        ]
+    },
+    {
+        "org_code": "ORG_3",
+        "categories":
+        [
+            "PROJECT - EQUIPMENT RENTAL & EXPENSE",	
+            "PROJECT - FUEL & LUBE EXPENSE",	
+            "PROJECT - PROFESSIONAL SERVICES",	
+            "PROJECT - MEALS & GROCERIES - JOB RELATED",	
+            "PROJECT - MEDICAL",	
+            "PROJECT - PORT EXPENSES",	
+            "PROJECT - SHIP STORES",	
+            "PROJECT - TRAVEL & LODGING COSTS",	
+            "PROJECT - FREIGHT",	
+            "PROJECT - CERTIFICATIONS",	
+            "PROJECT - LICENSES & INSPECTIONS",	
+            "PROJECT - MATERIALS & SUPPLIES",	
+            "PROJECT - REPAIRS & MAINTENANCE"
+        ]
+    },
+    {
+        "org_code": "ORG_4",
+        "categories":
+        [
+            "PROJECT - EQUIPMENT RENTAL & EXPENSE",
+            "PROJECT - FUEL & LUBE EXPENSE",
+            "PROJECT - PROFESSIONAL SERVICES",
+            "PROJECT - MEALS & GROCERIES - JOB RELATED",
+            "PROJECT - MEDICAL",
+            "PROJECT - PORT EXPENSES",
+            "PROJECT - SHIP STORES",
+            "PROJECT - TRAVEL & LODGING COSTS",
+            "PROJECT - FREIGHT",
+            "PROJECT - CERTIFICATIONS",
+            "PROJECT - COMMUNICATIONS",
+            "PROJECT - LICENSES & INSPECTIONS",
+            "PROJECT - MATERIALS & SUPPLIES",
+            "PROJECT - REPAIRS & MAINTENANCE"
+        ]
+    }
+]

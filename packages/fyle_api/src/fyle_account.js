@@ -1,6 +1,4 @@
-const common = require("@fyle-ops/common");
 
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
 const { fyle_auth } = require("./fyle_auth");
 const { fyle_category } = require("./fyle_category");
 const { fyle_feature_config } = require("./fyle_feature_config");
@@ -24,7 +22,7 @@ class fyle_account
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Auth instance
-    auth;
+    auth;    
     // Structure to store the access parameters
     access_params =
     {

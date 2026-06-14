@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData, postFyleData } = require("./fyle_common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -25,9 +24,9 @@ class fyle_project
       _initFyleProject(this, fyle_acc);
     }
 
-    async getProjects()
+    async getProjects(event, after, before)
     {
-        return await _getProjects(this);
+        return await _getProjects(this, event, after, before);
     }
 
     async addProjects(projects_list)
@@ -66,53 +65,103 @@ function _initFyleProject(fyle_project, fyle_acc)
 Function: _getProjects
 Purpose: Gets the list of projects in the fyle org and stores it in the fyle_account.projects structure. 
 Pre-requisite: getAccessToken() and getClusterEndpoint() to be invoked prior
-Inputs: fyle_account instance
+Inputs: fyle_account instance, event - event timestamp to filter projects for, after - timestamp to fetch projects after, before - timestamp to fetch projects before
 Output: 0 on success, -1 on failure
 */
-async function _getProjects(fyle_project)
+async function _getProjects(fyle_project, event, after, before)
 {
     // Get the function name for logging
     const fn = _getProjects.name;
     
     // Point to the fyle_account instance
-    var fyle_acc = fyle_project.fyle_acc;
+    const fyle_acc = fyle_project.fyle_acc;
 
     // API endpoint for fetching projects
-    const url_path = "/platform/v1/admin/projects";
-    var url = new URL(fyle_acc.access_params.cluster_domain + url_path);
+    const url_path = process.env.FYLE_PROJECTS_PATH || "/platform/v1/admin/projects";
+    const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
     // Pagination parameters
-    var offset = process.env.FYLE_API_START_OFFSET;
-    var limit = process.env.FYLE_API_MAX_ITEMS;
-    var total_count = 0;
-    var page = 1;
+    let offset = Number(process.env.FYLE_API_START_OFFSET);
+    let limit = Number(process.env.FYLE_API_MAX_ITEMS);
+    let total_count = 0;
+    let page = 1;
+
+    // Build the 'include' parameter for the API call based on the input parameters
+    const include = [];
+
+    // The API supports filtering expenses based on various events like created_at, updated_at, spent_at etc. 
+    // The event to filter on can be passed in the 'event' parameter and the corresponding timestamp can be passed in the 'after' and 'before' parameters. 
+    // We need to convert it to the format expected by the API, which is event=gte/lte.timestamp
+    event = (event ?? "").toString().trim();
+    if(event)
+    {
+        // Make sure that we are able to find the event passed in
+        const events = 
+        [
+            "created_at",
+            "updated_at"
+        ];
+
+        let found_event = false;
+        for(let i = 0; i < events.length; i++)
+        {
+            if(events[i] == event)
+            {
+                found_event = true;
+                break;
+            }
+        }
+        if(found_event == false)
+        {
+            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            event = "created_at";
+        }
+
+        // If the event is valid, then we can add the 'after' and 'before' parameters to the API call
+        after = (after   ?? "").toString().trim();
+        if(after)
+        {
+            const include_after = {[event]: "gte." + after};
+            include.push(include_after);
+        }
+
+        before = (before   ?? "").toString().trim();
+        if(before)
+        {
+            const include_before = {[event]: "lte." + before};
+            include.push(include_before);
+        }
+    }
+
+    // Always reset the project list and count so that there is no stale data from previous calls
+    fyle_acc.projects.project_list = [];
+    fyle_acc.projects.num_projects = 0;
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFyleData
-            ({
+            const {headers,data} = await fetchFyleData(
+            {
                 url: url.toString(),
                 access_token: fyle_acc.access_params.access_token,
                 offset: offset,
                 limit: limit,
-                include: null
+                include: include
             });
 
             // Save the overall number of projects we need to read in
             total_count = data.count;
 
             // Number of projects read in from this response
-            var this_count = data.data.length;
+            const this_count = data.data.length;
 
             // Load all projects received in this response to fyle_account.projects {}
-            var i = 0;
-            for(i = 0; i < data.data.length; i++)
+            for(let i = 0; i < data.data.length; i++)
             {
-                var this_project = data.data[i];
+                const this_project = data.data[i];
                 fyle_acc.projects.project_list.push(this_project);
                 fyle_acc.projects.num_projects++;
             }
@@ -154,26 +203,23 @@ async function _addProjects(fyle_project, projects_list)
     // Get the function name for logging
     const fn = _addProjects.name;
     
-    // Initialize counters
-    var i = 0;
-
     // Point to the fyle_account instance
-    var fyle_acc = fyle_project.fyle_acc;
+    const fyle_acc = fyle_project.fyle_acc;
 
     // API endpoint for adding projects
-    const url_path = "/platform/v1/admin/projects/bulk";
-    var url = new URL(fyle_acc.access_params.cluster_domain + url_path);
+    const url_path = process.env.FYLE_ADD_PROJECTS_BULK_PATH;
+    const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
     // Setup the data load
-    var data_load = 
+    const data_load = 
     {
         "data": []
     };
 
-    for(i = 0; i < projects_list.length; i++)
+    for(let i = 0; i < projects_list.length; i++)
     {
-        var this_project =
+        const this_project =
         {
               "name": projects_list[i].name,
               "is_enabled": projects_list[i].is_enabled,
@@ -187,8 +233,8 @@ async function _addProjects(fyle_project, projects_list)
     try
     {
         // Fetch data for the current page
-        const {headers,data} = await postFyleData
-        ({
+        const {headers,data} = await postFyleData(
+        {
             url: url.toString(),
             access_token: fyle_acc.access_params.access_token,
             data_load: data_load,
@@ -219,18 +265,15 @@ function _getProjectId(fyle_project, project_name)
     // Get the function name for logging
     const fn = _getProjectId.name;
 
-    // Loop counters
-    var i = 0;
-
     // Lets get the project ID for the given project name from fyle_acc.projects.project_list
-    var project_id = -1;
+    let project_id = -1;
 
     // Point to the fyle_account instance
-    var fyle_acc = fyle_project.fyle_acc;
+    const fyle_acc = fyle_project.fyle_acc;
 
-    for(i = 0; i < fyle_acc.projects.num_projects; i++)
+    for(let i = 0; i < fyle_acc.projects.num_projects; i++)
     {
-        var this_project_name = fyle_acc.projects.project_list[i].name;
+        const this_project_name = fyle_acc.projects.project_list[i].name;
         if(this_project_name === project_name)
         {
             project_id = fyle_acc.projects.project_list[i].id;

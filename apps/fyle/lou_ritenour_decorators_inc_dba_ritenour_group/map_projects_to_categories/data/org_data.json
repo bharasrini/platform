@@ -1,0 +1,27 @@
+[
+    {
+        "org_code": "ORG_1",
+        "categories":
+        [
+            "Shop Supplies-Tools",
+            "Materials",
+            "Freight Charges - COGS",
+            "Use Tax",
+            "Utilities-Propane-Gas-Diesel",
+            "Repair and Maintenance-Shop",
+            "Licenses Bonds. Permits",
+            "Sales Tax",
+            "Travel - 100% deductible JC",
+            "Equipment Rental",
+            "Safety Expenses",
+            "Freight - Shop",
+            "Subcontractors",
+            "Engineering and Design",
+            "Medical Insur ER Contr Adm JC",
+            "Other Job Costs",
+            "Materials from Inventory",
+            "Travel Shop",
+            "Travel COGS"
+        ]
+    }
+]

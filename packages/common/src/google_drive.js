@@ -10,6 +10,66 @@ const google_drive_core = require("./google_drive_core_fns");
 
 
 /*
+Function: getGoogleDriveFolder
+Purpose: Retrieves the folder details for a given folder ID.
+Inputs: ID of the folder
+Output: Folder details on success, null otherwise
+*/
+async function getGoogleDriveFolder(folder_id)
+{
+    // Get the function name for logging purposes
+    const fn = getGoogleDriveFolder.name;
+
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    const res = await google_drive_core.GoogleDrive_getFolder(drive, folder_id);
+
+    if(!res)
+    {
+        statusMessage(fn, "Error fetching folder with ID " , folder_id);
+        return null;
+    }
+
+    return res;
+}
+
+/*
+Function: getFileId
+Purpose: Retrieves the file ID for a given file name in a specified folder.
+Inputs: ID of the folder, name of the file
+Output: ID of the file on success, blank otherwise
+*/
+async function getFileId(folder_id, file_name)
+{
+    // Get the function name for logging purposes
+    const fn = getFileId.name;
+
+    // return file id
+    let ret_id = "";
+    
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    const res = await google_drive_core.GoogleDrive_getFilesInFolder(drive, folder_id, file_name);
+
+    if(res && res.data.files.length > 0)
+    {
+        ret_id = res.data.files[0].id;
+    }
+    else
+    {
+        statusMessage(fn, "No file found with name: " , file_name , " in folder with ID: " , folder_id);
+    }
+
+    return ret_id;
+
+}
+
+
+/*
 Function: copyFileOnGoogleDrive
 Purpose: Copies the file to the destination folder. Note that this has to be a 'Shared Folder' since the service account needs to have access to it. 
 Inputs: URL of the file to be copied, ID of the folder to where it needs to be copied, file name to use for the copied file, whether to copy if the same file exists
@@ -24,10 +84,11 @@ async function copyFileOnGoogleDrive(source_file_url, dest_folder_id, file_name_
     const auth = createGoogleAuth();
     const drive = google.drive({ version: 'v3', auth });
 
-    var copied_file_url = "";
+    // Return URL of the copied file or blank if we failed to copy for some reason
+    let copied_file_url = "";
 
     // Get the file ID from the URL
-    var source_file_id = getIdFromUrl(source_file_url);
+    const source_file_id = getIdFromUrl(source_file_url);
     if(source_file_id == "")
     {
         statusMessage(fn, "Failed to extract ID from source file url: " , source_file_url);
@@ -168,8 +229,10 @@ async function checkAndCreateFolderOnGoogleDrive(parent_folder_id, child_folder_
 {
     // Get the function name for logging purposes
     const fn = checkAndCreateFolderOnGoogleDrive.name;
+
+    let return_folder_id = "";
     
-    // Get authentication and sheets instance
+    // Get authentication and drive instance
     const auth = createGoogleAuth();
     const drive = google.drive({ version: 'v3', auth });
 
@@ -178,7 +241,7 @@ async function checkAndCreateFolderOnGoogleDrive(parent_folder_id, child_folder_
     if(!parent_res)
     {
         statusMessage(fn, "Error fetching parent folder with ID " , parent_folder_id);
-        return "";
+        return return_folder_id;
     }
 
     // Check for existing child folder with the given name under the parent folder
@@ -190,21 +253,110 @@ async function checkAndCreateFolderOnGoogleDrive(parent_folder_id, child_folder_
         if(!created_res)
         {
             statusMessage(fn, "Error creating child folder " , child_folder_name , " under parent folder with ID " , parent_folder_id);
-            return "";
+            return return_folder_id;
         }
-        const created_folder_id = created_res.data.id;
-        statusMessage(fn, "Created folder " , child_folder_name , " with ID " , created_folder_id , " under parent folder with ID " , parent_folder_id);
-        return created_folder_id;
+        return_folder_id = created_res.data.id;
+        statusMessage(fn, "Created folder " , child_folder_name , " with ID " , return_folder_id , " under parent folder with ID " , parent_folder_id);
     }
     else
     {
         // We found the child folder, return the ID
         statusMessage(fn, "Found existing folder " , child_folder_name , " under " , parent_folder_id);
-        const child_folder_id = child_res.data.files[0].id;
-        return child_folder_id; 
+        return_folder_id = child_res.data.files[0].id;
     }
 
-    return "";
+    return return_folder_id;
+}
+
+
+/* 
+Function: getMimeType
+Purpose: Gets the mime type of a file on Google Drive
+Inputs: file ID
+Output: mime type on success, "" otherwise
+*/
+async function getMimeType(file_id)
+{
+    // Get the function name for logging purposes
+    const fn = getMimeType.name;
+    
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    try
+    {
+        const res = await drive.files.get(
+        {
+            fileId: file_id,
+            fields: 'mimeType',
+            supportsAllDrives: true
+        });
+
+        return res.data.mimeType;
+    }
+    catch(e)
+    {
+        statusMessage(fn, "Error while trying to get mime type of file: " , file_id, " with error: ", e);
+        return "";
+    }
+}
+
+
+/* 
+Function: getParentFolderId
+Purpose: Gets the parent folder ID of a file or folder on Google Drive
+Inputs: file ID
+Output: parent folder ID on success, "" otherwise
+*/
+async function getParentFolderId(file_id)
+{
+    // Get the function name for logging purposes
+    const fn = getParentFolderId.name;
+    
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    return await google_drive_core.GoogleDrive_getParentFolderId(drive, file_id);
+}
+
+
+/* 
+Function: getFileOrFolderName
+Purpose: Gets the name of a file or folder on Google Drive
+Inputs: file ID
+Output: name of the file or folder on success, "" otherwise
+*/
+async function getFileOrFolderName(file_id)
+{
+    // Get the function name for logging purposes
+    const fn = getFileOrFolderName.name;
+
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    return await google_drive_core.GoogleDrive_getFileOrFolderName(drive, file_id);
+}
+
+
+/* 
+Function: renameFileOrFolder
+Purpose: Renames a file or folder on Google Drive
+Inputs: file ID, new name
+Output: new name of the file or folder on success, "" otherwise
+*/
+async function renameFileOrFolder(file_id, new_name)
+{
+    // Get the function name for logging purposes
+    const fn = renameFileOrFolder.name;
+
+    // Get authentication and drive instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+
+    return await google_drive_core.GoogleDrive_renameFileOrFolder(drive, file_id, new_name);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -214,8 +366,14 @@ async function checkAndCreateFolderOnGoogleDrive(parent_folder_id, child_folder_
 
 module.exports =
 {
+    getGoogleDriveFolder,
+    getFileId,
     copyFileOnGoogleDrive,
     trashFileOnGoogleDrive,
     moveFolderOnGoogleDrive,
-    checkAndCreateFolderOnGoogleDrive
+    checkAndCreateFolderOnGoogleDrive,
+    getMimeType,
+    getParentFolderId,
+    getFileOrFolderName,
+    renameFileOrFolder
 };

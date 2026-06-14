@@ -1,4 +1,3 @@
-const { google } = require('googleapis');
 const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -15,38 +14,26 @@ async function readAccountMapDataFromFile(account_map)
 {
     // Get the function name for logging
     const fn = readAccountMapDataFromFile.name;
-    
+
+    // Account Mapping sheet located at: My Drive -> Tooling -> Account Mapping Sheet
+    // URL: https://docs.google.com/spreadsheets/d/18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8/edit?usp=sharing
+    //const sheet_id = "18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8"; 
+    const sheet_id = process.env.ACCOUNT_MAPPING_SHEET_ID;
+
+    // Sheet in Account Mapping file that has the account mapping information
+    //const sheet_name = "Account Mapping";
+    const sheet_name = process.env.ACCOUNT_MAPPING_SHEET_NAME;
+
     // Read the Account Mapping sheet
-    try
-    {        
-        // Authenticate with Google Sheets API
-        const auth = common.createGoogleAuth();
-        const sheets = google.sheets({ version: "v4", auth });
-
-        // Account Mapping sheet located at: My Drive -> Tooling -> Account Mapping Sheet
-        // URL: https://docs.google.com/spreadsheets/d/18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8/edit?usp=sharing
-        //const sheet_id = "18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8"; 
-        const sheet_id = process.env.ACCOUNT_MAPPING_SHEET_ID;
-
-        // Sheet in Account Mapping file that has the account mapping information
-        //const sheet_name = "Account Mapping";
-        const sheet_name = process.env.ACCOUNT_MAPPING_SHEET_NAME;
-
-        // Get all values from the sheet
-        const res = await sheets.spreadsheets.values.get
-        ({
-            spreadsheetId: sheet_id,
-            range: `${sheet_name}`,
-        });
-
-        // Store the data read from the sheet in account_map.data
-        account_map.data = res.data.values;
-    }
-    catch (e)
+    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    if(data == null)
     {
-        common.statusMessage(fn, "Error getting account mapping data: ", e.message);
+        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
         return -1;
     }
+
+    // Store the data read from the sheet in account_map.data
+    account_map.data = data;
 
     return 0;
 }
@@ -62,40 +49,26 @@ async function flushAccountMapDataToFile(account_map)
 {
     // Get the function name for logging
     const fn = flushAccountMapDataToFile.name;
-    
-    try
+
+    // Account Mapping sheet located at: My Drive -> Tooling -> Account Mapping Sheet
+    // URL: https://docs.google.com/spreadsheets/d/18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8/edit?usp=sharing
+    //const sheet_id = "18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8"; 
+    const sheet_id = process.env.ACCOUNT_MAPPING_SHEET_ID;
+
+    // Sheet in Account Mapping file that has the account mapping information
+    //const sheet_name = "Account Mapping";
+    const sheet_name = process.env.ACCOUNT_MAPPING_SHEET_NAME;
+
+    // Flush the data in account_map.data to the Account Mapping sheet
+    const ret = await common.flushDataToGoogleSheet(sheet_id, sheet_name, account_map.data);
+
+    if(ret < 0)
     {
-        // Authenticate with Google Sheets API
-        const auth = common.createGoogleAuth();
-        const sheets = google.sheets({ version: "v4", auth });
-
-        // Account Mapping sheet located at: My Drive -> Tooling -> Account Mapping Sheet
-        // URL: https://docs.google.com/spreadsheets/d/18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8/edit?usp=sharing
-        //const sheet_id = "18LzUzM0qVzQ6vQ8wz05ihmGBE0J704w5eWG5m8I8cI8"; 
-        const sheet_id = process.env.ACCOUNT_MAPPING_SHEET_ID;
-
-        // Sheet in Account Mapping file that has the account mapping information
-        //const sheet_name = "Account Mapping";
-        const sheet_name = process.env.ACCOUNT_MAPPING_SHEET_NAME;
-
-        await sheets.spreadsheets.values.update
-        ({
-            spreadsheetId: sheet_id,
-            range: `${sheet_name}`,   // just give entire sheet
-            valueInputOption: "USER_ENTERED",
-            requestBody: 
-            {
-                values: account_map.data
-            }
-        });
-    }
-    catch(e)
-    {
-        common.statusMessage(fn, "Error flushing account map data to the account mapping sheet: ", e.message);
+        common.statusMessage(fn, "Error flushing account map data to the account mapping sheet");
         return -1;
     }
 
-    return 0;
+    return 0;   
 }
 
 

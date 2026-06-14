@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
 const { fd_company } = require("./fd_company");
@@ -73,15 +72,15 @@ async function _getTickets(ticket, updated_since)
     const fn = _getTickets.name;
 
     // URL path for fetching tickets
-    const url_path = "tickets";
+    const url_path = process.env.FRESHDESK_TICKETS_URL_PATH;
 
     // Include parameter to fetch additional details about the ticket such as requester and stats
     const include = "requester,stats";
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_TICKETS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_TICKETS_PER_PAGE);
+    let link = "";
 
     // Get the list of all business hours
     const business_hours = new fd_business_hours();
@@ -108,8 +107,8 @@ async function _getTickets(ticket, updated_since)
         // Fetch data for the current page
         try
         {
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -121,11 +120,9 @@ async function _getTickets(ticket, updated_since)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0;
 
             // Read through the tickets
-            for(var i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
 
                 // Build the account info in the required format
@@ -150,7 +147,7 @@ async function _getTickets(ticket, updated_since)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
 
         }
         catch(e)

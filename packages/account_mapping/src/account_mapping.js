@@ -162,6 +162,11 @@ class account_mapping
     {
         return await _changeEnterpriseBillingOrgIDs(this, enterprise_billing_org_ids)
     }
+
+    async flushAccountMappingChangesToFile()
+    {
+        return await _flushAccountMappingChangesToFile(this);
+    }
 }
 
 
@@ -193,9 +198,6 @@ async function _getAccountMappingData(account_map)
     // Get the function name for logging
     const fn = _getAccountMappingData.name;
     
-    // Initialize variables
-    var i = 0, j = 0;
-
     // Check - if the function has already been invoked, just return success
     if(account_map.num_maps > 0)
     {
@@ -225,23 +227,36 @@ async function _getAccountMappingData(account_map)
     // If we are here, then we have been able to get required columns. Read through the account mapping sheet
     // Initialize variables to read the account mapping sheet
     const start_row = 1;
-    const start_col = 1;    
 
-    for(i = start_row; i < account_map.num_rows; i++)
+    for(let i = start_row; i < account_map.num_rows; i++)
     {
-        var account_mapping_info = 
+        // Read the account mapping information. Handle any blank cells to prevent undefined references
+        const org_id = common.checkandHandleBlank(account_map.data[i][account_map.cols["org_id"]]);
+        const customer = common.checkandHandleBlank(account_map.data[i][account_map.cols["customer"]]);
+        const org = common.checkandHandleBlank(account_map.data[i][account_map.cols["org"]]);
+        const hierarchy = common.checkandHandleBlank(account_map.data[i][account_map.cols["hierarchy"]]);
+        let parent_org_id = common.checkandHandleBlank(account_map.data[i][account_map.cols["parent_org_id"]]);
+        parent_org_id = parent_org_id != "" ? parent_org_id : org_id;
+        const country = common.checkandHandleBlank(account_map.data[i][account_map.cols["country"]]);
+        const region = common.checkandHandleBlank(account_map.data[i][account_map.cols["region"]]);
+        const currency = common.checkandHandleBlank(account_map.data[i][account_map.cols["currency"]]);
+        const ou_org_id = common.checkandHandleBlank(account_map.data[i][account_map.cols["ou_org_id"]]);
+        const au_model = common.checkandHandleBlank(account_map.data[i][account_map.cols["au_model"]]);
+        const enterprise_billing_org_id = common.checkandHandleBlank(account_map.data[i][account_map.cols["enterprise_billing_org_id"]]);
+
+        const account_mapping_info = 
         {
-            "org_id": account_map.data[i][account_map.cols["org_id"]],
-            "customer": account_map.data[i][account_map.cols["customer"]],
-            "org": account_map.data[i][account_map.cols["org"]],
-            "hierarchy": account_map.data[i][account_map.cols["hierarchy"]],
-            "parent_org_id": account_map.data[i][account_map.cols["parent_org_id"]] != "" ? account_map.data[i][account_map.cols["parent_org_id"]] : account_map.data[i][account_map.cols["org_id"]],
-            "country": account_map.data[i][account_map.cols["country"]],
-            "region": account_map.data[i][account_map.cols["region"]],
-            "currency": account_map.data[i][account_map.cols["currency"]],
-            "ou_org_id": account_map.data[i][account_map.cols["ou_org_id"]],
-            "au_model": account_map.data[i][account_map.cols["au_model"]],
-            "enterprise_billing_org_id": account_map.data[i][account_map.cols["enterprise_billing_org_id"]],
+            "org_id": org_id,
+            "customer": customer,
+            "org": org,
+            "hierarchy": hierarchy,
+            "parent_org_id": parent_org_id,
+            "country": country,
+            "region": region,
+            "currency": currency,
+            "ou_org_id": ou_org_id,
+            "au_model": au_model,
+            "enterprise_billing_org_id": enterprise_billing_org_id,
         };
 
         // Add this to the account map list
@@ -441,11 +456,8 @@ async function _appendNewAccounts(account_map, new_accounts)
     // Get the function name for logging
     const fn = _appendNewAccounts.name;
     
-    // Initialize variables
-    var i = 0, j = 0;
-
     // Number of accounts to be appended
-    var num_accounts_appended = 0;
+    let num_accounts_appended = 0;
 
     // Sanity check
     if(account_map.num_maps == 0)
@@ -455,29 +467,29 @@ async function _appendNewAccounts(account_map, new_accounts)
     }
 
     // Loop through the new accounts and add them to appended_account_data []
-    for(i = 0; i < new_accounts.length; i++)
+    for(let i = 0; i < new_accounts.length; i++)
     {
-        var org_id = new_accounts[i]["org_id"];
-        var this_org_name = "";
+        const org_id = new_accounts[i]["org_id"];
         
         // Check if the org exists, skip if it does
-        if((this_org_name = account_map.getOrgName(org_id)) != "")
+        const this_org_name = account_map.getOrgName(org_id);
+        if(this_org_name != "")
         {
             common.statusMessage(fn, "Org already exists, ID: " , org_id , ", org_name: "  , this_org_name , ", will not be appending");
             continue;
         }
 
         // User definition (from FS) needs to be converted to the Account Mapping format
-        var au_model = convertFSUserDefToAccountMap(new_accounts[i]["au_model"]);
+        const au_model = convertFSUserDefToAccountMap(new_accounts[i]["au_model"]);
         new_accounts[i]["au_model"] = au_model;
 
         // Array to store each row to be appended to the account mapping sheet. This will be constructed based on the columns in the account mapping sheet
-        var account_cols = [];
+        const account_cols = [];
 
         // Load all fields into the account_cols [] based on the column sequence in the account mapping sheet
-        for(j = 0; j < account_map.num_cols; j++)
+        for(let j = 0; j < account_map.num_cols; j++)
         {
-            for(var key in account_map.cols)
+            for(let key in account_map.cols)
             {
                 if(account_map.cols[key] == j)
                 {
@@ -539,11 +551,8 @@ async function _editExistingAccounts(account_map, existing_accounts)
     // Get the function name for logging
     const fn = _editExistingAccounts.name;
     
-    // Initialize variables
-    var i = 0, j = 0;
-
     // Number of accounts that we will be editing in the account mapping sheet
-    var num_accounts_to_edit = 0;
+    let num_accounts_to_edit = 0;
 
     // Sanity check
     if(account_map.num_maps == 0)
@@ -553,9 +562,9 @@ async function _editExistingAccounts(account_map, existing_accounts)
     }
 
     // Loop through the existing accounts and queue them in for editing in the account mapping sheet
-    for(i = 0; i < existing_accounts.length; i++)
+    for(let i = 0; i < existing_accounts.length; i++)
     {
-        var org_id = existing_accounts[i]["org_id"];
+        const org_id = existing_accounts[i]["org_id"];
 
         // Sanity check
         if(org_id.toString().trim() == "")
@@ -564,8 +573,8 @@ async function _editExistingAccounts(account_map, existing_accounts)
             continue;
         }
 
-        var offset = -1;
         // Check if the org exists. If it doesn't skip the account
+        let offset = -1;
         if((offset = account_map.getOrgOffset(org_id)) < 0)
         {
             common.statusMessage(fn, "Failed to locate org with ID: " , org_id);
@@ -573,16 +582,16 @@ async function _editExistingAccounts(account_map, existing_accounts)
         }
 
         // FS AU model may need to be converted to the Account Mapping AU model
-        var au_model = convertFSUserDefToAccountMap(existing_accounts[i]["au_model"]);
+        const au_model = convertFSUserDefToAccountMap(existing_accounts[i]["au_model"]);
         existing_accounts[i]["au_model"] = au_model;
 
         // Array to store the account mapping columns
-        var account_cols = [];
+        const account_cols = [];
 
         // Load all fields into the account_cols []
-        for(j = 0; j < account_map.num_cols; j++)
+        for(let j = 0; j < account_map.num_cols; j++)
         {
-            for(var key in account_map.cols)
+            for(let key in account_map.cols)
             {
                 if(account_map.cols[key] == j)
                 {
@@ -595,7 +604,7 @@ async function _editExistingAccounts(account_map, existing_accounts)
         account_map.data[offset+1] = account_cols;
 
         // Update account_map.map_list []
-        for(var key in existing_accounts[i])
+        for(let key in existing_accounts[i])
         {
             account_map.map_list[offset][key] = existing_accounts[i][key];
         }
@@ -637,7 +646,7 @@ async function changeAccountField(account_map, account_data, key_to_update)
     const fn = changeAccountField.name;
     
     // Update the account map with the new values for the specified key
-    var num_accounts_to_edit = updateAccountMap(account_map, account_data, key_to_update);
+    const num_accounts_to_edit = updateAccountMap(account_map, account_data, key_to_update);
 
     if(num_accounts_to_edit > 0)
     {
@@ -828,6 +837,21 @@ async function _changeEnterpriseBillingOrgIDs(account_map, enterprise_billing_or
     const fn = _changeEnterpriseBillingOrgIDs.name;
 
     return await changeAccountField(account_map, enterprise_billing_org_ids, "enterprise_billing_org_id");
+}
+
+
+/* 
+Function: _flushAccountMappingChangesToFile
+Purpose: Flushes the changes made to the Account Mapping sheet to the file. getAccountMappingData() needs to be called prior
+Inputs: account_map instance
+Output: 0 on success, -1 on failure
+*/
+async function _flushAccountMappingChangesToFile(account_map)
+{
+    // Get the function name for logging
+    const fn = _flushAccountMappingChangesToFile.name;
+
+    return await flushAccountMapDataToFile(account_map);
 }
 
 

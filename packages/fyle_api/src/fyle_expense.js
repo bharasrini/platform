@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData } = require("./fyle_common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -66,51 +65,48 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
     // Get the function name for logging
     const fn = _getExpenses.name;
     
-    // Loop variables
-    var i = 0;
-
     // Point back to the fyle_account instance
-    var fyle_acc = fyle_expense.fyle_acc;
+    const fyle_acc = fyle_expense.fyle_acc;
 
     // API endpoint to fetch expenses
-    const url_path = "/platform/v1/admin/expenses";
-    var url = new URL(fyle_acc.access_params.cluster_domain + url_path);
+    const url_path = process.env.FYLE_EXPENSES_PATH;
+    const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
     // Pagination variables
-    var offset = process.env.FYLE_API_START_OFFSET;
-    var limit = process.env.FYLE_API_MAX_ITEMS;
-    var total_count = 0;
-    var page = 1;
+    let offset = Number(process.env.FYLE_API_START_OFFSET);
+    let limit = Number(process.env.FYLE_API_MAX_ITEMS);
+    let total_count = 0;
+    let page = 1;
 
     // Build the 'include' parameter for the API call based on the input parameters
-    var include = [];
+    const include = [];
 
     // List of users can be passed in the 'users' parameter, we need to convert it to the format expected by the API, which is user_id=in.(user1,user2,...)
     if(users && users.length > 0)
     {
-        var users_string = "";
-        for(var i = 0; i < users.length; i++)
+        let users_string = "";
+        for(let i = 0; i < users.length; i++)
         {
             if(i > 0) users_string += ",";
             users_string += users[i];
         }
         users_string = "in.(" + users_string + ")";
-        var include_users = {"user_id": users_string};
+        const include_users = {"user_id": users_string};
         include.push(include_users);
     }
 
     // List of states can be passed in the 'state' parameter, we need to convert it to the format expected by the API, which is state=in.(state1,state2,...)
     if(state && state.length > 0)
     {
-        var state_string = "";
-        for(var i = 0; i < state.length; i++)
+        let state_string = "";
+        for(let i = 0; i < state.length; i++)
         {
             if(i > 0) state_string += ",";
             state_string += state[i];
         }
         state_string = "in.(" + state_string + ")";
-        var include_state = {"state": state_string};
+        const include_state = {"state": state_string};
         include.push(include_state);
     }
 
@@ -132,8 +128,8 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
             "last_settled_at",
         ];
 
-        var found_event = false;
-        for(i = 0; i < events.length; i++)
+        let found_event = false;
+        for(let i = 0; i < events.length; i++)
         {
             if(events[i] == event)
             {
@@ -151,17 +147,21 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
         after = (after   ?? "").toString().trim();
         if(after)
         {
-            var include_after = {[event]: "gte." + after};
+            const include_after = {[event]: "gte." + after};
             include.push(include_after);
         }
 
         before = (before   ?? "").toString().trim();
         if(before)
         {
-            var include_before = {[event]: "lte." + before};
+            const include_before = {[event]: "lte." + before};
             include.push(include_before);
         }
     }
+
+    // Always reset the expense list and count so that there is no stale data from previous calls
+    fyle_acc.expenses.expense_list = [];
+    fyle_acc.expenses.num_expenses = 0;
 
     // Loop to fetch all expenses with pagination. We will keep fetching expenses until we have fetched the total number of expenses in the org, which is given by the 'count' field in the API response
     do
@@ -169,8 +169,8 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFyleData
-            ({
+            const {headers,data} = await fetchFyleData(
+            {
                 url: url.toString(),
                 access_token: fyle_acc.access_params.access_token,
                 offset: offset,
@@ -182,13 +182,12 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
             total_count = data.count;
 
             // Number of expenses read in from this response
-            var this_count = data.data.length;
+            const this_count = data.data.length;
 
             // Load all expenses received in this response to fyle_account.expenses {}
-            var i = 0;
-            for(i = 0; i < data.data.length; i++)
+            for(let i = 0; i < data.data.length; i++)
             {
-                var this_expense = data.data[i];
+                const this_expense = data.data[i];
                 fyle_acc.expenses.expense_list.push(this_expense);
                 fyle_acc.expenses.num_expenses++;
             }
@@ -213,7 +212,8 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
     common.statusMessage(fn, "Successfully retrieved expenses. Total expenses retrieved = " , fyle_acc.expenses.num_expenses);
 
     // As a test, export the expenses to an Excel file in the downloads folder
-    await common.exportToExcelFile(fyle_acc.expenses.expense_list, process.env.DOWNLOADS_FOLDER, "expenses.xlsx", "Expenses");
+    const downloads_folder = process.env.DOWNLOADS_FOLDER;
+    await common.exportToExcelFile(fyle_acc.expenses.expense_list, downloads_folder, "expenses.xlsx", "Expenses");
 
     return 0;
     

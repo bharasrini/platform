@@ -26,11 +26,8 @@ function convertFSUserDefToAccountMap(user_def)
     // Get the function name for logging
     const fn = convertFSUserDefToAccountMap.name;
 
-    // Initialize counters
-    var i = 0;
-
     // If it's already in the Account Mapping format, return the same
-    for(i = 0; i < fs_to_account_map_tbl.length; i++)
+    for(let i = 0; i < fs_to_account_map_tbl.length; i++)
     {
         if(user_def.toString().trim() == fs_to_account_map_tbl[i].acct_map_def)
         {
@@ -40,7 +37,7 @@ function convertFSUserDefToAccountMap(user_def)
     }
 
     // Else check if its in the FS mapping format and return the equivalent Account Mapping definition
-    for(i = 0; i < fs_to_account_map_tbl.length; i++)
+    for(let i = 0; i < fs_to_account_map_tbl.length; i++)
     {
         if(user_def.toString().trim() == fs_to_account_map_tbl[i].fs_def)
         {
@@ -63,11 +60,9 @@ function convertAccountMapUserDefToFS(user_def)
     // Get the function name for logging
     const fn = convertAccountMapUserDefToFS.name;
 
-    // Initialize counters
-    var i = 0;
 
     // If it's already in the FS format, return the same
-    for(i = 0; i < fs_to_account_map_tbl.length; i++)
+    for(let i = 0; i < fs_to_account_map_tbl.length; i++)
     {
         if(user_def.toString().trim() == fs_to_account_map_tbl[i].fs_def)
         {
@@ -77,7 +72,7 @@ function convertAccountMapUserDefToFS(user_def)
     }
 
     // Else check if its in the Account Mapping mapping format and return the equivalent FS definition
-    for(i = 0; i < fs_to_account_map_tbl.length; i++)
+    for(let i = 0; i < fs_to_account_map_tbl.length; i++)
     {
         if(user_def.toString().trim() == fs_to_account_map_tbl[i].acct_map_def)
         {

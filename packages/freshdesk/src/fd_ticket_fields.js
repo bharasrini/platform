@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData } = require("./fd_common");
 
@@ -94,13 +93,13 @@ async function _getTicketFields(ticket_fields)
     const fn = _getTicketFields.name;
 
     // URL path for the API endpoint to get the list of ticket fields
-    var url_path = "admin/ticket_fields";
+    const url_path = process.env.FRESHDESK_TICKET_FIELDS_URL_PATH;
 
     // Fetch data for the current page
     try
     {
-        const {headers,data} = await fetchFreshdeskData
-        ({
+        const {headers,data} = await fetchFreshdeskData(
+        {
             url_path: url_path,
             current_page: null,
             per_page: null,
@@ -108,17 +107,14 @@ async function _getTicketFields(ticket_fields)
             include: null
         });
 
-        // Initialize loop counters 
-        var i = 0;  
-
-        for(i = 0; i < data.length; i++)
+        for(let i = 0; i < data.length; i++)
         {
             ticket_fields.ticket_fields_list.push(data[i]);
             ticket_fields.num_ticket_fields++;
         }
 
         // set a sleep here for 100 ms so that we don't exceed the throttle
-        common.sleep(100);
+        await common.sleep(100);
 
     }
     catch(e)
@@ -147,8 +143,6 @@ async function getTicketFieldData(ticket_fields, field_name, field_data)
     // Get the function name for logging
     const fn = getTicketFieldData.name;
     
-    var i = 0;
-
     // If we don't have the ticket fields list built, build it first
     if(ticket_fields.ticket_fields_list.length == 0)
     {
@@ -157,10 +151,10 @@ async function getTicketFieldData(ticket_fields, field_name, field_data)
     }
 
     // Locate the field that we are interested in
-    var field_id = -1;
+    let field_id = -1;
 
     // Check if we have a field that matches the field_name sent in
-    for(i = 0; i < ticket_fields.ticket_fields_list.length; i++)
+    for(let i = 0; i < ticket_fields.ticket_fields_list.length; i++)
     {
         if(ticket_fields.ticket_fields_list[i].name == field_name)
         {
@@ -177,17 +171,14 @@ async function getTicketFieldData(ticket_fields, field_name, field_data)
     }
 
     // Now read the data for the field using the field id and populate the field_data array
-    var url_path = "admin/ticket_fields/" + field_id;
-
-    // Initialize loop counters 
-    var i = 0;  
+    const url_path = process.env.FRESHDESK_TICKET_FIELDS_URL_PATH + "/" + field_id;
 
     // Initialize the page and record count
     // Fetch data for the current page
     try
     {
-        const {headers,data} = await fetchFreshdeskData
-        ({
+        const {headers,data} = await fetchFreshdeskData(
+        {
             url_path: url_path,
             current_page: null,
             per_page: null,
@@ -198,7 +189,7 @@ async function getTicketFieldData(ticket_fields, field_name, field_data)
         field_data.push(data);
         
         // set a sleep here for 100 ms so that we don't exceed the throttle
-        common.sleep(100);
+        await common.sleep(100);
     }
     catch(e)
     {
@@ -226,8 +217,8 @@ async function getTicketFieldOptions(ticket_fields, field_name, options)
     // Get the function name for logging
     const fn = getTicketFieldOptions.name;
     
-    var i = 0;
-    var field_data = [];
+    // Initialize an array to hold the field data for the field that we are interested in
+    const field_data = [];
 
     // Get the field data for the field that we are interested in
     if(await getTicketFieldData(ticket_fields, field_name, field_data) < 0)
@@ -237,14 +228,14 @@ async function getTicketFieldOptions(ticket_fields, field_name, options)
     }
 
     // Check that there are choices available in the field data
-    var this_field_data = field_data[0];
+    const this_field_data = field_data[0];
     if(!this_field_data.choices)
     {
         common.statusMessage(fn, "Failed to locate choices in field data for: " , field_name);
         return -1;
     }
 
-    for(i = 0; i < this_field_data.choices.length; i++)
+    for(let i = 0; i < this_field_data.choices.length; i++)
     {
         options.push(this_field_data.choices[i]);
     }
@@ -259,7 +250,7 @@ async function getTicketFieldOptions(ticket_fields, field_name, options)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Array to hold the options for the status field. We will populate this when we read the status field data from Freshdesk and then use this to map status codes to status values and vice versa
-var ticket_status_options = [];
+let ticket_status_options = [];
 
 /* 
 Function: getStatusOptions
@@ -289,8 +280,6 @@ async function _getTicketStatusVal(ticket_fields, code)
     // Get the function name for logging
     const fn = _getTicketStatusVal.name;
     
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_status_options.length == 0)
     {
@@ -299,7 +288,7 @@ async function _getTicketStatusVal(ticket_fields, code)
     }
 
     // Loop through the options list and return the value for the code sent in
-    for(i = 0; i < ticket_status_options.length; i++)
+    for(let i = 0; i < ticket_status_options.length; i++)
     {
         if(ticket_status_options[i].id == code) return ticket_status_options[i].label;
     }
@@ -321,8 +310,6 @@ async function _getTicketStatusCode(ticket_fields, label)
     // Get the function name for logging
     const fn = _getTicketStatusCode.name;
     
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_status_options.length == 0)
     {
@@ -331,7 +318,7 @@ async function _getTicketStatusCode(ticket_fields, label)
     }
 
     // Loop through the options list and return the value for the label sent in
-    for(i = 0; i < ticket_status_options.length; i++)
+    for(let i = 0; i < ticket_status_options.length; i++)
     {
         if(ticket_status_options[i].label == label) return ticket_status_options[i].id;
     }
@@ -346,7 +333,7 @@ async function _getTicketStatusCode(ticket_fields, label)
 
 
 // Array to hold the options for the source field. We will populate this when we read the source field data from Freshdesk and then use this to map source codes to source values and vice versa
-var ticket_source_options = [];
+let ticket_source_options = [];
 
 /* 
 Function: getSourceOptions
@@ -376,9 +363,6 @@ async function _getTicketSourceVal(ticket_fields, code)
     // Get the function name for logging
     const fn = _getTicketSourceVal.name;
 
-    // Initialize loop counter
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_source_options.length == 0)
     {
@@ -387,7 +371,7 @@ async function _getTicketSourceVal(ticket_fields, code)
     }
 
     // Loop through the options list and return the value for the code sent in
-    for(i = 0; i < ticket_source_options.length; i++)
+    for(let i = 0; i < ticket_source_options.length; i++)
     {
         if(ticket_source_options[i].id == code) return ticket_source_options[i].label;
     }
@@ -409,9 +393,6 @@ async function _getTicketSourceCode(ticket_fields, label)
     // Get the function name for logging
     const fn = _getTicketSourceCode.name;
 
-    // Initialize loop counter
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_source_options.length == 0)
     {
@@ -420,7 +401,7 @@ async function _getTicketSourceCode(ticket_fields, label)
     }
 
     // Loop through the options list and return the code for the label sent in
-    for(i = 0; i < ticket_source_options.length; i++)
+    for(let i = 0; i < ticket_source_options.length; i++)
     {
         if(ticket_source_options[i].label == label) return ticket_source_options[i].id;
     }
@@ -434,7 +415,7 @@ async function _getTicketSourceCode(ticket_fields, label)
 
 
 // Array to hold the options for the priority field. We will populate this when we read the priority field data from Freshdesk and then use this to map priority codes to priority values and vice versa
-var ticket_priority_options = [];
+let ticket_priority_options = [];
 
 
 /* 
@@ -465,9 +446,6 @@ async function _getTicketPriorityVal(ticket_fields, code)
     // Get the function name for logging
     const fn = _getTicketPriorityVal.name;
 
-    // Initialize loop counter
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_priority_options.length == 0)
     {
@@ -476,7 +454,7 @@ async function _getTicketPriorityVal(ticket_fields, code)
     }
 
     // Loop through the options list and return the value for the code sent in
-    for(i = 0; i < ticket_priority_options.length; i++)
+    for(let i = 0; i < ticket_priority_options.length; i++)
     {
         if(ticket_priority_options[i].value == code) return ticket_priority_options[i].label;
     }
@@ -498,9 +476,6 @@ async function _getTicketPriorityCode(ticket_fields, label)
     // Get the function name for logging
     const fn = _getTicketPriorityCode.name;
     
-    // Initialize loop counter
-    var i = 0;
-
     // If we don't have the options list built, build it first
     if(ticket_priority_options.length == 0)
     {
@@ -509,7 +484,7 @@ async function _getTicketPriorityCode(ticket_fields, label)
     }
 
     // Loop through the options list and return the code for the label sent in
-    for(i = 0; i < ticket_priority_options.length; i++)
+    for(let i = 0; i < ticket_priority_options.length; i++)
     {
         if(ticket_priority_options[i].label == label) return ticket_priority_options[i].value;
     }

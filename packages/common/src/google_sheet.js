@@ -2,6 +2,7 @@ const { google } = require('googleapis');
 const { createGoogleAuth } = require("./google_auth");
 const { statusMessage } = require("./logs");
 const { combineObjects } = require("./misc");
+const google_drive = require("./google_drive")
 const google_drive_core = require("./google_drive_core_fns");
 const google_sheet_core = require("./google_sheet_core_fns");
 const { convertNestedDatato2DArray } = require("./misc");
@@ -10,6 +11,42 @@ const { convertNestedDatato2DArray } = require("./misc");
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/*
+Function: readDataFromGoogleSheet
+Purpose: Reads data from the given Google Spreadsheet
+Inputs: spreadsheet_id - ID of the spreadsheet, sheet_name - name of the sheet, range - range to read
+Output: Data from the sheet on success, null otherwise
+*/
+async function readDataFromGoogleSheet(spreadsheet_id, sheet_name, range)
+{
+    // Get the function name for logging purposes
+    const fn = readDataFromGoogleSheet.name;
+
+    // Get authentication and drive / sheets instance
+    const auth = createGoogleAuth();
+    const sheets = google.sheets({ version: 'v4', auth });
+    
+    // Ensure that the sheet is a Google Sheet by checking the mime type
+    const mimeType = await google_drive.getMimeType(spreadsheet_id);
+    if (mimeType !== 'application/vnd.google-apps.spreadsheet')
+    {
+        statusMessage(fn, "Invalid format - not a Google Sheet. ID: ", spreadsheet_id);
+        return null;
+    }
+
+    // Read data from the sheet
+    const data = await google_sheet_core.GoogleSheet_readDataFromGoogleSheet(sheets, spreadsheet_id, sheet_name, range);
+    if(data === null)
+    {
+        statusMessage(fn, "Failed to read data from spreadsheet id: ", spreadsheet_id, " sheet name: ", sheet_name, " range: ", range);
+        return null;
+    }
+
+    return data;
+}
+
 
 /*
 Function: writeDataArrayToGoogleSheet
@@ -23,9 +60,8 @@ async function writeDataArrayToGoogleSheet(data_array, folder_id, file_name, she
     const fn = writeDataArrayToGoogleSheet.name;
 
     // Initialize variables
-    var i = 0;
-    var mark_for_deletion = false;
-    var sheet_id_to_delete = -1;
+    let mark_for_deletion = false;
+    let sheet_id_to_delete = -1;
 
     // Get authentication and drive / sheets instance
     const auth = createGoogleAuth();
@@ -41,7 +77,7 @@ async function writeDataArrayToGoogleSheet(data_array, folder_id, file_name, she
     }
 
     // Check if the spreadsheet already exists in the folder
-    var spreadsheet_id = "";
+    let spreadsheet_id = "";
     const ss_res = await google_drive_core.GoogleDrive_getFilesInFolder(drive, folder_id, file_name);
     if(!ss_res)
     {
@@ -163,8 +199,7 @@ async function deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_name)
     const fn = deleteSheetInGoogleSpreadsheet.name;
 
     // Initialize variables
-    var i = 0;
-    var sheet_id_to_delete = -1;
+    let sheet_id_to_delete = -1;
 
     // Get authentication and drive / sheets instance
     const auth = createGoogleAuth();
@@ -180,7 +215,7 @@ async function deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_name)
     }
 
     // Check if the spreadsheet already exists in the folder
-    var spreadsheet_id = "";
+    let spreadsheet_id = "";
     const ss_res = await google_drive_core.GoogleDrive_getFilesInFolder(drive, folder_id, file_name);
     if(!ss_res)
     {
@@ -233,7 +268,7 @@ Purpose: Writes 'filtered' data to a Google Sheet
 Inputs: data, folder_name, file_name, sheet_name, data_objects, data_filter
 Output: 0 on success, -1 on failure
 */
-async function filterAndWriteDataToGoogleSheet(data, folder_name, file_name, sheet_name, data_objects = null, data_filter = null)
+async function filterAndWriteDataToGoogleSheet(data, folder_id, file_name, sheet_name, data_objects = null, data_filter = null)
 {
     // Get the function name for logging purposes
     const fn = filterAndWriteDataToGoogleSheet.name;
@@ -242,13 +277,13 @@ async function filterAndWriteDataToGoogleSheet(data, folder_name, file_name, she
     const filtered_data = data_filter ? data_filter(data) : data;
 
     // Final output array to be written to the sheet
-    var output_array = [];
+    let output_array = [];
     output_array = combineObjects(filtered_data, data_objects);
 
     // Write the output array to the google sheet
-    if(await writeDataArrayToGoogleSheet(output_array, folder_name, file_name, sheet_name, true, true) < 0)
+    if(await writeDataArrayToGoogleSheet(output_array, folder_id, file_name, sheet_name, true, true) < 0)
     {
-        statusMessage(fn, "Failed to write data to google spreadsheet: " , file_name , ", sheet: " , sheet_name , ", aborting write", true, -1);
+        statusMessage(fn, "Failed to write data to google spreadsheet: " , file_name , ", sheet: " , sheet_name , ", aborting write");
         return -1;
     }
 
@@ -258,6 +293,75 @@ async function filterAndWriteDataToGoogleSheet(data, folder_name, file_name, she
 }
 
 
+
+/*
+Function: flushDataToGoogleSheet
+Purpose: Writes data to a Google Sheet
+Inputs: spreadsheet_id, sheet_name, data_array
+Output: 0 on success, -1 on failure
+*/
+async function flushDataToGoogleSheet(spreadsheet_id, sheet_name, data_array)
+{
+    // Get the function name for logging purposes
+    const fn = flushDataToGoogleSheet.name;
+
+    // Get authentication and drive / sheets instance
+    const auth = createGoogleAuth();
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    const res = await google_sheet_core.GoogleSheet_writeValuesToGoogleSheet(sheets, spreadsheet_id, sheet_name, "A1", data_array);
+    if(res < 0)
+    {
+        statusMessage(fn, "Failed to write data to sheet with name: " , sheet_name , " in spreadsheet with ID: " , spreadsheet_id);
+        return -1;
+    }
+
+    statusMessage(fn, "Successfully flushed data to google sheet: " , sheet_name , " in spreadsheet with ID: " , spreadsheet_id);
+
+    return 0;
+}
+
+
+/*
+Function: copyInputGoogleSheet
+Purpose: Copies a sheet from one Google Spreadsheet to another
+Inputs: source_spreadsheet_id, source_sheet_name, destination_spreadsheet_id, dest_sheet_name
+Output: 0 on success, -1 on failure
+*/
+async function copyInputGoogleSheet(source_spreadsheet_id, source_sheet_name, destination_spreadsheet_id, dest_sheet_name)
+{
+    // Get the function name for logging purposes
+    const fn = copyInputGoogleSheet.name;
+
+    // Get authentication and drive / sheets instance
+    const auth = createGoogleAuth();
+    const drive = google.drive({ version: 'v3', auth });
+    const sheets = google.sheets({ version: 'v4', auth });
+
+    // Check if a sheet with the given name already exists in the source spreadsheet. 
+    const sheet_res = await google_sheet_core.GoogleSheet_findSheetByNameInGoogleSpreadsheet(sheets, source_spreadsheet_id, source_sheet_name);
+    if(!sheet_res)
+    {
+        statusMessage(fn, "Sheet with name: " , source_sheet_name , " not found in spreadsheet with ID: " , source_spreadsheet_id);
+        return 0;
+    }
+
+    // Get the sheet ID
+    const source_sheet_id = sheet_res.properties.sheetId;
+
+    // Create a copy of the source spreadsheet in the destination folder
+    const copy_res = await google_sheet_core.GoogleSheet_copySheet(sheets, source_spreadsheet_id, source_sheet_id, destination_spreadsheet_id, dest_sheet_name);
+    if(copy_res < 0)
+    {
+        statusMessage(fn, "Failed to copy sheet with ID: " , source_sheet_id , " from spreadsheet with ID: " , source_spreadsheet_id , " to spreadsheet with ID: " , destination_spreadsheet_id);
+        return -1;
+    }
+
+    statusMessage(fn, "Successfully copied sheet with ID: " , source_sheet_id , " from spreadsheet with ID: " , source_spreadsheet_id , " to spreadsheet with ID: " , destination_spreadsheet_id);
+
+    return 0;
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// EXPORTS /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +370,10 @@ async function filterAndWriteDataToGoogleSheet(data, folder_name, file_name, she
 // Exporting the functions
 module.exports = 
 {
+    readDataFromGoogleSheet,
     writeDataArrayToGoogleSheet,
     deleteSheetInGoogleSpreadsheet,
-    filterAndWriteDataToGoogleSheet
+    filterAndWriteDataToGoogleSheet,
+    flushDataToGoogleSheet,
+    copyInputGoogleSheet
 };

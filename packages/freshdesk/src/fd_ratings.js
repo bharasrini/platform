@@ -1,6 +1,6 @@
 const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFreshdeskData, postFreshdeskData, putFreshdeskData } = require('./fd_common');
+const { fetchFreshdeskData } = require('./fd_common');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ function getRatingString(rating_val)
     // Get the function name for logging
     const fn = getRatingString.name;
 
-    var rating_string = "";
+    let rating_string = "";
 
     switch(Number(rating_val))
     {
@@ -119,20 +119,20 @@ async function _getRatings(ratings, created_since)
     const fn = _getRatings.name;
 
     // URL path for fetching ratings
-    var url_path = "surveys/satisfaction_ratings?created_since="+created_since;
+    const url_path = process.env.FRESHDESK_RATINGS_URL_PATH + "?created_since=" + created_since;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_RATINGS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_RATINGS_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -144,13 +144,10 @@ async function _getRatings(ratings, created_since)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0, j = 0;  
-
             // Load all ratings received in this response to the ratings_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var ratings_info = 
+                const ratings_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "user_id": data[i]["user_id"] ? data[i]["user_id"] : "",
@@ -185,7 +182,7 @@ async function _getRatings(ratings, created_since)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {

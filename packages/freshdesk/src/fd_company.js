@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData, postFreshdeskData, putFreshdeskData } = require('./fd_common');
 
@@ -136,20 +135,20 @@ async function _getCompanies(company)
     const fn = _getCompanies.name;
 
     // URL path for fetching companies
-    var url_path = "companies";
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_COMPANIES_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_COMPANIES_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -161,15 +160,12 @@ async function _getCompanies(company)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0, j = 0;  
-
             // Load all accounts received in this response to the account_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var domain_list = "";
-                for(var j = 0; j < data[i].domains.length; j++) domain_list = domain_list + data[i].domains[j] + ";";
-                var company_info = 
+                let domain_list = "";
+                for(let j = 0; j < data[i].domains.length; j++) domain_list = domain_list + data[i].domains[j] + ";";
+                const company_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "name": data[i]["name"] ? data[i]["name"] : "",
@@ -200,7 +196,7 @@ async function _getCompanies(company)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {
@@ -229,8 +225,7 @@ function _getCompanyName(company, comp_id)
     // Get the function name for logging
     const fn = _getCompanyName.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -240,7 +235,7 @@ function _getCompanyName(company, comp_id)
     }
 
     // Loop through the company list to find the matching company id and return the company name
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i].id == comp_id)
         {
@@ -265,8 +260,7 @@ function _getCSM(company, comp_id)
     // Get the function name for logging
     const fn = _getCSM.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -276,7 +270,7 @@ function _getCSM(company, comp_id)
     }
 
     // Loop through the company list to find the matching company id and return the CSM
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i].id == comp_id)
         {
@@ -301,8 +295,7 @@ function _getFDCompanyID(company, org_id)
     // Get the function name for logging
     const fn = _getFDCompanyID.name;
 
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -312,7 +305,7 @@ function _getFDCompanyID(company, org_id)
     }
 
     // Loop through the company list to find the matching org id and return the Freshdesk company id
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i]["org_id"] == org_id)
         {
@@ -338,8 +331,7 @@ function _getFDOrgID(company, comp_id)
     // Get the function name for logging
     const fn = _getFDOrgID.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -349,7 +341,7 @@ function _getFDOrgID(company, comp_id)
     }
 
     // Loop through the company list to find the matching Freshdesk company id and return the org id
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i]["id"] == comp_id)
         {
@@ -374,8 +366,7 @@ function _getFDTier(company, comp_id)
     // Get the function name for logging
     const fn = _getFDTier.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -385,7 +376,7 @@ function _getFDTier(company, comp_id)
     }
 
     // Loop through the company list to find the matching Freshdesk company id and return the Tier
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i]["id"] == comp_id)
         {
@@ -410,8 +401,7 @@ function _getFDSource(company, comp_id)
     // Get the function name for logging
     const fn = _getFDSource.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -421,7 +411,7 @@ function _getFDSource(company, comp_id)
     }
 
     // Loop through the company list to find the matching Freshdesk company id and return the Source
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i]["id"] == comp_id)
         {
@@ -446,8 +436,7 @@ function _getFDPartner(company, comp_id)
     // Get the function name for logging
     const fn = _getFDPartner.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(company.num_companies == 0)
@@ -457,7 +446,7 @@ function _getFDPartner(company, comp_id)
     }
 
     // Loop through the company list to find the matching Freshdesk company id and return the Partner
-    for(i = 0; i < company.num_companies; i++)
+    for(let i = 0; i < company.num_companies; i++)
     {
         if(company.company_list[i]["id"] == comp_id)
         {
@@ -501,18 +490,18 @@ async function _updateAccountName(company, org_id, account_name)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "name": account_name
     };
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path,
             data_load
         });
@@ -565,10 +554,10 @@ async function _updateCSM(company, org_id, new_csm)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "custom_fields":
         {
@@ -578,8 +567,8 @@ async function _updateCSM(company, org_id, new_csm)
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -632,18 +621,18 @@ async function _updateAccountTier(company, org_id, account_tier)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "account_tier": common.escapeHtml(account_tier)
     };
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -695,18 +684,18 @@ async function _updateAccountDomains(company, org_id, account_domains)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "domains": account_domains
     };
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -718,8 +707,7 @@ async function _updateAccountDomains(company, org_id, account_domains)
             return -1;
         }
 
-        var i = 0;
-        for(i = 0; i < data.domains.length; i++)
+        for(let i = 0; i < data.domains.length; i++)
         {
             if(data.domains[i] != account_domains[i])
             {
@@ -769,10 +757,10 @@ async function _updateARR(company, org_id, new_arr)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "custom_fields":
         {
@@ -782,8 +770,8 @@ async function _updateARR(company, org_id, new_arr)
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -836,10 +824,10 @@ async function _updateSource(company, org_id, new_source)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "custom_fields":
         {
@@ -849,8 +837,8 @@ async function _updateSource(company, org_id, new_source)
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -903,10 +891,10 @@ async function _updatePartner(company, org_id, new_partner)
     }
 
     // Path to set company data
-    const url_path = "companies/" + fd_company_id;
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH + "/" + fd_company_id;
 
     // company data to be modified
-    var data_load = 
+    const data_load = 
     {
         "custom_fields":
         {
@@ -916,8 +904,8 @@ async function _updatePartner(company, org_id, new_partner)
 
     try
     {
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });
@@ -958,7 +946,7 @@ async function createNewCompanyonFD(company_details)
     // Get the function name for logging
     const fn = createNewCompanyonFD.name;
     
-    const url_path = "companies";
+    const url_path = process.env.FRESHDESK_COMPANIES_URL_PATH;
 
     const data_load = 
     {
@@ -977,8 +965,8 @@ async function createNewCompanyonFD(company_details)
 
     try
     {
-        const {headers,data} =  await postFreshdeskData
-        ({
+        const {headers,data} =  await postFreshdeskData(
+        {
             url_path,
             data_load
         });

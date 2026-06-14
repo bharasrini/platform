@@ -14,8 +14,8 @@ Inputs: url - API endpoint URL,
         include - Additional data to include in the response
 Output: Parsed JSON response from the API or binary data in case of file download
 */
-async function fetchFyleData
-({
+async function fetchFyleData(
+{
     url,
     access_token,
     offset,
@@ -94,12 +94,12 @@ Inputs: url - API endpoint URL,
         data_load - The data to be sent
 Output: Parsed JSON response from the API
 */
-async function sendFyleData
-({
-  url,
-  access_token,
-  method,
-  data_load
+async function sendFyleData(
+{
+    url,
+    access_token,
+    method,
+    data_load
 }) 
 {
     // Get the function name for logging
@@ -114,6 +114,7 @@ async function sendFyleData
         {
             "Content-Type": "application/json",
         };
+
         // Add Authorization header if access_token is provided
         if (access_token)
         {
@@ -147,11 +148,11 @@ Inputs: url - API endpoint URL,
         data_load - The data to be posted
 Output: Parsed JSON response from the API
 */
-async function postFyleData
-({
-  url,
-  access_token,
-  data_load
+async function postFyleData(
+{
+    url,
+    access_token,
+    data_load
 }) 
 {
     // Get the function name for logging
@@ -169,11 +170,11 @@ Inputs: url - API endpoint URL,
         data_load - The data to be put
 Output: Parsed JSON response from the API
 */
-async function putFyleData
-({
-  url,
-  access_token,
-  data_load
+async function putFyleData(
+{
+    url,
+    access_token,
+    data_load
 }) 
 {
     // Get the function name for logging

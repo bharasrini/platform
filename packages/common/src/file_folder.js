@@ -15,7 +15,7 @@ Output: true if the file has the expected extension, false otherwise
 function hasExtension(fileName, expectedExt)
 {
     // Get the function name for logging
-    var fn = hasExtension.name;
+    const fn = hasExtension.name;
 
     const actualExt = path.extname(fileName).toLowerCase();
     return actualExt === expectedExt.toLowerCase();

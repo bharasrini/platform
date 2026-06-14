@@ -1,6 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
-const common = require("@fyle-ops/common");
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -32,7 +29,7 @@ function isValidTicketType(ticket_type)
 
     if(ticket_type && (ticket_type != ""))
     {
-        for(var i = 0; i < invalid_ticket_types.length; i++)
+        for(let i = 0; i < invalid_ticket_types.length; i++)
         {
             if((ticket_type).toString().trim() == (invalid_ticket_types[i]).toString().trim())
             {
@@ -68,7 +65,7 @@ function isSupportGroup(group_name)
 
     if(group_name != "")
     {
-        for(var i = 0; i < non_support_groups.length; i++)
+        for(let i = 0; i < non_support_groups.length; i++)
         {
             if((group_name).toString().trim() == (non_support_groups[i]).toString().trim())
             {
@@ -113,10 +110,9 @@ function isRestrictedDomain(org_domain)
         "aol.com",
     ];
 
-    var this_org_domain = org_domain.toString().toLowerCase().trim();
-    var i;
+    const this_org_domain = org_domain.toString().toLowerCase().trim();
 
-    for(i = 0; i < restricted_domains.length; i++)
+    for(let i = 0; i < restricted_domains.length; i++)
     {
         if(this_org_domain == restricted_domains[i])
           return true;

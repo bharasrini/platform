@@ -32,8 +32,8 @@ function getIdFromUrl(url)
     // Get the funtion name for logging purposes
     const fn = getIdFromUrl.name;
     
-    var id = "";
-    var match = /[-\w]{25,}/.exec(url);
+    let id = "";
+    const match = /[-\w]{25,}/.exec(url);
     if (match) {
         id = match[0];
     } else if (/open\?id=(\w+)/.test(url)) {
@@ -82,7 +82,7 @@ function escapeHtml (string)
     // Get the funtion name for logging purposes
     const fn = escapeHtml.name;
 
-    return String(string).replace(/[&<>"'`=\/]/g, function fromEntityMap (s)
+    return String(string).replace(/[&<>"'`=/]/g, function fromEntityMap (s)
     {
         return entityMap[s];
     });
@@ -100,8 +100,8 @@ function validateEmailAddress(email_address)
     // Get the funtion name for logging purposes
     const fn = validateEmailAddress.name;
 
-    //var validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-    var validRegex = /\S+@\S+\.\S+/;
+    //let validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    const validRegex = /\S+@\S+\.\S+/;
 
     if (validRegex.test(email_address))
         return true;
@@ -122,23 +122,23 @@ function parseEmail(this_email, this_email_arr)
     // Get the funtion name for logging purposes
     const fn = parseEmail.name;
 
-    var split_str = [];
+    let split_str = [];
 
     // First replace all the '[', ']', '{', '}', ' ' & '"' by ""
     this_email = this_email.toString().replace("[","");
     this_email = this_email.toString().replace("]","");
     this_email = this_email.toString().replace("{","");
     this_email = this_email.toString().replace("}","");
-    this_email = this_email.toString().replace(/\"+/g,"");
+    this_email = this_email.toString().replace(/"+/g,"");
 
     split_str = this_email.toString().split(",");
   
-    for(var i = 0; i < split_str.length; i++) 
+    for(let i = 0; i < split_str.length; i++) 
     {
         if(split_str[i].toString().trim() == "") continue;
         
-        var found = false;
-        for(var j = 0; j < this_email_arr.length; j++)
+        let found = false;
+        for(let j = 0; j < this_email_arr.length; j++)
         {
             if((split_str[i]).toString().trim() == this_email_arr[j])
             {
@@ -167,7 +167,7 @@ function getNameFromEmail(email)
     // Get the funtion name for logging purposes
     const fn = getNameFromEmail.name;
     
-    var final = ""
+    let final = ""
 
     // Sanity check
     if(email.toString().trim() == "")
@@ -177,14 +177,14 @@ function getNameFromEmail(email)
     }
 
     // Split the email at the '@'
-    var offset = email.lastIndexOf("@");
+    const offset = email.lastIndexOf("@");
     if(offset < 0)
     {
         statusMessage(fn, "Invalid email: " , email);
         return "";
     }
 
-    var name = email.substring(0, offset);
+    const name = email.substring(0, offset);
     if(name.toString().trim() == "")
     {
         statusMessage(fn, "Failed to extract name from email: " , email);
@@ -192,13 +192,13 @@ function getNameFromEmail(email)
     }
 
     // Split the name at the period (.)
-    var split_str = name.toString().split(".");
+    let split_str = name.toString().split(".");
 
     // Convert to uppercase
-    for(var i = 0; i < split_str.length; i++) split_str[i] = (split_str[i]).toUpperCase();
+    for(let i = 0; i < split_str.length; i++) split_str[i] = (split_str[i]).toUpperCase();
 
     // Join the split pieces
-    for(var i = 0; i < split_str.length; i++)
+    for(let i = 0; i < split_str.length; i++)
     {
         if(i > 0) final += " ";
         final += split_str[i];
@@ -220,7 +220,7 @@ function replaceSpecialChars(string_to_replace, special_chars_list, char_to_repl
     // Get the funtion name for logging purposes
     const fn = replaceSpecialChars.name;
 
-    for(var i = 0; i < special_chars_list.length; i++)
+    for(let i = 0; i < special_chars_list.length; i++)
     {
         string_to_replace = string_to_replace.replaceAll(special_chars_list[i], char_to_replace_with);
     }
@@ -228,7 +228,7 @@ function replaceSpecialChars(string_to_replace, special_chars_list, char_to_repl
     // Make sure there are no double occurrences of the char_to_replace_with
     if(char_to_replace_with != '')
     {
-        var double_char_to_replace_with = char_to_replace_with.toString() + char_to_replace_with.toString();
+        let double_char_to_replace_with = char_to_replace_with.toString() + char_to_replace_with.toString();
         while(string_to_replace.indexOf(double_char_to_replace_with) > -1)
         {
             string_to_replace = string_to_replace.replace(double_char_to_replace_with, char_to_replace_with);
@@ -237,7 +237,7 @@ function replaceSpecialChars(string_to_replace, special_chars_list, char_to_repl
 
     // Make sure the first and last character are not char_to_replace_with
     if(string_to_replace.indexOf(char_to_replace_with) == 0) string_to_replace = string_to_replace.substring(1);
-    var reverse_string = string_to_replace.split("").reverse().join("");
+    let reverse_string = string_to_replace.split("").reverse().join("");
     if(reverse_string.indexOf(char_to_replace_with) == 0) reverse_string = reverse_string.substring(1);
     string_to_replace = reverse_string.split("").reverse().join("");
 
@@ -274,10 +274,10 @@ function matchWithinXPercent(num_a, num_b, perc)
     // Get the funtion name for logging purposes
     const fn = matchWithinXPercent.name;
 
-    var num_a_plus_perc = num_a * (1 + perc);
-    var num_a_minus_perc = num_a * (1 - perc);
-    var num_b_plus_perc = num_b * (1 + perc);
-    var num_b_minus_perc = num_b * (1 - perc);
+    const num_a_plus_perc = num_a * (1 + perc);
+    const num_a_minus_perc = num_a * (1 - perc);
+    const num_b_plus_perc = num_b * (1 + perc);
+    const num_b_minus_perc = num_b * (1 - perc);
 
     // If either num_a is within num_b_plus_perc or num_b_minus_perc, return true
     if((num_a >= num_b_minus_perc) && (num_a <= num_b_plus_perc)) return true;
@@ -305,7 +305,7 @@ function checkType(element)
     else if (typeof element === 'object') 
     {
         // Attempt to create a Date object from the string
-        var dateObject = new Date(element);
+        const dateObject = new Date(element);
         // Check if the dateObject is a valid date
         if (!isNaN(dateObject.getTime())) return "date";
         else return "object";
@@ -326,9 +326,6 @@ function flattenStructure(structure, parentKey = '', result = {})
     // Get the funtion name for logging purposes
     const fn = flattenStructure.name;
 
-    // Loop counter
-    var i = 0;
-
     // Sanity check
     if (structure === null || structure === undefined)
     {
@@ -347,7 +344,7 @@ function flattenStructure(structure, parentKey = '', result = {})
         // If it's an array of objects, we want to flatten each object in the array with an index
         else if(Array.isArray(value))
         {
-            for(i = 0; i < value.length; i++)
+            for(let i = 0; i < value.length; i++)
             {
                 const arrayItem = value[i];
                 const arrayItemKey = `${newKey}[${i}]`;
@@ -396,9 +393,6 @@ function convertNestedDatato2DArray(data_array)
     // Get the funtion name for logging purposes
     const fn = convertNestedDatato2DArray.name;
     
-    // Initialize variables
-    var i = 0, j = 0;
-
     // Sanity check
     if(!data_array || data_array.length === 0)
     {
@@ -407,7 +401,7 @@ function convertNestedDatato2DArray(data_array)
  
     // Flatten the data array if it is an array of objects with nested objects/arrays
     const flattened = [];    
-    for(i = 0; i < data_array.length; i++)
+    for(let i = 0; i < data_array.length; i++)
     {
         const obj = data_array[i];
         const flattenedObj = flattenStructure(obj, '', {});
@@ -415,15 +409,15 @@ function convertNestedDatato2DArray(data_array)
     }
 
     // Get all unique keys to form the header row
-    var headers = [];
-    for (i = 0; i < flattened.length; i++)
+    let headers = [];
+    for (let i = 0; i < flattened.length; i++)
     {
         const row = flattened[i];
         for (const key in row)
         {
             // Add header only if not present already
-            var exists = false;
-            for (j = 0; j < headers.length; j++)
+            let exists = false;
+            for (let j = 0; j < headers.length; j++)
             {
                 if (headers[j] === key)
                 {
@@ -439,8 +433,8 @@ function convertNestedDatato2DArray(data_array)
     }
 
     // Build out the rows based on the headers
-    var rows = [];
-    for (i = 0; i < flattened.length; i++)
+    let rows = [];
+    for (let i = 0; i < flattened.length; i++)
     {
         const row = flattened[i];
         let rowArray = [];
@@ -537,7 +531,7 @@ function LevDis(s,t)
     const fn = LevDis.name;
     
     // Workaround on Google Sheets rate-limit for external functions 
-    //var sleep = Math.floor((Math.random() * 3000) + 1);
+    //let sleep = Math.floor((Math.random() * 3000) + 1);
     //Utilities.sleep(3000+sleep);
     
     // The code
@@ -545,11 +539,11 @@ function LevDis(s,t)
     if (s.length == 0) return t.length;
     if (t.length == 0) return s.length;
   
-    var v0 = [];
-    var v1 = [];
-    var i;
-    var j;
-    var cost;
+    let v0 = [];
+    let v1 = [];
+    let i;
+    let j;
+    let cost;
   
     for (i = 0; i < (t.length+1); i++) 
     {
@@ -605,7 +599,7 @@ Output: value at the specified path or undefined if not found
 function getByPath(obj, path)
 {
     const parts = path.split(".");
-    var current = obj;
+    let current = obj;
 
     for (const part of parts)
     {
@@ -625,17 +619,16 @@ Output: array of combined objects
 */
 function combineObjects(array, keys)
 {
-    var i = 0, j = 0;    
-    var output_array = [];
+    let output_array = [];
 
-    for(i = 0; i < array.length; i++)
+    for(let i = 0; i < array.length; i++)
     {
-        var arr = array[i];
+        const arr = array[i];
         const combined = {};
 
         if(keys)
         {
-            for(j = 0; j < keys.length; j++)
+            for(let j = 0; j < keys.length; j++)
             {
                 const key = keys[j];
                 const obj = getByPath(arr, key);
@@ -655,6 +648,19 @@ function combineObjects(array, keys)
     return output_array;
 }
 
+
+/*
+Function: checkandHandleBlank
+Purpose: Checks if a value is blank (undefined, null, or empty string) and handles it
+Inputs: value to check
+Output: trimmed string or empty string if blank
+*/
+function checkandHandleBlank(value)
+{
+    if(value === undefined || value === null)
+        return "";
+    else return value.toString().trim();
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// EXPORTS /////////////////////////////////////////////////////////////////
@@ -681,6 +687,7 @@ module.exports =
     LevDis,
     mergeObjects,
     getByPath,
-    combineObjects
+    combineObjects,
+    checkandHandleBlank
 };
 

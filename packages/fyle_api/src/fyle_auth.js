@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData, postFyleData } = require("./fyle_common");
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,15 +73,12 @@ async function _getAccessToken(fyle_auth, client_id_str, client_secret_str, refr
     // Get the function name for logging
     const fn = _getAccessToken.name;
     
-    // Initialize loop counter
-    var i = 0;
-
     // Get a reference to the fyle_account instance from fyle_auth
-    var fyle_acc = fyle_auth.fyle_acc;
+    const fyle_acc = fyle_auth.fyle_acc;
 
     // URL path for authentication
-    var host = process.env.FYLE_HOST;
-    var url_path = process.env.FYLE_OAUTH_TOKEN_PATH;
+    const host = process.env.FYLE_HOST;
+    const url_path = process.env.FYLE_OAUTH_TOKEN_PATH;
 
     const url = new URL(`https://${host}${url_path}`);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
@@ -98,19 +94,19 @@ async function _getAccessToken(fyle_auth, client_id_str, client_secret_str, refr
         };
 
         // Fetch data for the current page
-        const {headers,data} = await postFyleData
-        ({
+        const {headers,data} = await postFyleData(
+        {
             url: url.toString(),
             access_token: null, // No access token is needed for this API call
             data_load: auth_token
         });
 
         // The Auth response returns multiple access parameters that we need to store in fyle_auth.access_params
-        for(var key in data)
+        for(let key in data)
         {
             //Logger.log("key = " + key + ", value = " + data[key]);
 
-            for(var key1 in fyle_acc.access_params)
+            for(let key1 in fyle_acc.access_params)
             {
                 if(key1 == key) fyle_acc.access_params[key1] = data[key];
             }
@@ -146,12 +142,12 @@ async function _getClusterEndpoint(fyle_auth)
     const fn = _getClusterEndpoint.name;
 
     // Get a reference to the fyle_account instance from fyle_auth
-    var fyle_acc = fyle_auth.fyle_acc;
+    const fyle_acc = fyle_auth.fyle_acc;
 
     // URL path for authentication
-    var host = process.env.FYLE_HOST;
-    var url_path = process.env.FYLE_OAUTH_CLUSTER_PATH;
-    var access_token = null;
+    const host = process.env.FYLE_HOST;
+    const url_path = process.env.FYLE_OAUTH_CLUSTER_PATH;
+    let access_token = null;
 
     const url = new URL(`https://${host}${url_path}`);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
@@ -159,15 +155,15 @@ async function _getClusterEndpoint(fyle_auth)
     try
     {
         // Fetch data for the current page
-        const {headers,data} = await postFyleData
-        ({
+        const {headers,data} = await postFyleData(
+        {
             url: url.toString(),
             access_token: fyle_acc.access_params.access_token,
             data_load: null
         });
 
         // Cluster Endpoint is returned in the response
-        for(var key in data)
+        for(let key in data)
         {
             if(key == "cluster_domain") fyle_acc.access_params.cluster_domain = data[key];
         }
@@ -207,18 +203,18 @@ async function _validateClusterEndpoint(fyle_auth)
     const fn = _validateClusterEndpoint.name;
     
     // Get a reference to the fyle_account instance from fyle_auth
-    var fyle_acc = fyle_auth.fyle_acc;
+    const fyle_acc = fyle_auth.fyle_acc;
 
-    var host = fyle_acc.access_params.cluster_domain;
-    var url_path = process.env.FYLE_MY_PROFILE_PATH;
+    const host = fyle_acc.access_params.cluster_domain;
+    const url_path = process.env.FYLE_MY_PROFILE_PATH;
     const url = new URL(`${host}${url_path}`);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
     try
     {
         // Fetch data for the current page
-        const {headers,data} = await fetchFyleData
-        ({
+        const {headers,data} = await fetchFyleData(
+        {
             url: url.toString(),
             access_token: fyle_acc.access_params.access_token,
             offset: null,

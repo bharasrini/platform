@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData, postFreshdeskData, putFreshdeskData } = require('./fd_common');
 
@@ -76,20 +75,20 @@ async function _getContacts(contact)
     const fn = _getContacts.name;
 
     // URL path for fetching contacts
-    var url_path = "contacts";
+    const url_path = process.env.FRESHDESK_CONTACTS_URL_PATH;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_CONTACTS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_CONTACTS_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -101,13 +100,10 @@ async function _getContacts(contact)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0, j = 0;  
-
             // Load all contacts received in this response to the contact_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var contact_info = 
+                const contact_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "name": data[i]["name"] ? data[i]["name"] : "",
@@ -132,7 +128,7 @@ async function _getContacts(contact)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {
@@ -176,9 +172,9 @@ function _getContactForEmail(contact, email)
     }
 
     // Loop through the contact list and find the contact with the email ID passed in
-    for(var i = 0; i < contact.contact_list.length; i++)
+    for(let i = 0; i < contact.contact_list.length; i++)
     {
-        var this_email = contact.contact_list[i].email;
+        const this_email = contact.contact_list[i].email;
 
         if(this_email == email)
         {
@@ -219,9 +215,9 @@ function _getContactForID(contact, id)
     }
 
     // Loop through the contact list and find the contact with the ID passed in
-    for(var i = 0; i < contact.contact_list.length; i++)
+    for(let i = 0; i < contact.contact_list.length; i++)
     {
-        var this_id = contact.contact_list[i].id;
+        const this_id = contact.contact_list[i].id;
 
         if(this_id == id)
         {
@@ -259,10 +255,10 @@ async function addContact(name, email, role)
     }
 
     // Path to set contact data
-    var url_path = "contacts";
+    const url_path = process.env.FRESHDESK_CONTACTS_URL_PATH;
 
     // contact data to be added
-    var data_load = 
+    const data_load = 
     {
         "name": name,
         "email": email,
@@ -276,8 +272,8 @@ async function addContact(name, email, role)
     try
     {
         // Add the contact information 
-        const {headers,data} =  await postFreshdeskData
-        ({
+        const {headers,data} =  await postFreshdeskData(
+        {
             url_path,
             data_load
         });
@@ -326,16 +322,16 @@ async function getContactIDFromEmail(email)
     const fn = getContactIDFromEmail.name;
 
     // Return value from the function
-    var id = "";
+    let id = "";
 
     // First get the ID for the email sent in
-    var url_path = "search/contacts?query=\"email:'" + email + "'\"";
+    const url_path = "search/contacts?query=\"email:'" + email + "'\"";
 
     try
     {
         // Fetch data for the current page
-        const {headers,data} = await fetchFreshdeskData
-        ({
+        const {headers,data} = await fetchFreshdeskData(
+        {
             url_path: url_path,
             current_page: null,
             per_page: null,
@@ -347,7 +343,7 @@ async function getContactIDFromEmail(email)
         id = data.results[0] && data.results[0].id ? data.results[0].id : "";
 
         // set a sleep here for 100 ms so that we don't exceed the throttle
-        common.sleep(100);
+        await common.sleep(100);
     }
     catch(e)
     {
@@ -379,7 +375,7 @@ async function updateContact(old_email, new_name, new_email, new_role)
     }
 
     // Fetch the contact ID for the email sent in
-    var id = await getContactIDFromEmail(old_email);
+    const id = await getContactIDFromEmail(old_email);
     if(id == "")
     {
         common.statusMessage(fn, "Failed to get contact ID for email: ", old_email);
@@ -387,10 +383,10 @@ async function updateContact(old_email, new_name, new_email, new_role)
     }
 
     // Path to set contact data
-    var url_path = "contacts/" + id;
+    const url_path = process.env.FRESHDESK_CONTACTS_URL_PATH + "/" + id;
 
     // contact data to be modified
-    var data_load = 
+    const data_load = 
     {
         "name": new_name,
         "email": new_email,
@@ -403,8 +399,8 @@ async function updateContact(old_email, new_name, new_email, new_role)
     try
     {
         // Update the contact information for the contact ID passed in
-        const {headers,data} =  await putFreshdeskData
-        ({
+        const {headers,data} =  await putFreshdeskData(
+        {
             url_path, 
             data_load
         });

@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData } = require("./fyle_common");
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -27,9 +26,9 @@ class fyle_category
       _initFyleCategory(this, fyle_acc);
     }
 
-    async getCategories()
+    async getCategories(event, after, before)
     {
-        return await _getCategories(this);
+        return await _getCategories(this, event, after, before);
     }
 
     getCategoryId(category_name)
@@ -63,52 +62,102 @@ function _initFyleCategory(fyle_category, fyle_acc)
 Function: _getCategories
 Purpose: Gets the list of categories in the fyle org and stores it in the fyle_account.categories structure. 
 Pre-requisite: getAccessToken() and getClusterEndpoint() to be invoked prior
-Inputs: fyle_category instance
+Inputs: fyle_category instance, event - event timestamp to filter categories for, after - timestamp to fetch categories after, before - timestamp to fetch categories before
 Output: 0 on success, -1 on failure
 */
-async function _getCategories(fyle_category)
+async function _getCategories(fyle_category, event, after, before)
 {
     // Get the function name for logging
     const fn = _getCategories.name;
     
     // Point back to fyle_account instance 
-    var fyle_acc = fyle_category.fyle_acc;
+    const fyle_acc = fyle_category.fyle_acc;
 
     // API endpoint to get categories
-    const url_path = "/platform/v1/admin/categories";
-    var url = new URL(fyle_acc.access_params.cluster_domain + url_path);
+    const url_path = process.env.FYLE_CATEGORIES_PATH;
+    const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
     common.statusMessage(fn, "Fyle URL = " , url.toString());
 
-    var offset = process.env.FYLE_API_START_OFFSET;
-    var limit = process.env.FYLE_API_MAX_ITEMS;
-    var total_count = 0;
-    var page = 1;
+    let offset = Number(process.env.FYLE_API_START_OFFSET);
+    const limit = Number(process.env.FYLE_API_MAX_ITEMS);
+    let total_count = 0;
+    let page = 1;
+
+    // Build the 'include' parameter for the API call based on the input parameters
+    const include = [];
+
+    // The API supports filtering expenses based on various events like created_at, updated_at, spent_at etc. 
+    // The event to filter on can be passed in the 'event' parameter and the corresponding timestamp can be passed in the 'after' and 'before' parameters. 
+    // We need to convert it to the format expected by the API, which is event=gte/lte.timestamp
+    event = (event ?? "").toString().trim();
+    if(event)
+    {
+        // Make sure that we are able to find the event passed in
+        const events = 
+        [
+            "created_at",
+            "updated_at"
+        ];
+
+        let found_event = false;
+        for(let i = 0; i < events.length; i++)
+        {
+            if(events[i] == event)
+            {
+                found_event = true;
+                break;
+            }
+        }
+        if(found_event == false)
+        {
+            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            event = "created_at";
+        }
+
+        // If the event is valid, then we can add the 'after' and 'before' parameters to the API call
+        after = (after   ?? "").toString().trim();
+        if(after)
+        {
+            const include_after = {[event]: "gte." + after};
+            include.push(include_after);
+        }
+
+        before = (before   ?? "").toString().trim();
+        if(before)
+        {
+            const include_before = {[event]: "lte." + before};
+            include.push(include_before);
+        }
+    }
+
+    // Always reset the category list and count so that there is no stale data from previous calls
+    fyle_acc.categories.category_list = [];
+    fyle_acc.categories.num_categories = 0;
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFyleData
-            ({
+            const {headers,data} = await fetchFyleData(
+            {
                 url: url.toString(),
                 access_token: fyle_acc.access_params.access_token,
                 offset: offset,
                 limit: limit,
-                include: null
+                include: include
             });
 
             // Save the overall number of categories we need to read in
             total_count = data.count;
 
             // Number of categories read in from this response
-            var this_count = data.data.length;
+            const this_count = data.data.length;
 
             // Load all categories received in this response to fyle_account.categories {}
-            var i = 0;
-            for(i = 0; i < data.data.length; i++)
+            for(let i = 0; i < data.data.length; i++)
             {
-                var this_category = data.data[i];
+                const this_category = data.data[i];
                 fyle_acc.categories.category_list.push(this_category);
                 fyle_acc.categories.num_categories++;
             }
@@ -149,18 +198,15 @@ function _getCategoryId(fyle_category, category_name)
     // Get the function name for logging
     const fn = _getCategoryId.name;
 
-    // Loop counters
-    var i = 0;
-
     // Point to the fyle_account instance
-    var fyle_acc = fyle_category.fyle_acc;
+    const fyle_acc = fyle_category.fyle_acc;
 
     // Loop through the categories in fyle_acc.categories to find the category_id for the given category_name
-    var category_id = -1;
+    let category_id = -1;
 
-    for(i = 0; i < fyle_acc.categories.num_categories; i++)
+    for(let i = 0; i < fyle_acc.categories.num_categories; i++)
     {
-        var this_category_name = fyle_acc.categories.category_list[i].name;
+        const this_category_name = fyle_acc.categories.category_list[i].name;
         if(this_category_name === category_name)
         {
             category_id = fyle_acc.categories.category_list[i].id;

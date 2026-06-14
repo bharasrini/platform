@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData } = require("./fd_common");
 
@@ -18,19 +17,19 @@ async function getAssociatedTicketsList(id, list)
     const fn = getAssociatedTicketsList.name;
 
     // URL path for fetching associated tickets for the given ticket id
-    var url_path = "tickets/"+id;
+    const url_path = process.env.FRESHDESK_ASSOCIATED_TICKETS_URL_PATH + id;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 0;
-    var per_page = Number(process.env.FRESHDESK_MAX_TICKETS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_TICKETS_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -42,13 +41,10 @@ async function getAssociatedTicketsList(id, list)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0;  
-
             // Read through the responses
             if(data.associated_tickets_list)
             {
-                for(var i = 0; i < data.associated_tickets_list.length; i++)
+                for(let i = 0; i < data.associated_tickets_list.length; i++)
                 {
                     list.push(data.associated_tickets_list[i]);
                 }
@@ -60,7 +56,7 @@ async function getAssociatedTicketsList(id, list)
             }
 
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
 
         }
         catch(e)
@@ -88,7 +84,7 @@ function getAssociationType(association_type)
     // Get the function name for logging
     const fn = getAssociationType.name;
     
-    var ret = "";
+    let ret = "";
 
     switch(association_type)
     {

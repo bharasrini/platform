@@ -10,6 +10,7 @@ const { setTicketField } = require("./fd_set_ticket_data");
 const { fd_contacts, addContact, updateContact } = require("./fd_contact");
 const { fd_ratings } = require("./fd_ratings");
 const { fd_email_config } = require("./fd_email_config");
+const { isValidTicketType, isSupportGroup, isRestrictedDomain } = require("./fd_misc");
 
 module.exports = 
 {
@@ -22,5 +23,6 @@ module.exports =
     setTicketField,
     fd_contacts, addContact, updateContact,
     fd_ratings,
-    fd_email_config
+    fd_email_config,
+    isValidTicketType, isSupportGroup, isRestrictedDomain
 };

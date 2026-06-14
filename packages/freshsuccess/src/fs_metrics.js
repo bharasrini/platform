@@ -1,4 +1,3 @@
-const { google } = require('googleapis');
 const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
@@ -31,11 +30,10 @@ async function readMetricsSheet(metric_name)
     // Get the function name for logging
     const fn = readMetricsSheet.name;
     
-    var i = 0;
-    var sheet_name = "";
+    let sheet_name = "";
 
     // Get the appropriate sheet for the metric
-    for(i = 0; i < metric_sheet_mapping.length; i++)
+    for(let i = 0; i < metric_sheet_mapping.length; i++)
     {
         if(metric_sheet_mapping[i].metric_name == metric_name)
         {
@@ -50,10 +48,6 @@ async function readMetricsSheet(metric_name)
         return null;
     }
 
-    // Get authentication and sheets instance
-    const auth = common.createGoogleAuth();
-    const sheets = google.sheets({ version: "v4", auth });
-
     // Read the metrics sheet file using the ID
     // Freshsuccess Metrics Sheet located at: My Drive -> Scripts -> Shared Library
     // URL: https://docs.google.com/spreadsheets/d/1l4MPIHXTwC5MmyHG1eclUyWQG8vCfcV-75P3IQimyWA/edit#gid=47320141
@@ -61,26 +55,25 @@ async function readMetricsSheet(metric_name)
     const metrics_sheet_id = process.env.FRESHSUCCESS_METRICS_SHEET_ID;
 
     // Get all values from the sheet
-    const res = await sheets.spreadsheets.values.get
-    ({
-        spreadsheetId: metrics_sheet_id,
-        range: `${sheet_name}`,
-    });
+    const data = await common.readDataFromGoogleSheet(metrics_sheet_id, sheet_name, null);
+    if(data == null)
+    {
+        common.statusMessage(fn, "Error reading data from Google Sheet id: ", metrics_sheet_id, ", sheet name: ", sheet_name);
+        return -1;
+    }
 
     // Initialize variables to read the metrics entries
-    const start_row = 1;
-    var data_start_row = 2;
-    const start_col = 1;
-    const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(res.data.values);
+    const data_start_row = 2;
+    const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
 
     // Some column definitions
-    i = 1;
+    let i = 1;
     const id_col = i; i++
     const timestamp_col = i; i++
     const formatted_date_col = i; i++
     const metric_val_col = i; i++
 
-    var this_metric = 
+    const this_metric = 
     {
         // Capture the metric name
         metric_name: metric_name,
@@ -93,29 +86,31 @@ async function readMetricsSheet(metric_name)
     };
 
     // Get period markers for the last 3 months
-    var last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();
+    const last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();
 
 
     // Read in the metrics
-    for(var i = data_start_row; i < num_rows; i++)
+    for(let i = data_start_row; i < num_rows; i++)
     {
-        var this_id = (res.data.values[i-1][id_col-1]).toString().trim();
-        var this_timestamp = (res.data.values[i-1][timestamp_col-1]).toString().trim() == "" ? 0 : Number((res.data.values[i-1][timestamp_col-1]).toString().trim());
-        var this_formatted_date = (res.data.values[i-1][formatted_date_col-1]).toString().trim();
-        var this_metric_val = (res.data.values[i-1][metric_val_col-1]).toString().trim();
-        var found = false;
+        let this_id = common.checkandHandleBlank(data[i-1][id_col-1]);
+        const this_timestamp = common.checkandHandleBlank(data[i-1][timestamp_col-1]) == "" ? 0 : Number(common.checkandHandleBlank(data[i-1][timestamp_col-1]));
+        const this_metric_val = common.checkandHandleBlank(data[i-1][metric_val_col-1]);
+        let found = false;
 
         // If we got a blank row, exit
         this_id = (this_id   ?? "").toString().trim();
         if(!this_id) break;
 
+        // org index in the list
+        let org_index = -1;
 
         // Search if we have this org already in the metrics table 
-        for(var j = 0; j < this_metric.num_orgs; j++)
+        for(let j = 0; j < this_metric.num_orgs; j++)
         {
             if(this_metric.metric_arr[j]["id"]["org_id"] == this_id)
             {
                 found = true;
+                org_index = j;
                 break;
             }
         }
@@ -124,7 +119,7 @@ async function readMetricsSheet(metric_name)
         if(found == false)
         {
             // Add a new metric structure
-            var metric_value =
+            const metric_value =
             {
                 "id":
                 {
@@ -157,35 +152,35 @@ async function readMetricsSheet(metric_name)
             // Add this to the metric array
             this_metric.metric_arr.push(metric_value);
 
-            // Set j to number of orgs
-            j = this_metric.num_orgs;
+            // Set org_index to number of orgs
+            org_index = this_metric.num_orgs;
 
             // Increment the org count
             this_metric.num_orgs++;
         }
 
         // Check if the new timestamp is the closest to any of the month markers, Check against m-1 first (since metrics entries are in desc order)
-        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_1_end"]["timestamp"], this_timestamp, this_metric.metric_arr[j]["m_1_end"]["matched_timestamp"], "week") == true)
+        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_1_end"]["timestamp"], this_timestamp, this_metric.metric_arr[org_index]["m_1_end"]["matched_timestamp"], "week") == true)
         {
             // Ok, we have a close match here, save it
-            this_metric.metric_arr[j]["m_1_end"]["matched_timestamp"] = this_timestamp;
-            this_metric.metric_arr[j]["m_1_end"]["matched_metric"] = Number(this_metric_val);
+            this_metric.metric_arr[org_index]["m_1_end"]["matched_timestamp"] = this_timestamp;
+            this_metric.metric_arr[org_index]["m_1_end"]["matched_metric"] = Number(this_metric_val);
         }
 
         // Check against m-2 next
-        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_2_end"]["timestamp"], this_timestamp, this_metric.metric_arr[j]["m_2_end"]["matched_timestamp"], "week") == true)
+        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_2_end"]["timestamp"], this_timestamp, this_metric.metric_arr[org_index]["m_2_end"]["matched_timestamp"], "week") == true)
         {
             // Ok, we have a close match here, save it
-            this_metric.metric_arr[j]["m_2_end"]["matched_timestamp"] = this_timestamp;
-            this_metric.metric_arr[j]["m_2_end"]["matched_metric"] = Number(this_metric_val);
+            this_metric.metric_arr[org_index]["m_2_end"]["matched_timestamp"] = this_timestamp;
+            this_metric.metric_arr[org_index]["m_2_end"]["matched_metric"] = Number(this_metric_val);
         }
 
         // Check against m-3 next
-        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_3_end"]["timestamp"], this_timestamp, this_metric.metric_arr[j]["m_3_end"]["matched_timestamp"], "week") == true)
+        if(common.isNewTimestampCloser(last3MonthsDateMarkers["m_3_end"]["timestamp"], this_timestamp, this_metric.metric_arr[org_index]["m_3_end"]["matched_timestamp"], "week") == true)
         {
             // Ok, we have a close match here, save it
-            this_metric.metric_arr[j]["m_3_end"]["matched_timestamp"] = this_timestamp;
-            this_metric.metric_arr[j]["m_3_end"]["matched_metric"] = Number(this_metric_val);
+            this_metric.metric_arr[org_index]["m_3_end"]["matched_timestamp"] = this_timestamp;
+            this_metric.metric_arr[org_index]["m_3_end"]["matched_metric"] = Number(this_metric_val);
         }
 
     }
@@ -196,7 +191,7 @@ async function readMetricsSheet(metric_name)
 }
 
 
-var readMetricsFromSheet = true;
+let readMetricsFromSheet = true;
 
 /* 
 Function: getMetricsSource
@@ -209,35 +204,26 @@ async function getMetricsSource()
     // Get the function name for logging purposes
     const fn = getMetricsSource.name;
 
-    // Get authentication and sheets instance
-    const auth = common.createGoogleAuth();
-    const sheets = google.sheets({ version: "v4", auth });
-
     // ID of the Freshsuccess API sheet
     //const fs_api_id = "1Tw9bDxF_0ajCk5_C9RC1Y9urOfp9GcKD7ueaXUqxu50";
     const sheet_id = process.env.FRESHSUCCESS_API_SHEET_ID;
 
     // Sheet where the config setting is present
-    //const sheet_name = "README";
     const sheet_name = process.env.FRESHSUCCESS_API_SHEET_NAME;
 
     // Get all values from the sheet
-    const res = await sheets.spreadsheets.values.get
-    ({
-        spreadsheetId: sheet_id,
-        range: `${sheet_name}`,
-    });
-    
-    // Initialize variables to read the config settings
-    const start_row = 1;
-    const start_col = 1;
-    const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(res.data.values);
+    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    if(data == null)
+    {
+        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        return -1;
+    }
 
     // Some row and column definitions
-    const settings_row = 7;
-    const settings_col = 5;
+    const settings_row = Number(process.env.FRESHSUCCESS_API_SHEET_TOGGLE_ROW);
+    const settings_col = Number(process.env.FRESHSUCCESS_API_SHEET_TOGGLE_COL);
 
-    var fs_metrics_from_sheet = (res.data.values[settings_row-1][settings_col-1]).toString().trim();
+    const fs_metrics_from_sheet = common.checkandHandleBlank(data[settings_row-1][settings_col-1]);
     readMetricsFromSheet = (fs_metrics_from_sheet == "Yes") ? true : false;
 
     return 0;
@@ -256,8 +242,7 @@ async function getUserMetrics(account, metric_name, m_3_metric_name, m_2_metric_
     // Get the function name for logging purposes
     const fn = getUserMetrics.name;
     
-    var i = 0, j = 0, k = 0;
-    var metric_offset = -1;
+    let metric_offset = -1;
 
     // get the metrics source
     await getMetricsSource();
@@ -265,7 +250,7 @@ async function getUserMetrics(account, metric_name, m_3_metric_name, m_2_metric_
     // Check if we need to read in the metrics from sheet or from FS
     if(readMetricsFromSheet == true)
     {
-        var this_metric = await readMetricsSheet(metric_name); 
+        const this_metric = await readMetricsSheet(metric_name); 
         if(this_metric == null)
         {
             common.statusMessage(fn, "Failed to read metrics from sheet for metric: " , metric_name);
@@ -292,11 +277,11 @@ async function getUserMetrics(account, metric_name, m_3_metric_name, m_2_metric_
         else common.statusMessage(fn, "Successfully read metrics from Freshsuccess for metric: " , metric_name);
         */
         common.statusMessage(fn, "Reading metrics from Freshsuccess API is currently not implemented, going to read from sheet instead for metric: " , metric_name);
-        var this_metric = await readMetricsSheet(metric_name);
+        const this_metric = await readMetricsSheet(metric_name);
     }
 
     // Locate the metric in the account structure
-    for(i = 0; i < account.num_metrics; i++)
+    for(let i = 0; i < account.num_metrics; i++)
     {
         if(account.metrics[i]["metric_name"] == metric_name)
         {
@@ -315,13 +300,13 @@ async function getUserMetrics(account, metric_name, m_3_metric_name, m_2_metric_
     // Now that we have the metrics, map them to the respective accounts 
     common.statusMessage(fn, "Finished getting all metric values for: " , metric_name + ", going to map them to the account next");
 
-    var metric = account.metrics[metric_offset];
+    const metric = account.metrics[metric_offset];
 
-    for(i = 0; i < metric.num_orgs; i++)
+    for(let i = 0; i < metric.num_orgs; i++)
     {
-        var this_org_id = metric.metric_arr[i]["id"]["org_id"];
+        const this_org_id = metric.metric_arr[i]["id"]["org_id"];
 
-        for(j = 0; j < account.num_accounts; j++)
+        for(let j = 0; j < account.num_accounts; j++)
         {
             if(account.account_list[j]["id"]["org_id"] == this_org_id)
             {

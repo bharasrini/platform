@@ -1,0 +1,170 @@
+[
+    {
+        "format": "Format_1 (2022-03)",
+        "format_map": 
+        [
+            {"parameter": "current_process", "api_type": "custom_label_dimensions", "data_type": "string", "row": 3, "col": 2},
+            {"parameter": "primary_focus", "api_type": "custom_label_dimensions", "data_type": "string", "row": 4, "col": 2},
+            {"parameter": "secondary_focus", "api_type": "custom_label_dimensions", "data_type": "string", "row": 5, "col": 2},
+            {"parameter": "not_important", "api_type": "custom_label_dimensions", "data_type": "string", "row": 6, "col": 2},
+            {"parameter": "custom_requirements", "api_type": "custom_label_dimensions", "data_type": "string", "row": 7, "col": 2},
+
+            {"parameter": "reimbursable_expenses", "api_type": "custom_label_dimensions", "data_type": "string", "row": 10, "col": 2},
+            {"parameter": "mileages", "api_type": "custom_label_dimensions", "data_type": "string", "row": 11, "col": 2},
+            {"parameter": "per_diem", "api_type": "custom_label_dimensions", "data_type": "string", "row": 12, "col": 2},
+            {"parameter": "advances", "api_type": "custom_label_dimensions", "data_type": "string", "row": 13, "col": 2},
+            {"parameter": "credit_card_expenses", "api_type": "custom_label_dimensions", "data_type": "string", "row": 14, "col": 2},
+
+            {"parameter": "primary_contact", "api_type": "custom_label_dimensions", "data_type": "string", "row": 6, "col": 5},
+            {"parameter": "secondary_contact", "api_type": "custom_label_dimensions", "data_type": "string", "row": 7, "col": 5},
+
+            {"parameter": "categories", "api_type": "custom_label_dimensions", "data_type": "string", "row": 18, "col": 2},
+            {"parameter": "projects", "api_type": "custom_label_dimensions", "data_type": "string", "row": 19, "col": 2},
+            {"parameter": "billable", "api_type": "custom_label_dimensions", "data_type": "string", "row": 20, "col": 2},
+            {"parameter": "policies", "api_type": "custom_label_dimensions", "data_type": "string", "row": 22, "col": 2},
+            {"parameter": "budgets", "api_type": "custom_label_dimensions", "data_type": "string", "row": 23, "col": 2},
+            {"parameter": "approval_workflows", "api_type": "custom_label_dimensions", "data_type": "string", "row": 24, "col": 2},
+            {"parameter": "sequential_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 25, "col": 2},
+            {"parameter": "project_based_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 26, "col": 2},
+            {"parameter": "automatic_report_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 27, "col": 2},
+            {"parameter": "automatic_report_creation", "api_type": "custom_label_dimensions", "data_type": "string", "row": 28, "col": 2},
+            {"parameter": "number_of_orgs", "api_type": "custom_label_dimensions", "data_type": "string", "row": 29, "col": 2},
+            {"parameter": "multi_org_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 30, "col": 2},
+            {"parameter": "multi_currency", "api_type": "custom_label_dimensions", "data_type": "string", "row": 31, "col": 2},
+            {"parameter": "report_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 32, "col": 2},
+            {"parameter": "webapp_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 33, "col": 2},
+            {"parameter": "email_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 34, "col": 2},
+
+            {"parameter": "account_manager_model", "api_type": "custom_label_dimensions", "data_type": "string", "row": 18, "col": 5},
+            {"parameter": "guided_onboarding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 20, "col": 5},
+            {"parameter": "implementation_support", "api_type": "custom_label_dimensions", "data_type": "string", "row": 21, "col": 5},
+
+            {"parameter": "email_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 24, "col": 5},
+            {"parameter": "erp_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 25, "col": 5},
+            {"parameter": "hrms_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 26, "col": 5},
+            {"parameter": "travel_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 28, "col": 5},
+            {"parameter": "project_management_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 29, "col": 5},
+            {"parameter": "any_other_systems", "api_type": "custom_label_dimensions", "data_type": "string", "row": 30, "col": 5},
+
+            {"parameter": "ach_y_n", "api_type": "custom_label_dimensions", "data_type": "string", "row": 37, "col": 2},
+
+            {"parameter": "card_1_bank_provider", "api_type": "custom_label_dimensions", "data_type": "string", "row": 40, "col": 2},
+            {"parameter": "card_1_network", "api_type": "custom_label_dimensions", "data_type": "string", "row": 41, "col": 2},
+            {"parameter": "card_1_program", "api_type": "custom_label_dimensions", "data_type": "string", "row": 42, "col": 2},
+            {"parameter": "card_1_num_of_cards", "api_type": "custom_label_dimensions", "data_type": "string", "row": 43, "col": 2},
+            {"parameter": "card_1_login_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 44, "col": 2},
+            {"parameter": "card_1_feed_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 45, "col": 2},
+            {"parameter": "card_1_csv_available", "api_type": "custom_label_dimensions", "data_type": "string", "row": 46, "col": 2},
+            {"parameter": "card_1_automatic_reconciliation", "api_type": "custom_label_dimensions", "data_type": "string", "row": 47, "col": 2},
+            {"parameter": "card_1_notes", "api_type": "custom_label_dimensions", "data_type": "string", "row": 40, "col": 3},
+
+            {"parameter": "card_2_bank_provider", "api_type": "custom_label_dimensions", "data_type": "string", "row": 40, "col": 4},
+            {"parameter": "card_2_network", "api_type": "custom_label_dimensions", "data_type": "string", "row": 41, "col": 4},
+            {"parameter": "card_2_program", "api_type": "custom_label_dimensions", "data_type": "string", "row": 42, "col": 4},
+            {"parameter": "card_2_num_of_cards", "api_type": "custom_label_dimensions", "data_type": "string", "row": 43, "col": 4},
+            {"parameter": "card_2_login_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 44, "col": 4},
+            {"parameter": "card_2_feed_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 45, "col": 4},
+            {"parameter": "card_2_csv_available", "api_type": "custom_label_dimensions", "data_type": "string", "row": 46, "col": 4},
+            {"parameter": "card_2_automatic_reconciliation", "api_type": "custom_label_dimensions", "data_type": "string", "row": 47, "col": 4},
+            {"parameter": "card_2_notes", "api_type": "custom_label_dimensions", "data_type": "string", "row": 40, "col": 5},
+
+            {"parameter": "sso", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 2},
+            {"parameter": "ip_whitelisting", "api_type": "custom_label_dimensions", "data_type": "string", "row": 52, "col": 2},
+            {"parameter": "custom_tax_configuration", "api_type": "custom_label_dimensions", "data_type": "string", "row": 53, "col": 2},
+            {"parameter": "api_access_for_third_party_integrations", "api_type": "custom_label_dimensions", "data_type": "string", "row": 58, "col": 2},
+            {"parameter": "custom_data_exports", "api_type": "custom_label_dimensions", "data_type": "string", "row": 59, "col": 2},
+            {"parameter": "hrms_integration", "api_type": "custom_label_dimensions", "data_type": "string", "row": 60, "col": 2}
+        ]
+    },
+
+    {
+        "format": "Format_2 (2023-07)",
+        "format_map": 
+        [
+            {"parameter": "current_process", "api_type": "custom_label_dimensions", "data_type": "string", "row": 3, "col": 2},
+            {"parameter": "primary_focus", "api_type": "custom_label_dimensions", "data_type": "string", "row": 4, "col": 2},
+            {"parameter": "customer_p0", "api_type": "custom_label_dimensions", "data_type": "string", "row": 5, "col": 2},
+            {"parameter": "secondary_focus", "api_type": "custom_label_dimensions", "data_type": "string", "row": 6, "col": 2},
+            {"parameter": "not_important", "api_type": "custom_label_dimensions", "data_type": "string", "row": 7, "col": 2},
+            {"parameter": "custom_requirements", "api_type": "custom_label_dimensions", "data_type": "string", "row": 8, "col": 2},
+            {"parameter": "customer_success_metrics", "api_type": "custom_label_dimensions", "data_type": "string", "row": 9, "col": 2},
+
+            {"parameter": "onboarding_risk_identified", "api_type": "custom_label_dimensions", "data_type": "string", "row": 12, "col": 2},
+            {"parameter": "onboarding_frs_requested", "api_type": "custom_label_dimensions", "data_type": "string", "row": 13, "col": 2},
+            {"parameter": "onboarding_workaround_suggested", "api_type": "custom_label_dimensions", "data_type": "string", "row": 14, "col": 2},
+            {"parameter": "onboarding_roadmap_feature_committed", "api_type": "custom_label_dimensions", "data_type": "string", "row": 15, "col": 2},
+            {"parameter": "onboarding_trial_offered", "api_type": "custom_label_dimensions", "data_type": "string", "row": 16, "col": 2},
+
+            {"parameter": "reimbursable_expenses", "api_type": "custom_label_dimensions", "data_type": "string", "row": 19, "col": 2},
+            {"parameter": "mileages", "api_type": "custom_label_dimensions", "data_type": "string", "row": 20, "col": 2},
+            {"parameter": "per_diem", "api_type": "custom_label_dimensions", "data_type": "string", "row": 21, "col": 2},
+            {"parameter": "advances", "api_type": "custom_label_dimensions", "data_type": "string", "row": 22, "col": 2},
+            {"parameter": "credit_card_expenses", "api_type": "custom_label_dimensions", "data_type": "string", "row": 23, "col": 2},
+
+            {"parameter": "categories", "api_type": "custom_label_dimensions", "data_type": "string", "row": 26, "col": 2},
+            {"parameter": "projects", "api_type": "custom_label_dimensions", "data_type": "string", "row": 27, "col": 2},
+            {"parameter": "billable", "api_type": "custom_label_dimensions", "data_type": "string", "row": 28, "col": 2},
+            {"parameter": "cost_center", "api_type": "custom_label_dimensions", "data_type": "string", "row": 29, "col": 2},
+            {"parameter": "additional_custom_fields", "api_type": "custom_label_dimensions", "data_type": "string", "row": 30, "col": 2},
+            {"parameter": "custom_tax_configuration", "api_type": "custom_label_dimensions", "data_type": "string", "row": 31, "col": 2},
+
+            {"parameter": "approval_workflows", "api_type": "custom_label_dimensions", "data_type": "string", "row": 34, "col": 2},
+            {"parameter": "sequential_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 35, "col": 2},
+            {"parameter": "project_based_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 36, "col": 2},
+            {"parameter": "automatic_report_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 37, "col": 2},
+            {"parameter": "automatic_report_creation", "api_type": "custom_label_dimensions", "data_type": "string", "row": 38, "col": 2},
+            {"parameter": "expense_rules", "api_type": "custom_label_dimensions", "data_type": "string", "row": 39, "col": 2},
+            {"parameter": "policies", "api_type": "custom_label_dimensions", "data_type": "string", "row": 40, "col": 2},
+            {"parameter": "budgets", "api_type": "custom_label_dimensions", "data_type": "string", "row": 41, "col": 2},
+            {"parameter": "multi_currency", "api_type": "custom_label_dimensions", "data_type": "string", "row": 42, "col": 2},
+            {"parameter": "number_of_orgs", "api_type": "custom_label_dimensions", "data_type": "string", "row": 43, "col": 2},
+            {"parameter": "multi_org_approval", "api_type": "custom_label_dimensions", "data_type": "string", "row": 44, "col": 2},
+            {"parameter": "report_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 45, "col": 2},
+            {"parameter": "webapp_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 46, "col": 2},
+            {"parameter": "email_branding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 47, "col": 2},
+
+            {"parameter": "card_1_program", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 1},
+            {"parameter": "card_1_network", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 2},
+            {"parameter": "card_1_bank_provider", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 3},
+            {"parameter": "card_1_num_of_cards", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 4},
+            {"parameter": "card_1_feed_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 5},
+            {"parameter": "card_1_login_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 6},
+            {"parameter": "card_1_csv_available", "api_type": "custom_label_dimensions", "data_type": "string", "row": 50, "col": 7},
+
+            {"parameter": "card_2_program", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 1},
+            {"parameter": "card_2_network", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 2},
+            {"parameter": "card_2_bank_provider", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 3},
+            {"parameter": "card_2_num_of_cards", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 4},
+            {"parameter": "card_2_feed_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 5},
+            {"parameter": "card_2_login_type", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 6},
+            {"parameter": "card_2_csv_available", "api_type": "custom_label_dimensions", "data_type": "string", "row": 51, "col": 7},
+
+            {"parameter": "ach_y_n", "api_type": "custom_label_dimensions", "data_type": "string", "row": 56, "col": 2},
+
+            {"parameter": "erp_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 57, "col": 2},
+            {"parameter": "expected_integration_output", "api_type": "custom_label_dimensions", "data_type": "string", "row": 58, "col": 2},
+            {"parameter": "accounting_integration_with_fyle", "api_type": "custom_label_dimensions", "data_type": "string", "row": 59, "col": 2},
+            {"parameter": "implementation_partner", "api_type": "custom_label_dimensions", "data_type": "string", "row": 60, "col": 2},
+            {"parameter": "custom_data_exports", "api_type": "custom_label_dimensions", "data_type": "string", "row": 61, "col": 2},
+            {"parameter": "sso", "api_type": "custom_label_dimensions", "data_type": "string", "row": 62, "col": 2},
+            {"parameter": "email_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 63, "col": 2},
+            {"parameter": "ip_whitelisting", "api_type": "custom_label_dimensions", "data_type": "string", "row": 64, "col": 2},
+            {"parameter": "hrms_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 65, "col": 2},
+            {"parameter": "hrms_integration", "api_type": "custom_label_dimensions", "data_type": "string", "row": 66, "col": 2},
+            {"parameter": "project_management_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 67, "col": 2},
+            {"parameter": "travel_system", "api_type": "custom_label_dimensions", "data_type": "string", "row": 68, "col": 2},
+            {"parameter": "any_other_systems", "api_type": "custom_label_dimensions", "data_type": "string", "row": 69, "col": 2},
+            {"parameter": "api_access_for_third_party_integrations", "api_type": "custom_label_dimensions", "data_type": "string", "row": 70, "col": 2},
+
+            {"parameter": "customer_persona", "api_type": "custom_label_dimensions", "data_type": "string", "row": 3, "col": 6},
+            {"parameter": "primary_contact", "api_type": "custom_label_dimensions", "data_type": "string", "row": 4, "col": 6},
+            {"parameter": "secondary_contact", "api_type": "custom_label_dimensions", "data_type": "string", "row": 5, "col": 6},
+
+            {"parameter": "guided_onboarding", "api_type": "custom_label_dimensions", "data_type": "string", "row": 17, "col": 6},
+            {"parameter": "account_manager_model", "api_type": "custom_label_dimensions", "data_type": "string", "row": 18, "col": 6}
+        ]
+    }
+]
+
+
+

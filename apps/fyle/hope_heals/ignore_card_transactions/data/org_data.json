@@ -1,0 +1,23 @@
+[
+    {
+        "org_code": "ORG_1",
+        "match_condition": "AND",
+        "match_transaction_fields":
+        [
+            {
+                "hierarchy": "",
+                "key": "transaction_status",
+                "type": "ARRAY",
+                "delimiter": "COMMA",
+                "pattern": "POSTED"
+            },
+            {
+                "hierarchy": "",
+                "key": "description",
+                "type": "ELEMENT",
+                "delimiter": "",
+                "pattern": "AUTOPAY PAYMENT - THANK YOU"
+            }
+        ]
+    }
+]

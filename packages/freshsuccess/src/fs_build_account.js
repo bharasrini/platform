@@ -18,10 +18,10 @@ function buildFSAccount({this_account})
     const fn = buildFSAccount.name;
     
     // Get period markers for the last 3 months
-    var last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();
-    var account_churn = this_account["is_churned"] == true ? true : false;
+    const last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();
+    const account_churn = this_account["is_churned"] == true ? true : false;
 
-    var account_info =  
+    const account_info =  
     {
         "id":
         {

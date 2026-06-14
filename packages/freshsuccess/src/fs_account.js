@@ -1,10 +1,9 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
-const { fetchFreshsuccessData, postFreshsuccessData, putFreshsuccessData, deleteFreshsuccessData } = require('./fs_common');
+const { fetchFreshsuccessData, postFreshsuccessData, deleteFreshsuccessData } = require('./fs_common');
 const { buildFSAccount } = require('./fs_build_account');
 const { getUserMetrics } = require('./fs_metrics');
-const { getFSContacts, postContactsToFS } = require('./fs_contact');
+const { getFSContacts} = require('./fs_contact');
 const { readLast3MonthsBillingData } = require('./fs_billing');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,30 +106,27 @@ async function _getAccounts(account)
     const fn = _getAccounts.name;
 
     // API endpoint and query params
-    var url_path = "accounts";
+    const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH;
 
     // URL parameters
-    var include_inactive = "true";
-    var include_dimensions = null;
-    var order_by = "name";
-    var direction = "asc";
-    var include = "assigned_csms,custom_label_dimensions,custom_value_dimensions,custom_event_dimensions";
-
-    // Initialize loop counters 
-    var i = 0, j = 0;  
+    const include_inactive = "true";
+    const include_dimensions = null;
+    const order_by = "name";
+    const direction = "asc";
+    const include = "assigned_csms,custom_label_dimensions,custom_value_dimensions,custom_event_dimensions";
 
     // Initialize the page and record count
-    var max_page_size = Number(process.env.FRESHSUCCESS_MAX_ACCOUNTS_PER_PAGE) || 1000;
-    var current_page = Number(process.env.FRESHSUCCESS_START_PAGE) || 0;
-    var records_on_current_page = 0;
+    let max_page_size = Number(process.env.FRESHSUCCESS_MAX_ACCOUNTS_PER_PAGE);
+    let current_page = Number(process.env.FRESHSUCCESS_START_PAGE);
+    let records_on_current_page = 0;
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshsuccessData
-            ({
+            const {headers,data} = await fetchFreshsuccessData(
+            {
                 url_path: url_path,
                 current_page: current_page,
                 include_inactive: include_inactive,
@@ -145,10 +141,10 @@ async function _getAccounts(account)
             records_on_current_page = data.results.length;
 
             // Load all accounts received in this response to the account_list []
-            for(i = 0; i < data.results.length; i++)
+            for(let i = 0; i < data.results.length; i++)
             {
-                var org_id = data.results[i]["account_id"];
-                var account_churn = false;
+                const org_id = data.results[i]["account_id"];
+                let account_churn = false;
 
                 // If we dont't have a valid org ID, skip
                 if(org_id == "") continue;
@@ -172,7 +168,7 @@ async function _getAccounts(account)
             if(records_on_current_page >= max_page_size) current_page++;
 
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {
@@ -199,8 +195,7 @@ function _locateOrg(account, org_id)
     // Get the function name for logging
     const fn = _locateOrg.name;
     
-    var i;
-    var ret = -1;
+    let ret = -1;
 
     // Sanity check
     if(account.num_accounts == 0)
@@ -209,9 +204,9 @@ function _locateOrg(account, org_id)
         return -1;
     }
 
-    for(i = 0; i < account.num_accounts; i++)
+    for(let i = 0; i < account.num_accounts; i++)
     {
-        var this_org_id = account.account_list[i]["id"]["org_id"];
+        const this_org_id = account.account_list[i]["id"]["org_id"];
         if(this_org_id == org_id)
         {
             ret = i;
@@ -303,10 +298,10 @@ async function postRecordsToFS(record_container)
     const fn = postRecordsToFS.name;
     
     // API endpoint and query params
-    var url_path = "accounts";
+    const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH;
 
     // Format the data to be sent in the request body
-    var data_load = {records: record_container};
+    const data_load = {records: record_container};
 
     try
     {
@@ -335,7 +330,7 @@ async function removeCSMMappingfromFS(account_id, csm_email)
     // Get the function name for logging
     const fn = removeCSMMappingfromFS.name;
     
-    const url_path = "accounts/"+account_id+"/assigned_csms/"+encodeURIComponent(csm_email);
+    const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH + "/" + account_id + "/assigned_csms/" + encodeURIComponent(csm_email);
 
     try
     {

@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFreshsuccessData, postFreshsuccessData, putFreshsuccessData } = require('./fs_common');
+const { fetchFreshsuccessData, postFreshsuccessData } = require('./fs_common');
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,30 +18,27 @@ async function getFSContacts(account)
     const fn = getFSContacts.name;
 
     // API endpoint and query params
-    var url_path = "account_contacts";
+    const url_path = process.env.FRESHSUCCESS_CONTACTS_URL_PATH || "account_contacts";
 
     // URL parameters
-    var include_inactive = "true";
-    var include_dimensions = "true";
-    var order_by = "account_id";
-    var direction = "asc";
-    var include = null;
-
-    // Initialize loop counters 
-    var i = 0, j = 0;  
+    const include_inactive = "true";
+    const include_dimensions = "true";
+    const order_by = "account_id";
+    const direction = "asc";
+    const include = null;
 
     // Initialize the page and record count
-    var max_page_size = Number(process.env.FRESHSUCCESS_MAX_CONTACTS_PER_PAGE) || 1000;
-    var current_page = Number(process.env.FRESHSUCCESS_START_PAGE) || 0;
-    var records_on_current_page = 0;
+    let max_page_size = Number(process.env.FRESHSUCCESS_MAX_CONTACTS_PER_PAGE);
+    let current_page = Number(process.env.FRESHSUCCESS_START_PAGE);
+    let records_on_current_page = 0;
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshsuccessData
-            ({
+            const {headers,data} = await fetchFreshsuccessData(
+            {
                 url_path: url_path,
                 current_page: current_page,
                 include_inactive: include_inactive,
@@ -57,23 +53,24 @@ async function getFSContacts(account)
             records_on_current_page = data.results.length;
 
             // Load all contacts received in this response to the contact_list []
-            for(i = 0; i < data.results.length; i++)
+            for(let i = 0; i < data.results.length; i++)
             {
-                var org_id = data.results[i]["account_id"];
+                const org_id = data.results[i]["account_id"];
 
                 // If we dont't have a valid org ID, skip
                 if(org_id == "") continue;
 
                 // Get details of checkin and survey exclusions from custom_label_dimensions[]
-                var exclude_from_checkin = "No";
-                var exclude_from_survey = "No";
-                var exclude_from_renewals = "No";
-                var exclude_from_roundups = "No";
+                let exclude_from_checkin = "No";
+                let exclude_from_survey = "No";
+                let exclude_from_renewals = "No";
+                let exclude_from_roundups = "No";
+
                 if(data.results[i]["custom_label_dimensions"])
                 {
-                    for(j = 0; j < data.results[i]["custom_label_dimensions"].length; j++)
+                    for(let j = 0; j < data.results[i]["custom_label_dimensions"].length; j++)
                     {
-                        for(var key in data.results[i]["custom_label_dimensions"][j])
+                        for(let key in data.results[i]["custom_label_dimensions"][j])
                         {
                             if(key == "exclude_from_checkin")
                             {
@@ -85,18 +82,18 @@ async function getFSContacts(account)
                             }
                             else if(key == "exclude_from_renewals")
                             {
-                                exclude_from_survey = data.results[i]["custom_label_dimensions"][j][key];
+                                exclude_from_renewals = data.results[i]["custom_label_dimensions"][j][key];
                             }
                             else if(key == "exclude_from_roundups")
                             {
-                                exclude_from_survey = data.results[i]["custom_label_dimensions"][j][key];
+                                exclude_from_roundups = data.results[i]["custom_label_dimensions"][j][key];
                             }
                         }
                     }
                 }
 
                 // Build the contact info in the required format
-                var contact_info =  
+                const contact_info =  
                 {
                     "org_id": org_id,
                     "email": data.results[i]["email"] ? data.results[i]["email"] : "",
@@ -122,7 +119,7 @@ async function getFSContacts(account)
             if(records_on_current_page >= max_page_size) current_page++;
 
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
         }
         catch(e)
         {
@@ -150,10 +147,10 @@ async function postContactsToFS(record_container)
     const fn = postContactsToFS.name;
     
     // API endpoint and query params
-    var url_path = "account_contacts";
+    const url_path = process.env.FRESHSUCCESS_CONTACTS_URL_PATH;
 
     // Format the data to be sent in the request body
-    var data_load = {records: record_container};
+    const data_load = {records: record_container};
 
     try
     {

@@ -1,18 +1,29 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "outDir": "./dist",
-    "noEmit": true,
-    "allowJs": true,          // <-- JS files participate
-    "checkJs": true,          // <-- actually type-check JS
-    "resolveJsonModule": true,
-    "esModuleInterop": true
-  },
-  "include": [
-    "packages/**/src/**/*",
-    "packages/**/test/**/*",
-    "packages/**/data/**/*"
-  ]
+    "compilerOptions":
+    {
+        "target": "ES2022",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "noEmit": true,
+        "allowJs": true,
+        "checkJs": true,
+        "resolveJsonModule": true,
+        "esModuleInterop": true
+    },
+    "include":
+    [
+        "packages/**/*.js",
+        "packages/**/*.json",
+        "apps/**/*.js",
+        "apps/**/*.json",
+        "services/**/*.js",
+        "services/**/*.json"
+    ],
+    "exclude":
+    [
+        "node_modules",
+        "dist",
+        ".vscode"
+    ]
 }

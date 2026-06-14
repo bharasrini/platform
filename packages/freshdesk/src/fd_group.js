@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData } = require('./fd_common');
 
@@ -77,20 +76,20 @@ async function _getGroups(group)
     const fn = _getGroups.name;
 
     // URL path for fetching groups from Freshdesk API
-    var url_path = "groups";
+    const url_path = process.env.FRESHDESK_GROUPS_URL_PATH;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_GROUPS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_GROUPS_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -102,13 +101,10 @@ async function _getGroups(group)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0;  
-
             // Load all groups received in this response to the group_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var group_info = 
+                const group_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "name": data[i]["name"] ? data[i]["name"] : "",
@@ -139,7 +135,7 @@ async function _getGroups(group)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
 
         }
         catch(e)
@@ -169,8 +165,7 @@ function _getGroupName(group, group_id)
     // Get the function name for logging
     const fn = _getGroupName.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Trivial check
     if(group.num_groups == 0)
@@ -179,7 +174,7 @@ function _getGroupName(group, group_id)
         return ret;
     }
 
-    for(i = 0; i < group.num_groups; i++)
+    for(let i = 0; i < group.num_groups; i++)
     {
         if(group.group_list[i].id == group_id)
         {
@@ -203,8 +198,7 @@ function _getGroupID(group, group_name)
     // Get the function name for logging
     const fn = _getGroupID.name;
     
-    var i = 0;
-    var ret = "";
+    let ret = "";
 
     // Trivial check
     if(group.num_groups == 0)
@@ -213,7 +207,7 @@ function _getGroupID(group, group_name)
         return ret;
     }
 
-    for(i = 0; i < group.num_groups; i++)
+    for(let i = 0; i < group.num_groups; i++)
     {
         if(group.group_list[i].name == group_name)
         {

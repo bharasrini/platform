@@ -1,0 +1,16 @@
+{
+    "name": "retrieve_billing_details",
+    "private": true,
+    "type": "commonjs",
+    "dependencies": 
+    {
+        "@fyle-ops/common": "workspace:*",
+        "@fyle-ops/freshsuccess": "workspace:*",
+        "@fyle-ops/billing": "workspace:*",
+        "@fyle-ops/account_mapping": "workspace:*",
+        "@fyle-ops/freshdesk": "workspace:*",
+        "@fyle-ops/sales_checklist": "workspace:*",
+        "@fyle-ops/account_folders": "workspace:*",
+        "@fyle-ops/csm_mapping": "workspace:*"}
+}
+

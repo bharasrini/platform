@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 const { fetchFreshdeskData } = require('./fd_common');
 
@@ -77,20 +76,20 @@ async function _getEmailConfigs(email_config)
     const fn = _getEmailConfigs.name;
 
     // URL path for fetching email configs from Freshdesk API
-    var url_path = "email_configs";
+    const url_path = process.env.FRESHDESK_EMAIL_CONFIGS_URL_PATH;
 
     // Initialize the page and record count
-    var page = Number(process.env.FRESHDESK_START_PAGE) || 1;
-    const per_page = Number(process.env.FRESHDESK_MAX_GROUPS_PER_PAGE) || 100;
-    var link = "";
+    let page = Number(process.env.FRESHDESK_START_PAGE);
+    const per_page = Number(process.env.FRESHDESK_MAX_EMAIL_CONFIGS_PER_PAGE);
+    let link = "";
 
     do
     {
         try
         {
             // Fetch data for the current page
-            const {headers,data} = await fetchFreshdeskData
-            ({
+            const {headers,data} = await fetchFreshdeskData(
+            {
                 url_path: url_path,
                 current_page: page,
                 per_page: per_page,
@@ -102,13 +101,10 @@ async function _getEmailConfigs(email_config)
             link = headers.get("link");
             link = (link   ?? "").toString().trim();
 
-            // Initialize loop counters 
-            var i = 0;  
-
             // Load all email configs received in this response to the email_config_list []
-            for(i = 0; i < data.length; i++)
+            for(let i = 0; i < data.length; i++)
             {
-                var email_config_info = 
+                const email_config_info = 
                 {
                     "id": data[i]["id"] ? data[i]["id"] : "",
                     "name": data[i]["name"]? data[i]["name"] : "",
@@ -139,7 +135,7 @@ async function _getEmailConfigs(email_config)
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
-            common.sleep(100);
+            await common.sleep(100);
 
         }
         catch(e)
@@ -165,18 +161,20 @@ Output: Email Config ID
 */
 function _getEmailConfigID(email_config, reply_email)
 {
-    var i = 0;
-    var ret = 0;
+    // Get the function name for logging
+    const fn = _getEmailConfigID.name;
+
+    let ret = 0;
 
     // Trivial check
     if(email_config.num_email_configs == 0)
     {
-        common.statusMessage(arguments.callee.name, "No email configs to read, possibly getEmailConfigs() not called ?");
+        common.statusMessage(fn, "No email configs to read, possibly getEmailConfigs() not called ?");
         return ret;
     }
 
 
-    for(i = 0; i < email_config.num_email_configs; i++)
+    for(let i = 0; i < email_config.num_email_configs; i++)
     {
         if(email_config.email_config_list[i].reply_email == reply_email)
         {
@@ -197,18 +195,20 @@ Output: Email Config ID
 */
 function _getEmailConfigIDUsingGroupID(email_config, group_id)
 {
-    var i = 0;
-    var ret = 0;
+    // Get the function name for logging
+    const fn = _getEmailConfigIDUsingGroupID.name;
+
+    let ret = 0;
 
     // Trivial check
     if(email_config.num_email_configs == 0)
     {
-        common.statusMessage(arguments.callee.name, "No email configs to read, possibly getEmailConfigs() not called ?");
+        common.statusMessage(fn, "No email configs to read, possibly getEmailConfigs() not called ?");
         return ret;
     }
 
 
-    for(i = 0; i < email_config.num_email_configs; i++)
+    for(let i = 0; i < email_config.num_email_configs; i++)
     {
         if(email_config.email_config_list[i].group_id == group_id)
         {

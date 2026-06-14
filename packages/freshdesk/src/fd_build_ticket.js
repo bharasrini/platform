@@ -1,10 +1,4 @@
 const { formatInTimeZone } = require("date-fns-tz");
-const common = require("@fyle-ops/common");
-const { fd_company } = require("./fd_company");
-const { fd_group } = require("./fd_group");
-const { fd_agent } = require("./fd_agent");
-const { fd_business_hours } = require("./fd_business_hours");
-const { fd_ticket_fields } = require("./fd_ticket_fields");
 const { getAssociatedTicketsList, getAssociationType } = require("./fd_associated_tickets");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -22,13 +16,11 @@ async function buildTicketInfo({this_ticket, group, company, agent, business_hou
     // Get the function name for logging
     const fn = buildTicketInfo.name;
 
-    var i = 0;
-
-    var tags = "";
+    let tags = "";
     // Tags is an array
     if(this_ticket.tags)
     {
-        for(i = 0; i < this_ticket.tags.length; i++)
+        for(let i = 0; i < this_ticket.tags.length; i++)
         {
             if(i != 0) tags += ", ";
             tags += this_ticket.tags[i];
@@ -37,15 +29,15 @@ async function buildTicketInfo({this_ticket, group, company, agent, business_hou
 
     // Get associated tickets details
     const association_type = this_ticket.association_type ? Number(this_ticket.association_type) : 0;
-    var associated_tickets_count = this_ticket.associated_tickets_count ? this_ticket.associated_tickets_count : 0;
-    var associated_tickets_list = [];
-    var associated_tickets_list_str = "";
+    let associated_tickets_count = this_ticket.associated_tickets_count ? this_ticket.associated_tickets_count : 0;
+    let associated_tickets_list = [];
+    let associated_tickets_list_str = "";
 
     // If there are associated tickets, get the list of associated ticket IDs and also build a string with the list of associated ticket IDs separated by ;
     if(association_type != 0)
     {
         await getAssociatedTicketsList(this_ticket.id, associated_tickets_list);
-        for(i = 0; i < associated_tickets_list.length; i++)
+        for(let i = 0; i < associated_tickets_list.length; i++)
         {
             if(i != 0) associated_tickets_list_str += ";";
             associated_tickets_list_str += associated_tickets_list[i];
@@ -97,12 +89,12 @@ async function buildTicketInfo({this_ticket, group, company, agent, business_hou
     const diff_mins = diff_secs/60;
 
     // Calculate FRT (first response time in minutes)
-    var frt_mins = 0;
+    let frt_mins = 0;
     if (this_ticket["stats"] && this_ticket["stats"]["first_responded_at"]) 
     {
-        var created_at_date = (new Date(this_ticket["created_at"])).getTime();
-        var first_responded_at_date = (new Date(this_ticket["stats"]["first_responded_at"])).getTime();
-        var diff_ms = first_responded_at_date - created_at_date;
+        const created_at_date = (new Date(this_ticket["created_at"])).getTime();
+        const first_responded_at_date = (new Date(this_ticket["stats"]["first_responded_at"])).getTime();
+        const diff_ms = first_responded_at_date - created_at_date;
         frt_mins = Math.round(diff_ms / 60000); // convert ms to minutes
     }
 
@@ -111,7 +103,7 @@ async function buildTicketInfo({this_ticket, group, company, agent, business_hou
     const in_business_hours_str = in_business_hours == true ? "Y" : "N";
 
     // Fill in the ticket info in the required format
-    var ticket_info = 
+    const ticket_info = 
     {
         // Basic ticket details
         "id": this_ticket.id ? this_ticket.id : "",

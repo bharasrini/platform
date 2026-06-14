@@ -4,7 +4,6 @@ const { fd_tickets, fd_group, fd_company, fd_agent, fd_business_hours, fd_ticket
 
 
 
-
 /*
 Function: fd_write_ticket_data
 Purpose: Writes FD ticket data to a Google Sheet
@@ -16,8 +15,7 @@ async function fd_write_ticket_data(ticket, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_ticket_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         ticket.ticket_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -39,8 +37,7 @@ async function fd_write_group_data(group, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_group_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         group.group_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -62,8 +59,7 @@ async function fd_write_company_data(company, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_company_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         company.company_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -85,8 +81,7 @@ async function fd_write_agent_data(agent, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_agent_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         agent.agent_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -108,8 +103,7 @@ async function fd_write_business_hours_data(business_hours, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_business_hours_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         business_hours.business_hours_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -131,8 +125,7 @@ async function fd_write_ticket_fields_data(ticket_fields, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_ticket_fields_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         ticket_fields.ticket_fields_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -154,8 +147,7 @@ async function fd_write_ratings_data(ratings, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_ratings_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         ratings.ratings_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -177,8 +169,7 @@ async function fd_write_email_config_data(email_config, file_name)
     // Get the function name for logging purposes
     const fn = fd_write_email_config_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet
-    (
+    return await common.filterAndWriteDataToGoogleSheet(
         email_config.email_config_list, 
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
@@ -202,8 +193,8 @@ async function takeFreshdeskBackup()
     common.statusMessage(fn, " ****************** Freshdesk Backup Start ****************** ");
 
     // Get all tickets for the last 3 months
-    var three_months = 3;
-    var dateObj = new Date();
+    const three_months = 3;
+    const dateObj = new Date();
     const three_months_ago = common.getNMonthsAgo(dateObj, three_months);
     const since_str = formatInTimeZone(three_months_ago, "UTC", "yyyy-MM-dd");
     const ticket = new fd_tickets();
@@ -243,8 +234,8 @@ async function takeFreshdeskBackup()
     common.statusMessage(fn, "Successfully retrieved Email Config data, going to write out data to google sheet");
 
     // Create a new file every day in the My Drive -> Tooling -> Freshdesk -> Data Backup folder
-    var today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd");
-    var file_name = process.env.FRESHDESK_DATA_BACKUP_FILE_PREFIX + today_date;
+    const today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd");
+    const file_name = process.env.FRESHDESK_DATA_BACKUP_FILE_PREFIX + today_date;
     
     // Write out the ticket data to the sheet
     await fd_write_ticket_data(ticket, file_name);
@@ -279,7 +270,9 @@ async function takeFreshdeskBackup()
     common.statusMessage(fn, "Successfully wrote 'Email Config' details, going to cleanup and exit");
 
     // Delete "Sheet1" that was created by default in the backup sheet
-    common.deleteSheetInGoogleSpreadsheet(process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, file_name, process.env.FRESHDESK_DATA_BACKUP_DEFAULT_SHEET_TO_DELETE);
+    const folder_id = process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID;
+    const sheet_to_delete = process.env.FRESHDESK_DATA_BACKUP_DEFAULT_SHEET_TO_DELETE;
+    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
     common.statusMessage(fn, " ****************** Freshdesk Backup End ****************** ");
 

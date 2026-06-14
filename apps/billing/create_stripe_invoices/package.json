@@ -1,0 +1,11 @@
+{
+    "name": "create_stripe_invoices",
+    "private": true,
+    "type": "commonjs",
+    "dependencies": 
+    {
+        "@fyle-ops/common": "workspace:*",
+        "@fyle-ops/stripe": "workspace:*"
+    }
+}
+

@@ -1,4 +1,3 @@
-const { google } = require('googleapis');
 const ExcelJS = require("exceljs");
 const fs = require("fs/promises");
 const path = require("path");
@@ -21,8 +20,6 @@ async function exportToExcelFile(data_array, dir_name, file_name, sheet_name)
     // Get the function name for logging purposes
     const fn = exportToExcelFile.name;
     
-    var i = 0;
-
     // Sanity check - if data_array is empty, return without creating the file
     if (!data_array || data_array.length === 0)
     {
@@ -40,11 +37,11 @@ async function exportToExcelFile(data_array, dir_name, file_name, sheet_name)
 
         // Write out the header row
         const columns = [];
-        for (i = 0; i < headers.length; i++)
+        for (let i = 0; i < headers.length; i++)
         {
             const key = headers[i];
-            columns.push
-            ({
+            columns.push(
+            {
                 header: key,
                 key: key,
                 width: 20

@@ -1,5 +1,3 @@
-const { google } = require('googleapis');
-const { createGoogleAuth } = require("./google_auth");
 const { statusMessage } = require("./logs");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -19,8 +17,8 @@ async function GoogleDrive_getFolder(drive, folder_id)
     
     try
     {
-        const res = await drive.files.get
-        ({
+        const res = await drive.files.get(
+        {
             fileId: folder_id,
             fields: '*',
             supportsAllDrives: true,
@@ -56,8 +54,8 @@ async function GoogleDrive_getFilesInFolder(drive, parent_folder_id, file_name)
     try
     {
         // Check if a file with the same name already exists in the parent folder
-        const res = await drive.files.list
-        ({
+        const res = await drive.files.list(
+        {
             q: [
             `'${parent_folder_id}' in parents`,
             `name = '${file_name.replace(/'/g, "\\'")}'`,
@@ -101,8 +99,8 @@ async function GoogleDrive_getFolderInFolder(drive, parent_folder_id, child_fold
     try
     {
         // Check if a folder with the same name already exists in the parent folder
-        const res = await drive.files.list
-        ({
+        const res = await drive.files.list(
+        {
             q: 
             [
                 `'${parent_folder_id}' in parents`,
@@ -153,8 +151,8 @@ async function GoogleDrive_copyFileToFolder(drive, source_file_id, dest_folder_i
         };
 
         // Copy the file to the destination folder with the specified name
-        const res = await drive.files.copy
-        ({
+        const res = await drive.files.copy(
+        {
             fileId: source_file_id,
             requestBody,
             fields: "id, name, parents, mimeType",
@@ -208,8 +206,8 @@ async function GoogleDrive_trashFile(drive, file_id)
     try
     {
         // Update the file to be trashed. Not using delete on purpose
-        const res = await drive.files.update
-        ({
+        const res = await drive.files.update(
+        {
             fileId: file_id,
             requestBody: 
             {
@@ -253,8 +251,8 @@ async function GoogleDrive_moveFolder(drive, folder_id, dest_folder_id, src_pare
     try
     {
         // Now move the folder to the destination folder by updating its parents - removing the old parent and adding the new parent
-        const res = await drive.files.update
-        ({
+        const res = await drive.files.update(
+        {
             fileId: folder_id,
             addParents: dest_folder_id,
             removeParents: parent_to_be_removed,
@@ -301,8 +299,8 @@ async function GoogleDrive_createFolder(drive, folder_name, parent_folder_id)
     try
     {
         // Create the folder in the parent folder with the specified name
-        const res = await drive.files.create
-        ({
+        const res = await drive.files.create(
+        {
             requestBody: 
             {
                 name: folder_name,
@@ -358,8 +356,8 @@ async function GoogleDrive_createFile(drive, file_name, parent_folder_id, mimeTy
     
     try
     {
-        const res = await drive.files.create
-        ({
+        const res = await drive.files.create(
+        {
             requestBody:
             {
                 name: file_name,
@@ -401,6 +399,108 @@ async function GoogleDrive_createFile(drive, file_name, parent_folder_id, mimeTy
     }
 }
 
+
+/*
+Function: GoogleDrive_getParentFolderId
+Purpose: Retrieves the parent folder ID of a given file or folder on Google Drive.
+Inputs: Drive instance, ID of the child file or folder
+Output: Parent folder ID on success, empty string otherwise
+*/
+async function GoogleDrive_getParentFolderId(drive, child_id)
+{
+    // Get the function name for logging purposes
+    const fn = GoogleDrive_getParentFolderId.name;
+    
+    try
+    {
+        const res = await drive.files.get(
+        {
+            fileId: child_id,
+            fields: 'parents',
+            supportsAllDrives: true
+        });
+
+        const parent_id = res.data.parents?.[0];
+        return parent_id;
+    }
+    catch(e)
+    {
+        statusMessage(fn, "Error fetching parent folder for file with ID " , child_id , ": " , e.message);
+        return "";
+    }
+}
+
+
+/*
+Function: GoogleDrive_getFileOrFolderName
+Purpose: Retrieves the name of a given file or folder on Google Drive.
+Inputs: Drive instance, ID of the file or folder
+Output: Name of the file or folder on success, empty string otherwise
+*/
+async function GoogleDrive_getFileOrFolderName(drive, file_id)
+{
+    // Get the function name for logging purposes
+    const fn = GoogleDrive_getFileOrFolderName.name;
+    
+    try
+    {
+        const res = await drive.files.get(
+        {
+            fileId: file_id,
+            fields: 'name',
+            supportsAllDrives: true
+        });
+
+        const name = res.data.name;
+        return name;
+    }
+    catch(e)
+    {
+        statusMessage(GoogleDrive_getFileOrFolderName.name, "Error fetching name for file or folder with ID " , file_id , ": " , e.message);
+        return "";
+    }
+}
+
+
+/*
+Function: GoogleDrive_renameFileOrFolder
+Purpose: Renames a given file or folder on Google Drive.
+Inputs: Drive instance, ID of the file or folder, new name
+Output: Updated file or folder name on success, "" otherwise
+*/
+async function GoogleDrive_renameFileOrFolder(drive, file_id, new_name)
+{
+    // Get the function name for logging purposes
+    const fn = GoogleDrive_renameFileOrFolder.name;
+
+    try
+    {
+        const res = await drive.files.update(
+        {
+            fileId: file_id,
+            requestBody:
+            {
+                name: new_name  
+            },
+            fields: 'id, name',
+            supportsAllDrives: true
+        });
+
+        if(!res || !res.data || res.data.name != new_name)
+        {
+            statusMessage(fn, "Failed to rename file or folder with ID " , file_id , ": expected name " , new_name , ", got " , res.data.name);
+            return null;
+        }
+
+        return res.data.name;
+    }
+    catch(e)
+    {
+        statusMessage(fn, "Error renaming file or folder with ID " , file_id , ": " , e.message);
+        return "";
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// EXPORTS /////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -416,5 +516,8 @@ module.exports =
     GoogleDrive_trashFile,
     GoogleDrive_moveFolder,
     GoogleDrive_createFolder,
-    GoogleDrive_createFile
+    GoogleDrive_createFile,
+    GoogleDrive_getParentFolderId,
+    GoogleDrive_getFileOrFolderName,
+    GoogleDrive_renameFileOrFolder
 };

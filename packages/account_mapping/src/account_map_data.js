@@ -17,9 +17,6 @@ function initializeAccountMapCols(account_map)
     // Get the function name for logging
     const fn = initializeAccountMapCols.name;
 
-    // Initialize variables
-    var i = 0, j = 0;
-
     // Columns in the Account Mapping sheet that we are interested in
     const account_map_lookup_cols = 
     [
@@ -37,11 +34,13 @@ function initializeAccountMapCols(account_map)
     ];
 
     // Locate the columns that we are interested in
-    for(i = 0; i < account_map.num_cols; i++)
+    for(let i = 0; i < account_map.num_cols; i++)
     {
-        for(j = 0; j < account_map_lookup_cols.length; j++)
+        for(let j = 0; j < account_map_lookup_cols.length; j++)
         {
-            if(account_map.data[0][i].toString().trim().toLowerCase() == account_map_lookup_cols[j].sheet_key.toString().trim().toLowerCase())
+            // Check and handle blank values in the cell before comparing
+            const val = common.checkandHandleBlank(account_map.data[0][i]);
+            if(val.toLowerCase() == account_map_lookup_cols[j].sheet_key.toString().trim().toLowerCase())
             {
                 account_map.cols[account_map_lookup_cols[j].map_key] = i;
                 break;
@@ -77,7 +76,7 @@ function getOrgOffset(account_map, org_id)
     const fn = getOrgOffset.name;
 
     // return value initialization
-    var ret = -1;
+    let ret = -1;
 
     // Sanity check
     if(account_map.num_maps == 0)
@@ -87,7 +86,7 @@ function getOrgOffset(account_map, org_id)
     }
 
     // Loop through the account mapping list and find the offset for the org_id passed in
-    for(var i = 0; i < account_map.num_maps; i++)
+    for(let i = 0; i < account_map.num_maps; i++)
     {
         if(account_map.map_list[i].org_id == org_id)
         {
@@ -114,7 +113,7 @@ function getFieldValueFromAccountMap(account_map, org_id, field_name)
     const fn = getFieldValueFromAccountMap.name;
 
     // Initialize return value
-    var ret = "";
+    let ret = "";
 
     // Sanity check
     if(account_map.num_maps == 0)
@@ -124,7 +123,7 @@ function getFieldValueFromAccountMap(account_map, org_id, field_name)
     }
 
     // Loop through the account mapping list and find the field value for the org_id passed in
-    for(var i = 0; i < account_map.num_maps; i++)
+    for(let i = 0; i < account_map.num_maps; i++)
     {
         if(account_map.map_list[i].org_id == org_id)
         {
@@ -154,11 +153,8 @@ function updateAccountMap(account_map, account_data, key_to_update)
     // Get the function name for logging
     const fn = updateAccountMap.name;
 
-    // Initialize variables
-    var i = 0; 
-
     // Number of accounts that we will be editing in the account mapping sheet
-    var num_accounts_to_edit = 0;
+    let num_accounts_to_edit = 0;
 
     // Sanity check
     if(account_map.num_maps == 0)
@@ -168,26 +164,25 @@ function updateAccountMap(account_map, account_data, key_to_update)
     }
 
     // Loop through the accounts and change the account names in account_map.data [] and account_map.map_list []
-    for(i = 0; i < account_data.length; i++)
+    for(let i = 0; i < account_data.length; i++)
     {
-        var org_id = account_data[i].org_id;
+        const org_id = common.checkandHandleBlank(account_data[i].org_id);
         // Sanity check
-        if(org_id.toString().trim() == "")
+        if(org_id == "")
         {
             common.statusMessage(fn, "Invalid org ID");
             continue;
         }
 
-        var val_to_update = account_data[i][key_to_update];
-        if(val_to_update.toString().trim() == "")
+        const val_to_update = common.checkandHandleBlank(account_data[i][key_to_update]);
+        if(val_to_update == "")
         {
             common.statusMessage(fn, "Invalid value for ", key_to_update);
             continue;
         }
 
-        var offset = -1;
-        
         // Check if the org exists
+        let offset = -1;
         if((offset = account_map.getOrgOffset(org_id)) < 0)
         {
             common.statusMessage(fn, "Failed to locate org with ID: ", org_id, ", will not be changing account name");
