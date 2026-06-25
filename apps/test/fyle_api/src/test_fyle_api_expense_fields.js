@@ -8,9 +8,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_expense_fields()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_expense_fields.name;
+    const _fn = test_fyle_api_get_expense_fields.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -22,12 +22,12 @@ async function test_fyle_api_get_expense_fields()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     await fyle_acc.expense_field.getExpenseFields(null, null, null);
-    common.statusMessage(fn,"Expense fields retrieved successfully !!!. Number of expense fields retrieved: " + fyle_acc.expense_fields.num_expense_fields);
+    common.statusMessage(_fn,"Expense fields retrieved successfully !!!. Number of expense fields retrieved: " + fyle_acc.expense_fields.num_expense_fields);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -35,9 +35,9 @@ async function test_fyle_api_get_expense_fields()
 async function test_fyle_api_get_named_expense_field()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_named_expense_field.name;
+    const _fn = test_fyle_api_get_named_expense_field.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -49,31 +49,31 @@ async function test_fyle_api_get_named_expense_field()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     let ret = {};
     const field_name = "Project";
     await fyle_acc.expense_field.getNamedExpenseField(field_name, ret);
     if(ret.data)
     {
-        common.statusMessage(fn,"Named expense field " , field_name , " retrieved successfully !!!");
-        common.statusMessage(fn,"Expense Field details for " , field_name , " :" , JSON.stringify(ret.data));
+        common.statusMessage(_fn,"Named expense field " , field_name , " retrieved successfully !!!");
+        common.statusMessage(_fn,"Expense Field details for " , field_name , " :" , JSON.stringify(ret.data));
     }
     else
     {
-        common.statusMessage(fn,"Expense field with name " , field_name , " not found");
+        common.statusMessage(_fn,"Expense field with name " , field_name , " not found");
     }
     
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fyle_api_set_expense_field()
 {
     // Get function name for logging
-    const fn = test_fyle_api_set_expense_field.name;
+    const _fn = test_fyle_api_set_expense_field.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
     
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -85,15 +85,15 @@ async function test_fyle_api_set_expense_field()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     let ret = {};
     const field_name = "Onward Travel Class";
     await fyle_acc.expense_field.getNamedExpenseField(field_name, ret);
     if(ret.data)
     {
-        common.statusMessage(fn,"Named expense field " + field_name + " retrieved successfully !!!");
-        common.statusMessage(fn,"Expense Field details for " , field_name , " :" , JSON.stringify(ret.data));
+        common.statusMessage(_fn,"Named expense field " + field_name + " retrieved successfully !!!");
+        common.statusMessage(_fn,"Expense Field details for " , field_name , " :" , JSON.stringify(ret.data));
         
         const id = ret.data.id;
         const new_field_name = "Onward Travel Class New";
@@ -103,14 +103,14 @@ async function test_fyle_api_set_expense_field()
         const is_enabled = true;
         const is_mandatory = true;
         await fyle_acc.expense_field.setExpenseField(id, new_field_name, type, options, default_value, is_enabled, is_mandatory);
-        common.statusMessage(fn,"Expense fields updated successfully !!!");
+        common.statusMessage(_fn,"Expense fields updated successfully !!!");
     }
     else
     {
-        common.statusMessage(fn,"Expense field with name " , field_name , " not found");
+        common.statusMessage(_fn,"Expense field with name " , field_name , " not found");
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -121,7 +121,7 @@ async function test_fyle_api_set_expense_field()
 async function test_fyle_api_expense_fields()
 {
     // Get function name for logging
-    const fn = test_fyle_api_expense_fields.name;
+    const _fn = test_fyle_api_expense_fields.name;
 
     common.start_test_suite("Fyle API - Expense Fields");
 

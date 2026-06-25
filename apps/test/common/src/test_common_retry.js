@@ -6,11 +6,11 @@ const common = require("@fyle-ops/common");
 async function retry_func(retry_count)
 {
     // Get function name for logging
-    const fn = retry_func.name;
+    const _fn = retry_func.name;
     
     if(retry_count < 2)   
     {
-        common.statusMessage(fn, "Retry count: ", retry_count, " - Throwing error");
+        common.statusMessage(_fn, "Retry count: ", retry_count, " - Throwing error");
         throw new Error("Test error");
     }
     const ret = "Success at retry count: " + retry_count;
@@ -21,9 +21,9 @@ async function retry_func(retry_count)
 async function test_withRetry()
 {
     // Get function name for logging
-    const fn = test_withRetry.name;
+    const _fn = test_withRetry.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     let attempt = 0;
 
@@ -37,7 +37,7 @@ async function test_withRetry()
         common.statusMessage("test_withRetry", "Error after " + attempt + " retries: ", e.message);
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ async function test_withRetry()
 async function test_common_retry()
 {
     // Get function name for logging
-    const fn = test_common_retry.name;
+    const _fn = test_common_retry.name;
 
     common.start_test_suite("Retry functions");
     

@@ -1,6 +1,6 @@
-const { google } = require('googleapis');
 const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
+
 
 const column_formats = require("../data/column_formats.json");
 
@@ -14,10 +14,10 @@ Output: None
 function fillColumnIndices(partner_list)
 {
     // Get the function name for logging purposes
-    const fn = fillColumnIndices.name;
+    const _fn = fillColumnIndices.name;
 
     // Flatten the partner list
-    const [headers, ...rows] = common.convertNestedDatato2DArray(partner_list);
+    const [headers, ..._rows] = common.convertNestedDatato2DArray(partner_list);
 
     // For each key in the column formats, get the offset of the corresponding column in the partner list and fill in the index in the column formats
     for(let i = 0; i < column_formats.length; i++)
@@ -48,41 +48,20 @@ Output: 0 on success, -1 on failure
 async function formatPartnerSheet(partner_list, folder_id, file_name, sheet_name)
 {
     // Get the function name for logging purposes
-    const fn = formatPartnerSheet.name;
-
-    // Get authentication and drive instance
-    const auth = common.createGoogleAuth();
-    const sheets = google.sheets({ version: 'v4', auth });
-
-    // ID of the sheet that was created
-    const spreadsheet_id = await common.getFileId(folder_id, file_name);
-    if(spreadsheet_id == "")
-    {
-        common.statusMessage(fn, "Error: Could not find sheet with name: ", file_name, " in folder with ID: ", folder_id);
-        return -1;
-    }
-
-    // Get the sheet ID
-    const res = await common.GoogleSheet_findSheetByNameInGoogleSpreadsheet(sheets, spreadsheet_id, sheet_name);
-    if(!res)
-    {
-        common.statusMessage(fn, "Error: Could not find sheet with name: ", sheet_name, " in spreadsheet with ID: ", spreadsheet_id);
-        return -1;
-    }
-    const sheet_id = res.properties.sheetId;
+    const _fn = formatPartnerSheet.name;
 
     // Read data from the sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(spreadsheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", spreadsheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
 
     // Read in the number of rows and columns
     const start_row = 1;
     const start_col = 1;
-    const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
+    const {lastRow: _num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
     let curr_row = start_row;
 
     // List of all formats to be set
@@ -111,10 +90,6 @@ async function formatPartnerSheet(partner_list, folder_id, file_name, sheet_name
     // Increment the current row
     curr_row++;
 
-    // Set the start and end of the 'current' partner
-    let table_start = curr_row;
-    let table_end = table_start;
-
     for(let i = 0; i < partner_list.length; i++)
     {        
         const type = partner_list[i]["type"];
@@ -127,8 +102,6 @@ async function formatPartnerSheet(partner_list, folder_id, file_name, sheet_name
             {
                 // Move to the next row
                 curr_row ++;
-                // Set this location as the start of the table
-                table_start = curr_row;
             }
 
             // Change the format for the Master row
@@ -177,13 +150,13 @@ async function formatPartnerSheet(partner_list, folder_id, file_name, sheet_name
     }
 
     // Format the entire range of the sheet
-    let status = await common.GoogleSheet_formatRangeInGoogleSheet(sheets, spreadsheet_id, sheet_id, format_options);
+    let status = await common.GoogleSheet_formatRangeInGoogleSheet(folder_id, file_name, sheet_name, format_options);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to format range for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to format range for sheet with name " + sheet_name);
         return -1;
     }
-    common.statusMessage(fn, "Range formatted successfully for sheet with name " + sheet_name);
+    common.statusMessage(_fn, "Range formatted successfully for sheet with name " + sheet_name);
 
    
     // Before formatting, first map all the column indices
@@ -242,61 +215,61 @@ async function formatPartnerSheet(partner_list, folder_id, file_name, sheet_name
     }
 
     // Batch update the column widths
-    status = await common.GoogleSheet_setColumnWidthsInGoogleSheet(sheets, spreadsheet_id, sheet_id, col_width_requests);
+    status = await common.GoogleSheet_setColumnWidthsInGoogleSheet( folder_id, file_name, sheet_name, col_width_requests);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to update column widths for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to update column widths for sheet with name " + sheet_name);
         return -1;
     }
-    common.statusMessage(fn, "Column widths updated successfully for sheet with name " + sheet_name);
+    common.statusMessage(_fn, "Column widths updated successfully for sheet with name " + sheet_name);
 
     // Batch update the column alignments
-    status = await common.GoogleSheet_formatRangeInGoogleSheet(sheets, spreadsheet_id, sheet_id, col_align_requests);
+    status = await common.GoogleSheet_formatRangeInGoogleSheet(folder_id, file_name, sheet_name, col_align_requests);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to update column alignments for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to update column alignments for sheet with name " + sheet_name);
         return -1;
     }
-    common.statusMessage(fn, "Column alignments updated successfully for sheet with name " + sheet_name);
+    common.statusMessage(_fn, "Column alignments updated successfully for sheet with name " + sheet_name);
 
     // Batch update the column formats
-    status = await common.GoogleSheet_formatRangeInGoogleSheet(sheets, spreadsheet_id, sheet_id, col_format_requests);
+    status = await common.GoogleSheet_formatRangeInGoogleSheet(folder_id, file_name, sheet_name, col_format_requests);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to update column formats for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to update column formats for sheet with name " + sheet_name);
         return -1;
     }
-    common.statusMessage(fn, "Column formats updated successfully for sheet with name " + sheet_name);
+    common.statusMessage(_fn, "Column formats updated successfully for sheet with name " + sheet_name);
 
     // Freeze top row
     const num_rows_to_freeze = Number(process.env.PARTNER_SUCCESS_DASHBOARD_NUM_ROWS_TO_FREEZE);
-    status = await common.GoogleSheet_freezeNRowsInGoogleSheet(sheets, spreadsheet_id, sheet_id, num_rows_to_freeze);
+    status = await common.GoogleSheet_freezeNRowsInGoogleSheet(folder_id, file_name, sheet_name, num_rows_to_freeze);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to freeze top row for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to freeze top row for sheet with name " + sheet_name);
         return -1;
     }
-    common.statusMessage(fn, "Top row frozen successfully for sheet with name " + sheet_name);
+    common.statusMessage(_fn, "Top row frozen successfully for sheet with name " + sheet_name);
 
     // Freeze first 3 columns
     const num_cols_to_freeze = Number(process.env.PARTNER_SUCCESS_DASHBOARD_NUM_COLS_TO_FREEZE);
-    status = await common.GoogleSheet_freezeNColumnsInGoogleSheet(sheets, spreadsheet_id, sheet_id, num_cols_to_freeze);
+    status = await common.GoogleSheet_freezeNColumnsInGoogleSheet(folder_id, file_name, sheet_name, num_cols_to_freeze);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to freeze first " + num_cols_to_freeze + " columns for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to freeze first " + num_cols_to_freeze + " columns for sheet with name " + sheet_name);
         return -1;
     }
-    else common.statusMessage(fn, "First " + num_cols_to_freeze + " columns frozen successfully for sheet with name " + sheet_name);
+    else common.statusMessage(_fn, "First " + num_cols_to_freeze + " columns frozen successfully for sheet with name " + sheet_name);
 
     // Remove gridlines
     const hide_gridlines = true;
-    status = await common.GoogleSheet_hideGridlinesInGoogleSheet(sheets, spreadsheet_id, sheet_id, hide_gridlines);
+    status = await common.GoogleSheet_hideGridlinesInGoogleSheet(folder_id, file_name, sheet_name, hide_gridlines);
     if(status < 0)
     {
-        common.statusMessage(fn, "Failed to hide gridlines for sheet with name " + sheet_name);
+        common.statusMessage(_fn, "Failed to hide gridlines for sheet with name " + sheet_name);
         return -1;
     }
-    else common.statusMessage(fn, "Gridlines hidden successfully for sheet with name " + sheet_name);
+    else common.statusMessage(_fn, "Gridlines hidden successfully for sheet with name " + sheet_name);
 
     return 0;
 }
@@ -311,7 +284,7 @@ Output: 0 on success, -1 on failure
 async function writePartnerList(partner_list, file_name, sheet_name)
 {
     // Get the function name for logging purposes
-    const fn = writePartnerList.name;
+    const _fn = writePartnerList.name;
 
     // Local list to write out to the sheet
     const local_list = [];
@@ -379,20 +352,20 @@ async function writePartnerList(partner_list, file_name, sheet_name)
     }
 
     const folder_id = process.env.PARTNER_SUCCESS_DASHBOARD_FOLDER_ID;
-    if(await common.writeDataArrayToGoogleSheet(local_list, folder_id, file_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, file_name, sheet_name, local_list, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to write sheet: ", sheet_name, " to spreadsheet: ", file_name, " in folder: ", folder_id);
+        common.statusMessage(_fn, "Failed to write sheet: ", sheet_name, " to spreadsheet: ", file_name, " in folder: ", folder_id);
         return -1;
     }
 
     // Format the sheet next
     if(await formatPartnerSheet(partner_list, folder_id, file_name, sheet_name) < 0)
     {
-        common.statusMessage(fn, "Failed to format sheet: ", sheet_name, " in spreadsheet: ", file_name, " in folder: ", folder_id);
+        common.statusMessage(_fn, "Failed to format sheet: ", sheet_name, " in spreadsheet: ", file_name, " in folder: ", folder_id);
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully wrote sheet: ", sheet_name, " to spreadsheet: ", file_name, " in folder: ", folder_id);
+    common.statusMessage(_fn, "Successfully wrote sheet: ", sheet_name, " to spreadsheet: ", file_name, " in folder: ", folder_id);
 
     return 0;
 }
@@ -408,7 +381,7 @@ Output: 0 on success, -1 on failure
 */
 async function createPartnerDashboard(referral_list, reseller_list, wholesale_list)
 {
-    const fn = createPartnerDashboard.name;
+    const _fn = createPartnerDashboard.name;
 
     // Create a new file in the Customer Success Shared Drive -> Tooling -> Platform -> Partner Success Dashboard folder with the name format "Partner_Success_Dashboard_MM_DD_YYYY"
     const today_date = formatInTimeZone(new Date(), "UTC", "yyyy_MM_dd");
@@ -429,7 +402,7 @@ async function createPartnerDashboard(referral_list, reseller_list, wholesale_li
     // Delete "Sheet1" that was created by default
     const folder_id = process.env.PARTNER_SUCCESS_DASHBOARD_FOLDER_ID;
     const sheet_to_delete = process.env.PARTNER_SUCCESS_DASHBOARD_DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);    
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);    
 
     return 0;
 }

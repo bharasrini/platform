@@ -1,7 +1,5 @@
 const { subMonths } = require("date-fns");
 const { formatInTimeZone } = require("date-fns-tz");
-const util = require("util");
-const { statusMessage } = require("./logs");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -16,7 +14,7 @@ Output: Structure with Date Markers in last 3 months denoted by "m_1_start", "m_
 function returnPrevious3MonthsPeriodMarkers()
 {
     // Get the function name for logging
-    const fn = returnPrevious3MonthsPeriodMarkers.name;
+    const _fn = returnPrevious3MonthsPeriodMarkers.name;
 
     // Get the current date
     const todayDateObj = new Date();
@@ -96,7 +94,7 @@ Output: Structure with Date Markers for start and end of the months denoted by "
 function getMonthMarkers(period)
 {
     // Get the function name for logging
-    const fn = getMonthMarkers.name;
+    const _fn = getMonthMarkers.name;
 
     // Get the month and year of the period
     const year = period.getFullYear();
@@ -138,7 +136,7 @@ Output: Date
 function getEndOfMonth(month_offset) 
 {
     // Get the function name for logging
-    const fn = getEndOfMonth.name;
+    const _fn = getEndOfMonth.name;
 
     // Get the current date
     const end_of_month = new Date();
@@ -163,7 +161,7 @@ Output: True if the new timestamp is closer, false otherwise
 function isNewTimestampCloser(base_timestamp, new_timestamp, current_timestamp, max_interval)
 {
     // Get the function name for logging
-    const fn = isNewTimestampCloser.name;
+    const _fn = isNewTimestampCloser.name;
 
     // Compute the acceptable time interval
     let interval_timestamp = 0;
@@ -213,7 +211,7 @@ Output: String representation of Time
 function convertTimeMinutesToString(time_mins)
 {
     // Get the function name for logging
-    const fn = convertTimeMinutesToString.name;
+    const _fn = convertTimeMinutesToString.name;
 
     // Initialize the return string
     let ret_str = "";
@@ -252,7 +250,7 @@ Output: true if valid, false otherwise
 function isValidDate(dateString) 
 {
     // Get the function name for logging
-    const fn = isValidDate.name;
+    const _fn = isValidDate.name;
 
     const timestamp = Date.parse(dateString);
     return isNaN(timestamp) == false;
@@ -269,7 +267,7 @@ Output: String
 function getSinceString(interval)
 {
     // Get the function name for logging
-    const fn = getSinceString.name;
+    const _fn = getSinceString.name;
     
     const now = new Date();
     const since = new Date(now.getTime() - (interval * 60 * 60 * 1000));
@@ -287,7 +285,7 @@ Output: date that is 'n' months less than the date passed in
 function getNMonthsAgo(date,n)
 {
     // Get the function name for logging
-    const fn = getNMonthsAgo.name;
+    const _fn = getNMonthsAgo.name;
 
     const n_month_ago = subMonths(date, n);
     return n_month_ago;
@@ -328,20 +326,28 @@ function googleSheetToUTCDate(value)
     {
         return value;
     }
-    // ISO string
-    else if (typeof value === 'string')
+
+    // Numeric string from Google Sheets
+    if (typeof value === "string" && !isNaN(value))
+    {
+        value = Number(value);
+    }
+
+    if (typeof value === "string")
     {
         return new Date(value);
     }
-    else if (typeof value === 'number')
+
+    if (typeof value === "number")
     {
         const msPerDay = 24 * 60 * 60 * 1000;
-        const epoch = Date.UTC(1899, 11, 30); // Google Sheets epoch
+        const epoch = Date.UTC(1899, 11, 30);
+
         return new Date(epoch + value * msPerDay);
     }
-    else return "Invalid Date";
-}
 
+    return "Invalid Date";
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////// EXPORTS /////////////////////////////////////////////////////////////////

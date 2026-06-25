@@ -12,7 +12,7 @@ Output: Maximum row number; -1 if no valid rows are found
 function getMaxChecklistRow(checklist_format_map)
 {
     // Get the function name for logging purposes
-    const fn = getMaxChecklistRow.name;
+    const _fn = getMaxChecklistRow.name;
 
     // return value
     let max_row = -1;
@@ -38,7 +38,7 @@ Output: Checklist information in record;  0 on success, -1 on failure
 async function processSalesChecklist(checklist_file, record, checklist_format)
 {
     // Get the function name for logging purposes
-    const fn = processSalesChecklist.name;
+    const _fn = processSalesChecklist.name;
 
     // Pointer to the checklist format to use
     let checklist_format_map = null;
@@ -46,7 +46,7 @@ async function processSalesChecklist(checklist_file, record, checklist_format)
     // Sanity check
     if(!record || !checklist_file || !checklist_format)
     {
-        common.statusMessage(fn, "Invalid input parameters");
+        common.statusMessage(_fn, "Invalid input parameters");
         return -1;
     }
 
@@ -63,7 +63,7 @@ async function processSalesChecklist(checklist_file, record, checklist_format)
     // If we were unable to find the checklist format, return an error
     if(checklist_format_map == null)
     {
-        common.statusMessage(fn, "Invalid format: ", checklist_format);
+        common.statusMessage(_fn, "Invalid format: ", checklist_format);
         return -1;
     }
 
@@ -71,7 +71,7 @@ async function processSalesChecklist(checklist_file, record, checklist_format)
     const spreadsheet_id = common.getIdFromUrl(checklist_file);
     if(spreadsheet_id == "")
     {
-        common.statusMessage(fn, "Failed to extract ID from checklist file: ", checklist_file);
+        common.statusMessage(_fn, "Failed to extract ID from checklist file: ", checklist_file);
         return -1;
     }
 
@@ -79,10 +79,10 @@ async function processSalesChecklist(checklist_file, record, checklist_format)
     const sheet_name = process.env.SALES_CHECKLIST_SHEET;
 
     // Read information from the sheet
-    const data = await common.readDataFromGoogleSheet(spreadsheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheetGivenSpreadsheetID(spreadsheet_id, sheet_name, null);
     if(data === null)
     {
-        common.statusMessage(fn, "Failed to read data from checklist file: ", checklist_file);
+        common.statusMessage(_fn, "Failed to read data from checklist file: ", checklist_file);
         return -1;
     }
 
@@ -93,7 +93,7 @@ async function processSalesChecklist(checklist_file, record, checklist_format)
     const max_row_in_checklist_format = getMaxChecklistRow(checklist_format_map);
     if(num_rows < max_row_in_checklist_format)
     {
-        common.statusMessage(fn, "Checklist file has fewer rows than expected: ", checklist_file);
+        common.statusMessage(_fn, "Checklist file has fewer rows than expected: ", checklist_file);
         return -1;
     }
 

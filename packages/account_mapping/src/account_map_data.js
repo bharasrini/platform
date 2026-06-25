@@ -15,7 +15,7 @@ Output: 0 if successful, -1 if any required column is not found
 function initializeAccountMapCols(account_map)
 {
     // Get the function name for logging
-    const fn = initializeAccountMapCols.name;
+    const _fn = initializeAccountMapCols.name;
 
     // Columns in the Account Mapping sheet that we are interested in
     const account_map_lookup_cols = 
@@ -53,7 +53,7 @@ function initializeAccountMapCols(account_map)
     {
         if(account_map.cols[key] == -1)
         {
-            common.statusMessage(fn, "Failed to locate column for key: ", key);
+            common.statusMessage(_fn, "Failed to locate column for key: ", key);
             return -1;
         }
     }
@@ -73,7 +73,7 @@ Output: Offset (number). -1 returned if not found
 function getOrgOffset(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = getOrgOffset.name;
+    const _fn = getOrgOffset.name;
 
     // return value initialization
     let ret = -1;
@@ -81,7 +81,7 @@ function getOrgOffset(account_map, org_id)
     // Sanity check
     if(account_map.num_maps == 0)
     {
-        common.statusMessage(fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
+        common.statusMessage(_fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
         return ret;
     }
 
@@ -110,7 +110,7 @@ Output: Field value (string), "" is returned as the default if a match is not fo
 function getFieldValueFromAccountMap(account_map, org_id, field_name)
 {
     // Get the function name for logging
-    const fn = getFieldValueFromAccountMap.name;
+    const _fn = getFieldValueFromAccountMap.name;
 
     // Initialize return value
     let ret = "";
@@ -118,7 +118,7 @@ function getFieldValueFromAccountMap(account_map, org_id, field_name)
     // Sanity check
     if(account_map.num_maps == 0)
     {
-        common.statusMessage(fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
+        common.statusMessage(_fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
         return ret;
     }
 
@@ -151,7 +151,7 @@ Output: 0 on success, -1 on failure
 function updateAccountMap(account_map, account_data, key_to_update)
 {
     // Get the function name for logging
-    const fn = updateAccountMap.name;
+    const _fn = updateAccountMap.name;
 
     // Number of accounts that we will be editing in the account mapping sheet
     let num_accounts_to_edit = 0;
@@ -159,7 +159,7 @@ function updateAccountMap(account_map, account_data, key_to_update)
     // Sanity check
     if(account_map.num_maps == 0)
     {
-        common.statusMessage(fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
+        common.statusMessage(_fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
         return 0;
     }
 
@@ -170,14 +170,14 @@ function updateAccountMap(account_map, account_data, key_to_update)
         // Sanity check
         if(org_id == "")
         {
-            common.statusMessage(fn, "Invalid org ID");
+            common.statusMessage(_fn, "Invalid org ID");
             continue;
         }
 
         const val_to_update = common.checkandHandleBlank(account_data[i][key_to_update]);
         if(val_to_update == "")
         {
-            common.statusMessage(fn, "Invalid value for ", key_to_update);
+            common.statusMessage(_fn, "Invalid value for ", key_to_update);
             continue;
         }
 
@@ -185,11 +185,11 @@ function updateAccountMap(account_map, account_data, key_to_update)
         let offset = -1;
         if((offset = account_map.getOrgOffset(org_id)) < 0)
         {
-            common.statusMessage(fn, "Failed to locate org with ID: ", org_id, ", will not be changing account name");
+            common.statusMessage(_fn, "Failed to locate org with ID: ", org_id, ", will not be changing account name");
             continue;
         }
 
-        common.statusMessage(fn, "[" + (i+1) + "]. Updating value: ", val_to_update, " for org ID: ", org_id, " at row: ", (offset + 2));
+        common.statusMessage(_fn, "[" + (i+1) + "]. Updating value: ", val_to_update, " for org ID: ", org_id, " at row: ", (offset + 2));
         
         // Load the required field into the data []
         // Add 1 to the offset to factor in the header row

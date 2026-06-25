@@ -1,0 +1,16 @@
+{
+    "vertical_alignment": "TOP",
+    "font_family": "Arial",
+    "font_size": 12,
+    "bold": true,
+    "wrap": "WRAP",
+    "foreground_color": { "red": 0, "green": 0, "blue": 0 },
+    "background_color": { "red": 255, "green": 255, "blue": 0 },
+    "borders":
+    {
+        "top": { "style": "SOLID", "color": { "red": 183, "green": 183, "blue": 183 } },
+        "bottom": { "style": "SOLID", "color": { "red": 183, "green": 183, "blue": 183 } },
+        "left": { "style": "SOLID", "color": { "red": 183, "green": 183, "blue": 183 } },
+        "right": { "style": "SOLID", "color": { "red": 183, "green": 183, "blue": 183 } }
+    }
+}

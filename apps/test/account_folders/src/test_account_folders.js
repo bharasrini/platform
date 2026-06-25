@@ -7,9 +7,9 @@ const { createDirectAccountFolder, createPartnerAccountFolder, createWhiteLabelA
 async function test_af_create_direct_account_folder()
 {
     // Get the function name for logging
-    const fn = test_af_create_direct_account_folder.name;
+    const _fn = test_af_create_direct_account_folder.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const region = "Americas";
     const account_name = "Test Account";
@@ -26,7 +26,12 @@ async function test_af_create_direct_account_folder()
     };
 
     const result = await createDirectAccountFolder(region, account_name, account_folders);
-    common.statusMessage(fn, "Created Direct Account Folder: ", account_folders);
+    if(result === "")
+    {
+        common.statusMessage(_fn, "Failed to create Direct Account Folder: ", account_folders);
+        return;
+    }
+    common.statusMessage(_fn, "Created Direct Account Folder: ", account_folders);
 
     const region1 = "EMEA";
     const account_name1 = "Test Account 2";
@@ -42,18 +47,23 @@ async function test_af_create_direct_account_folder()
         "contract_folder_url": ""
     };
     const result1 = await createDirectAccountFolder(region1, account_name1, account_folders1);
-    common.statusMessage(fn, "Created Direct Account Folder: ", account_folders1);
+    if(result1 === "")
+    {
+        common.statusMessage(_fn, "Failed to create Direct Account Folder: ", account_folders1);
+        return;
+    }
+    common.statusMessage(_fn, "Created Direct Account Folder: ", account_folders1);
 
-    common.end_test(fn);    
+    common.end_test(_fn);    
 }
 
 
 async function test_af_create_partner_account_folder()
 {
     // Get the function name for logging
-    const fn = test_af_create_partner_account_folder.name;
+    const _fn = test_af_create_partner_account_folder.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const type = "Wholesale";
     const partner_name = "Test Partner";
@@ -71,7 +81,12 @@ async function test_af_create_partner_account_folder()
     };
 
     const result = await createPartnerAccountFolder(type, partner_name, account_name, account_folders);
-    common.statusMessage(fn, "Created Partner Account Folder: ", account_folders);
+    if(result === "")
+    {
+        common.statusMessage(_fn, "Failed to create Partner Account Folder: ", account_folders);
+        return;
+    }
+    common.statusMessage(_fn, "Created Partner Account Folder: ", account_folders);
 
     const type1 = "Referral";
     const partner_name1 = "Test Partner 2";
@@ -88,9 +103,14 @@ async function test_af_create_partner_account_folder()
         "contract_folder_url": ""
     };
     const result1 = await createPartnerAccountFolder(type1, partner_name1, account_name1, account_folders1);
-    common.statusMessage(fn, "Created Partner Account Folder: ", account_folders1);
+    if(result1 === "")
+    {
+        common.statusMessage(_fn, "Failed to create Partner Account Folder: ", account_folders1);
+        return;
+    }
+    common.statusMessage(_fn, "Created Partner Account Folder: ", account_folders1);
 
-    common.end_test(fn);    
+    common.end_test(_fn);    
 }
 
 
@@ -98,9 +118,9 @@ async function test_af_create_partner_account_folder()
 async function test_af_create_white_label_account_folder()
 {
     // Get the function name for logging
-    const fn = test_af_create_white_label_account_folder.name;
+    const _fn = test_af_create_white_label_account_folder.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const white_label_principal_name = "White Label Principal 1";
     const account_name = "Test Account";
@@ -117,7 +137,12 @@ async function test_af_create_white_label_account_folder()
     };
 
     const result = await createWhiteLabelAccountFolder(white_label_principal_name, account_name, account_folders);
-    common.statusMessage(fn, "Created White Label Account Folder: ", account_folders);
+    if(result === "")
+    {
+        common.statusMessage(_fn, "Failed to create White Label Account Folder: ", account_folders);
+        return;
+    }
+    common.statusMessage(_fn, "Created White Label Account Folder: ", account_folders);
 
     const white_label_principal_name1 = "White Label Principal 2";
     const account_name1 = "Test Account 2";
@@ -133,24 +158,29 @@ async function test_af_create_white_label_account_folder()
         "contract_folder_url": ""
     };
     const result1 = await createWhiteLabelAccountFolder(white_label_principal_name1, account_name1, account_folders1);
-    common.statusMessage(fn, "Created White Label Account Folder: ", account_folders1);
+    if(result1 === "")
+    {
+        common.statusMessage(_fn, "Failed to create White Label Account Folder: ", account_folders1);
+        return;
+    }
+    common.statusMessage(_fn, "Created White Label Account Folder: ", account_folders1);
 
-    common.end_test(fn);    
+    common.end_test(_fn);    
 }
 
 
 async function test_af_create_sales_checklist_file_name()
 {
     // Get the function name for logging
-    const fn = test_af_create_sales_checklist_file_name.name;
+    const _fn = test_af_create_sales_checklist_file_name.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_name = "Test Account for Testing, LLC.";
     const file_name = createSalesChecklistFileName(account_name);
-    common.statusMessage(fn, "Created Sales Checklist file name: ", file_name);
+    common.statusMessage(_fn, "Created Sales Checklist file name: ", file_name);
 
-    common.end_test(fn);    
+    common.end_test(_fn);    
 }
 
 
@@ -158,16 +188,16 @@ async function test_af_create_sales_checklist_file_name()
 async function test_af_create_order_form_file_name()
 {
     // Get the function name for logging
-    const fn = test_af_create_sales_checklist_file_name.name;
+    const _fn = test_af_create_sales_checklist_file_name.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_name = "Test Account for Testing, LLC.";
     const order_form_date = "03-Mar-2026";
     const file_name = createOrderFormFileName(account_name, order_form_date);
-    common.statusMessage(fn, "Created Order Form file name: ", file_name);
+    common.statusMessage(_fn, "Created Order Form file name: ", file_name);
 
-    common.end_test(fn);    
+    common.end_test(_fn);    
 }
 
 
@@ -176,7 +206,7 @@ async function test_af_create_order_form_file_name()
 async function test_account_folders()
 {
     // Get the function name for logging
-    const fn = test_account_folders.name;
+    const _fn = test_account_folders.name;
 
     common.start_test_suite("Account Folder functions");
     

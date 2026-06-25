@@ -29,6 +29,9 @@ importers:
       mime-types:
         specifier: ^3.0.2
         version: 3.0.2
+      nodemailer:
+        specifier: ^9.0.0
+        version: 9.0.0
       util:
         specifier: ^0.12.5
         version: 0.12.5
@@ -45,6 +48,9 @@ importers:
       '@eslint/markdown':
         specifier: ^7.5.1
         version: 7.5.1
+      '@types/nodemailer':
+        specifier: ^8.0.1
+        version: 8.0.1
       concurrently:
         specifier: ^9.0.1
         version: 9.2.1
@@ -232,6 +238,30 @@ importers:
         specifier: workspace:*
         version: link:../../../../packages/sales_checklist
 
+  apps/fyle/common/expense_export:
+    dependencies:
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../../packages/freshsuccess
+      '@fyle-ops/fyle_api':
+        specifier: workspace:*
+        version: link:../../../../packages/fyle_api
+
   apps/fyle/common/ignore_card_transactions:
     dependencies:
       '@fyle-ops/account_mapping':
@@ -257,6 +287,30 @@ importers:
         version: link:../../../../packages/fyle_api
 
   apps/fyle/common/map_projects_to_categories:
+    dependencies:
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../../packages/freshsuccess
+      '@fyle-ops/fyle_api':
+        specifier: workspace:*
+        version: link:../../../../packages/fyle_api
+
+  apps/fyle/common/unmap_projects_from_new_categories:
     dependencies:
       '@fyle-ops/account_mapping':
         specifier: workspace:*
@@ -342,6 +396,105 @@ importers:
       '@fyle-ops/fyle_map_projects_to_categories':
         specifier: workspace:*
         version: link:../../common/map_projects_to_categories
+      '@fyle-ops/sales_checklist':
+        specifier: workspace:*
+        version: link:../../../../packages/sales_checklist
+
+  apps/fyle/peakstar_consulting_services_llc/expense_export:
+    dependencies:
+      '@fyle-ops/account_folders':
+        specifier: workspace:*
+        version: link:../../../../packages/account_folders
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../../packages/freshsuccess
+      '@fyle-ops/fyle_api':
+        specifier: workspace:*
+        version: link:../../../../packages/fyle_api
+      '@fyle-ops/fyle_expense_export':
+        specifier: workspace:*
+        version: link:../../common/expense_export
+      '@fyle-ops/sales_checklist':
+        specifier: workspace:*
+        version: link:../../../../packages/sales_checklist
+
+  apps/fyle/peninsula_healthcare_connection_inc/expense_export:
+    dependencies:
+      '@fyle-ops/account_folders':
+        specifier: workspace:*
+        version: link:../../../../packages/account_folders
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../../packages/freshsuccess
+      '@fyle-ops/fyle_api':
+        specifier: workspace:*
+        version: link:../../../../packages/fyle_api
+      '@fyle-ops/fyle_expense_export':
+        specifier: workspace:*
+        version: link:../../common/expense_export
+      '@fyle-ops/sales_checklist':
+        specifier: workspace:*
+        version: link:../../../../packages/sales_checklist
+
+  apps/fyle/port_alberni_association_for_community_living/unmap_projects_from_categories:
+    dependencies:
+      '@fyle-ops/account_folders':
+        specifier: workspace:*
+        version: link:../../../../packages/account_folders
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../../packages/freshsuccess
+      '@fyle-ops/fyle_api':
+        specifier: workspace:*
+        version: link:../../../../packages/fyle_api
+      '@fyle-ops/fyle_unmap_projects_from_categories':
+        specifier: workspace:*
+        version: link:../../common/unmap_projects_from_new_categories
       '@fyle-ops/sales_checklist':
         specifier: workspace:*
         version: link:../../../../packages/sales_checklist
@@ -433,7 +586,61 @@ importers:
         specifier: workspace:*
         version: link:../../../packages/sales_checklist
 
+  apps/platform/daily_platform_update:
+    dependencies:
+      '@fyle-ops/account_folders':
+        specifier: workspace:*
+        version: link:../../../packages/account_folders
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../packages/freshsuccess
+      '@fyle-ops/sales_checklist':
+        specifier: workspace:*
+        version: link:../../../packages/sales_checklist
+
   apps/platform/partner_success_dashboard:
+    dependencies:
+      '@fyle-ops/account_folders':
+        specifier: workspace:*
+        version: link:../../../packages/account_folders
+      '@fyle-ops/account_mapping':
+        specifier: workspace:*
+        version: link:../../../packages/account_mapping
+      '@fyle-ops/billing':
+        specifier: workspace:*
+        version: link:../../../packages/billing
+      '@fyle-ops/common':
+        specifier: workspace:*
+        version: link:../../../packages/common
+      '@fyle-ops/csm_mapping':
+        specifier: workspace:*
+        version: link:../../../packages/csm_mapping
+      '@fyle-ops/freshdesk':
+        specifier: workspace:*
+        version: link:../../../packages/freshdesk
+      '@fyle-ops/freshsuccess':
+        specifier: workspace:*
+        version: link:../../../packages/freshsuccess
+      '@fyle-ops/sales_checklist':
+        specifier: workspace:*
+        version: link:../../../packages/sales_checklist
+
+  apps/platform/risk_dashboard:
     dependencies:
       '@fyle-ops/account_folders':
         specifier: workspace:*
@@ -514,7 +721,11 @@ importers:
         specifier: workspace:*
         version: link:../common
 
-  packages/common: {}
+  packages/common:
+    dependencies:
+      nodemailer:
+        specifier: ^9.0.0
+        version: 9.0.0
 
   packages/csm_mapping:
     dependencies:
@@ -1103,6 +1314,9 @@ packages:
 
   '@types/node@14.18.63':
     resolution: {integrity: sha512-fAtCfv4jJg+ExtXhvCkCqUKZ+4ok/JQk01qDKhL5BDDoS3AxKXhV5/MAVUZyQnSEd2GT92fkgZl0pz0Q0AzcIQ==}
+
+  '@types/nodemailer@8.0.1':
+    resolution: {integrity: sha512-PxpaInm8V1JQDd4j0ds5HfvWQk8JupS1C0Picb96QJsrrRDjBH+DlK7L4ZdNSqNULhiZRQHc40nLVShaGxXAMw==}
 
   '@types/unist@3.0.3':
     resolution: {integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==}
@@ -2111,6 +2325,10 @@ packages:
   node-fetch@3.3.2:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
+  nodemailer@9.0.0:
+    resolution: {integrity: sha512-tbPTid7d/p9jAA8CRZ3iomvrMaST0o6NYuY7v6JQZHpPRZ61mLFSPKYd7342NtOFuej9/+L48SOIxwfu2uDvtw==}
+    engines: {node: '>=6.0.0'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -3423,6 +3641,10 @@ snapshots:
 
   '@types/node@14.18.63': {}
 
+  '@types/nodemailer@8.0.1':
+    dependencies:
+      '@types/node': 14.18.63
+
   '@types/unist@3.0.3': {}
 
   '@typescript-eslint/eslint-plugin@8.59.4(@typescript-eslint/parser@8.59.4(eslint@10.0.3)(typescript@6.0.3))(eslint@10.0.3)(typescript@6.0.3)':
@@ -4707,6 +4929,8 @@ snapshots:
       data-uri-to-buffer: 4.0.1
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
+
+  nodemailer@9.0.0: {}
 
   normalize-path@3.0.0: {}
 

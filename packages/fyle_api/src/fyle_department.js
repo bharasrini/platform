@@ -1,6 +1,5 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
-const { fetchFyleData, postFyleData, putFyleData } = require("./fyle_common");
+const { fetchFyleData } = require("./fyle_common");
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,7 +44,7 @@ Output: 0 on success, -1 on failure
 function _initFyleDepartment(fyle_department, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleDepartment.name;
+    const _fn = _initFyleDepartment.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_department functions
     fyle_department.fyle_acc = fyle_acc;
@@ -64,7 +63,7 @@ Output: 0 on success, -1 on failure
 async function _getDepartments(fyle_department, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getDepartments.name;
+    const _fn = _getDepartments.name;
     
     // Point back to fyle_account instance
     const fyle_acc = fyle_department.fyle_acc;
@@ -72,7 +71,7 @@ async function _getDepartments(fyle_department, event, after, before)
     // API endpoint to get departments
     const url_path = process.env.FYLE_DEPARTMENTS_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     let offset = Number(process.env.FYLE_API_START_OFFSET);
     let limit = Number(process.env.FYLE_API_MAX_ITEMS);
@@ -106,7 +105,7 @@ async function _getDepartments(fyle_department, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -158,7 +157,7 @@ async function _getDepartments(fyle_department, event, after, before)
                 fyle_acc.departments.num_departments++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count + " departments on page " + page + ", total departments processed = " + fyle_acc.departments.num_departments);
+            common.statusMessage(_fn, "Finished processing " , this_count + " departments on page " + page + ", total departments processed = " + fyle_acc.departments.num_departments);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -169,13 +168,13 @@ async function _getDepartments(fyle_department, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get departments. Error:" , e.message);
+            common.statusMessage(_fn, "Failed to get departments. Error:" , e.message);
             return -1;
         }
 
     } while(fyle_acc.departments.num_departments < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved departments. Total departments retrieved = " , fyle_acc.departments.num_departments);
+    common.statusMessage(_fn, "Successfully retrieved departments. Total departments retrieved = " , fyle_acc.departments.num_departments);
 
     return 0;
     

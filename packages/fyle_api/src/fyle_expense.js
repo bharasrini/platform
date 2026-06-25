@@ -43,7 +43,7 @@ Output: 0 on success, -1 on failure
 function _initFyleExpense(fyle_expense, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleExpense.name;
+    const _fn = _initFyleExpense.name;
 
     // Save a reference to the fyle_account instance in fyle_expense so that we can access it in the fyle_expense functions
     fyle_expense.fyle_acc = fyle_acc;
@@ -63,7 +63,7 @@ Output: 0 on success, -1 on failure
 async function _getExpenses(fyle_expense, users, state, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getExpenses.name;
+    const _fn = _getExpenses.name;
     
     // Point back to the fyle_account instance
     const fyle_acc = fyle_expense.fyle_acc;
@@ -71,7 +71,7 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
     // API endpoint to fetch expenses
     const url_path = process.env.FYLE_EXPENSES_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Pagination variables
     let offset = Number(process.env.FYLE_API_START_OFFSET);
@@ -139,7 +139,7 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -192,7 +192,7 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
                 fyle_acc.expenses.num_expenses++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count , " expenses on page " , page , ", total expenses processed = " , fyle_acc.expenses.num_expenses);
+            common.statusMessage(_fn, "Finished processing " , this_count , " expenses on page " , page , ", total expenses processed = " , fyle_acc.expenses.num_expenses);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -203,13 +203,13 @@ async function _getExpenses(fyle_expense, users, state, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get expenses. Error: " , e.message);
+            common.statusMessage(_fn, "Failed to get expenses. Error: " , e.message);
             return -1;
         }
 
     } while(fyle_acc.expenses.num_expenses < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved expenses. Total expenses retrieved = " , fyle_acc.expenses.num_expenses);
+    common.statusMessage(_fn, "Successfully retrieved expenses. Total expenses retrieved = " , fyle_acc.expenses.num_expenses);
 
     // As a test, export the expenses to an Excel file in the downloads folder
     const downloads_folder = process.env.DOWNLOADS_FOLDER;

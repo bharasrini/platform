@@ -13,13 +13,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_ticket_data(ticket, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_ticket_data.name;
+    const _fn = fd_write_ticket_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        ticket.ticket_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_TICKETS_SHEET_NAME, 
+        ticket.ticket_list, 
         null, 
         null
     );
@@ -35,13 +35,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_group_data(group, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_group_data.name;
+    const _fn = fd_write_group_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        group.group_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_GROUPS_SHEET_NAME, 
+        group.group_list, 
         null, 
         null
     );
@@ -57,13 +57,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_company_data(company, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_company_data.name;
+    const _fn = fd_write_company_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        company.company_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_COMPANIES_SHEET_NAME, 
+        company.company_list, 
         null, 
         null
     );
@@ -79,13 +79,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_agent_data(agent, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_agent_data.name;
+    const _fn = fd_write_agent_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        agent.agent_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_AGENTS_SHEET_NAME, 
+        agent.agent_list, 
         null, 
         null
     );
@@ -101,13 +101,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_business_hours_data(business_hours, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_business_hours_data.name;
+    const _fn = fd_write_business_hours_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        business_hours.business_hours_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_BUSINESS_HOURS_SHEET_NAME, 
+        business_hours.business_hours_list, 
         null, 
         null
     );
@@ -123,13 +123,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_ticket_fields_data(ticket_fields, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_ticket_fields_data.name;
+    const _fn = fd_write_ticket_fields_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        ticket_fields.ticket_fields_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_TICKET_FIELDS_SHEET_NAME, 
+        ticket_fields.ticket_fields_list, 
         null, 
         null
     );
@@ -145,13 +145,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_ratings_data(ratings, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_ratings_data.name;
+    const _fn = fd_write_ratings_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        ratings.ratings_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_RATINGS_SHEET_NAME, 
+        ratings.ratings_list, 
         null, 
         null
     );
@@ -167,13 +167,13 @@ Output: 0 on success, -1 on failure
 async function fd_write_email_config_data(email_config, file_name)
 {
     // Get the function name for logging purposes
-    const fn = fd_write_email_config_data.name;
+    const _fn = fd_write_email_config_data.name;
 
-    return await common.filterAndWriteDataToGoogleSheet(
-        email_config.email_config_list, 
+    return await common.GoogleSheet_filterAndWriteDataToGoogleSheet(
         process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID, 
         file_name, 
         process.env.FRESHDESK_DATA_BACKUP_EMAIL_CONFIG_SHEET_NAME, 
+        email_config.email_config_list, 
         null, 
         null
     );
@@ -188,9 +188,9 @@ Output: 0 on success, -1 on failure
 async function takeFreshdeskBackup()
 {
     // Get the function name for logging purposes
-    const fn = takeFreshdeskBackup.name;
+    const _fn = takeFreshdeskBackup.name;
 
-    common.statusMessage(fn, " ****************** Freshdesk Backup Start ****************** ");
+    common.statusMessage(_fn, " ****************** Freshdesk Backup Start ****************** ");
 
     // Get all tickets for the last 3 months
     const three_months = 3;
@@ -199,39 +199,39 @@ async function takeFreshdeskBackup()
     const since_str = formatInTimeZone(three_months_ago, "UTC", "yyyy-MM-dd");
     const ticket = new fd_tickets();
     await ticket.getTickets(since_str);
-    common.statusMessage(fn, "Successfully retrieved tickets data since ", since_str, ", going to get Groups data");
+    common.statusMessage(_fn, "Successfully retrieved tickets data since ", since_str, ", going to get Groups data");
 
     // Get list of all groups
     const group = new fd_group();
     await group.getGroups();
-    common.statusMessage(fn, "Successfully retrieved Groups data, going to get Companies data");
+    common.statusMessage(_fn, "Successfully retrieved Groups data, going to get Companies data");
 
     // Get list of all companies
     const company = new fd_company();
     await company.getCompanies();
-    common.statusMessage(fn, "Successfully retrieved Companies data, going to get Agents data");
+    common.statusMessage(_fn, "Successfully retrieved Companies data, going to get Agents data");
 
     // Get list of all agents    
     const agent = new fd_agent();
     await agent.getAgents();
-    common.statusMessage(fn, "Successfully retrieved Agents data, going to get Business hours data");
+    common.statusMessage(_fn, "Successfully retrieved Agents data, going to get Business hours data");
 
     // Get list of all business hours
     const business_hours = new fd_business_hours();
     await business_hours.getBusinessHours();
-    common.statusMessage(fn, "Successfully retrieved Business hours data, going to get Ticket Fields data");
+    common.statusMessage(_fn, "Successfully retrieved Business hours data, going to get Ticket Fields data");
 
     const ticket_fields = new fd_ticket_fields();
     await ticket_fields.getTicketFields();
-    common.statusMessage(fn, "Successfully retrieved Ticket fields data, going to get Ratings data");
+    common.statusMessage(_fn, "Successfully retrieved Ticket fields data, going to get Ratings data");
 
     const ratings = new fd_ratings();
     await ratings.getRatings(since_str);
-    common.statusMessage(fn, "Successfully retrieved Ratings data, going to get Email Config data");
+    common.statusMessage(_fn, "Successfully retrieved Ratings data, going to get Email Config data");
 
     const email_config = new fd_email_config();
     await email_config.getEmailConfigs();
-    common.statusMessage(fn, "Successfully retrieved Email Config data, going to write out data to google sheet");
+    common.statusMessage(_fn, "Successfully retrieved Email Config data, going to write out data to google sheet");
 
     // Create a new file every day in the My Drive -> Tooling -> Freshdesk -> Data Backup folder
     const today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd");
@@ -239,42 +239,42 @@ async function takeFreshdeskBackup()
     
     // Write out the ticket data to the sheet
     await fd_write_ticket_data(ticket, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Ticket' data, going to write 'Groups' data");
+    common.statusMessage(_fn, "Successfully wrote 'Ticket' data, going to write 'Groups' data");
     
     // Write out Group details
     await fd_write_group_data(group, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Groups' details, going to write 'Companies' details");
+    common.statusMessage(_fn, "Successfully wrote 'Groups' details, going to write 'Companies' details");
 
     // Write out company details
     await fd_write_company_data(company, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Companies' details, going to write 'Agents' details");
+    common.statusMessage(_fn, "Successfully wrote 'Companies' details, going to write 'Agents' details");
 
     // Write out agent details
     await fd_write_agent_data(agent, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Agents' details, going to write 'Business Hours' details");
+    common.statusMessage(_fn, "Successfully wrote 'Agents' details, going to write 'Business Hours' details");
 
     // Write out business hours details
     await fd_write_business_hours_data(business_hours, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Business Hours' details, going to write 'Ticket Fields' details");
+    common.statusMessage(_fn, "Successfully wrote 'Business Hours' details, going to write 'Ticket Fields' details");
 
     // Write out ticket fields details
     await fd_write_ticket_fields_data(ticket_fields, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Ticket Fields' details, going to write 'Ratings' details");
+    common.statusMessage(_fn, "Successfully wrote 'Ticket Fields' details, going to write 'Ratings' details");
 
     // Write out ratings details
     await fd_write_ratings_data(ratings, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Ratings' details, going to write 'Email Config' details");
+    common.statusMessage(_fn, "Successfully wrote 'Ratings' details, going to write 'Email Config' details");
 
     // Write out email config details
     await fd_write_email_config_data(email_config, file_name);
-    common.statusMessage(fn, "Successfully wrote 'Email Config' details, going to cleanup and exit");
+    common.statusMessage(_fn, "Successfully wrote 'Email Config' details, going to cleanup and exit");
 
     // Delete "Sheet1" that was created by default in the backup sheet
     const folder_id = process.env.FRESHDESK_DATA_BACKUP_FOLDER_ID;
     const sheet_to_delete = process.env.FRESHDESK_DATA_BACKUP_DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
-    common.statusMessage(fn, " ****************** Freshdesk Backup End ****************** ");
+    common.statusMessage(_fn, " ****************** Freshdesk Backup End ****************** ");
 
     return;
 }

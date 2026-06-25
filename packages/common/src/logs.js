@@ -1,7 +1,35 @@
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Buffer to store execution logs
+const execution_logs = [];
+
+
+/* 
+Function: getExecutionLogs
+Purpose: Retrieve the execution logs
+Inputs: none
+Output: execution logs as a string
+*/
+function getExecutionLogs()
+{
+    return execution_logs.join("\n");
+}
+
+
+/* 
+Function: clearExecutionLogs
+Purpose: Clear the execution logs
+Inputs: none
+Output: none
+*/
+function clearExecutionLogs()
+{
+    execution_logs.length = 0; // Clear the array
+    return;
+}
+
 
 /* 
 Function: statusMessage
@@ -11,6 +39,11 @@ Output: none
 */
 function statusMessage(calling_func, ...args)
 {
+    const message = `${calling_func} : ${args.join(" ")}`;
+    
+    // Push the message to the execution_logs
+    execution_logs.push(message);
+
     // Log the message to the console
     console.log(calling_func, ":", ...args);
 
@@ -86,9 +119,11 @@ function end_test_suite(suite_name)
 module.exports = 
 { 
     statusMessage,
+    getExecutionLogs,
+    clearExecutionLogs,
     start_test,
     end_test,
     start_test_suite,
-    end_test_suite
+    end_test_suite,
 };
 

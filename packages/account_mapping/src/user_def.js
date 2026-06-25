@@ -1,4 +1,3 @@
-const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -24,7 +23,7 @@ Output: Account Mapping User definition, by default "report_0" is returned
 function convertFSUserDefToAccountMap(user_def)
 {
     // Get the function name for logging
-    const fn = convertFSUserDefToAccountMap.name;
+    const _fn = convertFSUserDefToAccountMap.name;
 
     // If it's already in the Account Mapping format, return the same
     for(let i = 0; i < fs_to_account_map_tbl.length; i++)
@@ -58,7 +57,7 @@ Output: FS User definition, by default ">= 1 report" is returned
 function convertAccountMapUserDefToFS(user_def)
 {
     // Get the function name for logging
-    const fn = convertAccountMapUserDefToFS.name;
+    const _fn = convertAccountMapUserDefToFS.name;
 
 
     // If it's already in the FS format, return the same

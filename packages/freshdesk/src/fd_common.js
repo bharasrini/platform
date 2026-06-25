@@ -24,7 +24,7 @@ async function fetchFreshdeskData(
 }) 
 {
     // Get the function name for logging
-    const fn = fetchFreshdeskData.name;
+    const _fn = fetchFreshdeskData.name;
 
     // Read environment variables
     const api_key_orig = process.env.FRESHDESK_API_KEY;
@@ -38,7 +38,7 @@ async function fetchFreshdeskData(
     if(updated_since) url.searchParams.append("updated_since", updated_since);
     if(include) url.searchParams.append("include", include);
 
-    common.statusMessage(fn, "Freshdesk URL = ", url.toString());
+    common.statusMessage(_fn, "Freshdesk URL = ", url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -80,7 +80,7 @@ async function sendFreshdeskData(
 }) 
 {
     // Get the function name for logging
-    const fn = sendFreshdeskData.name;
+    const _fn = sendFreshdeskData.name;
 
     // Read environment variables
     const api_key_orig = process.env.FRESHDESK_API_KEY;
@@ -89,7 +89,7 @@ async function sendFreshdeskData(
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
     const api_key_base64 = Buffer.from(`${api_key_orig}:X`).toString("base64");
 
-    common.statusMessage(fn, "Freshdesk URL = ", url.toString());
+    common.statusMessage(_fn, "Freshdesk URL = ", url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -134,7 +134,7 @@ async function postFreshdeskData(
 }) 
 {
     // Get the function name for logging
-    const fn = postFreshdeskData.name;
+    const _fn = postFreshdeskData.name;
 
     return await sendFreshdeskData({url_path, method: "POST", data_load});
 }
@@ -155,7 +155,7 @@ async function putFreshdeskData(
 }) 
 {
     // Get the function name for logging
-    const fn = putFreshdeskData.name;
+    const _fn = putFreshdeskData.name;
     
     return await sendFreshdeskData({url_path, method: "PUT", data_load});
 }

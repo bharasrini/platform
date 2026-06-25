@@ -1,0 +1,15 @@
+[
+    {
+        "org_code": "ORG_1",
+        "categories":
+        [
+            "Direct Projects / Supplies",
+            "Direct Projects / Subcontractors",
+            "Direct Projects / Travel",
+            "Direct Projects / Fuel",
+            "Direct Projects / Meals",
+            "Direct Projects / Licenses & Permits",
+            "Direct Projects / Equipment Rental"
+        ]
+    }
+]

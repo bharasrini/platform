@@ -18,12 +18,12 @@ Output: 0 on success, -1 on failure
 async function exportToExcelFile(data_array, dir_name, file_name, sheet_name)
 {
     // Get the function name for logging purposes
-    const fn = exportToExcelFile.name;
+    const _fn = exportToExcelFile.name;
     
     // Sanity check - if data_array is empty, return without creating the file
     if (!data_array || data_array.length === 0)
     {
-        statusMessage(fn, "No data to export");
+        statusMessage(_fn, "No data to export");
         return 0;
     }
 
@@ -61,11 +61,11 @@ async function exportToExcelFile(data_array, dir_name, file_name, sheet_name)
         const fullPath = path.join(output_dir, file_name);
         await workbook.xlsx.writeFile(fullPath);
 
-        statusMessage(fn, "Excel file saved at: " , fullPath);
+        statusMessage(_fn, "Excel file saved at: " , fullPath);
     }
     catch(e)
     {
-        statusMessage(fn, "Error exporting Excel file: " , e);
+        statusMessage(_fn, "Error exporting Excel file: " , e);
         return -1;
     }
 

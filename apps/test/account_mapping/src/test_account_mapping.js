@@ -13,68 +13,68 @@ So you can safely run these tests without worrying about messing up the actual A
 async function test_getAccountMapping()
 {
     // Get the function name for logging
-    const fn = test_getAccountMapping.name;
+    const _fn = test_getAccountMapping.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
-    common.statusMessage(fn, "Account mapping data read successfully !!!");
+    common.statusMessage(_fn, "Account mapping data read successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_getAccountMappingFields()
 {
     // Get the function name for logging
-    const fn = test_getAccountMappingFields.name;
+    const _fn = test_getAccountMappingFields.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
-    common.statusMessage(fn, "Account mapping fields read successfully !!!");
+    common.statusMessage(_fn, "Account mapping fields read successfully !!!");
 
     const org_id = "orXXwruNfbqm";
     
     const offset = account_map.getOrgOffset(org_id);
-    common.statusMessage(fn, "Org offset for org_id " , org_id , " is: " , offset);
+    common.statusMessage(_fn, "Org offset for org_id " , org_id , " is: " , offset);
 
     const customer = account_map.getCustomerAccountName(org_id);
-    common.statusMessage(fn, "Customer account name for org_id " , org_id , " is: " , customer);
+    common.statusMessage(_fn, "Customer account name for org_id " , org_id , " is: " , customer);
 
     const org = account_map.getOrgName(org_id);
-    common.statusMessage(fn, "Org name for org_id " , org_id , " is: " , org);
+    common.statusMessage(_fn, "Org name for org_id " , org_id , " is: " , org);
 
     const hierarchy = account_map.getHierarchyForOrg(org_id);
-    common.statusMessage(fn, "Hierarchy for org_id " , org_id , " is: " , hierarchy);
+    common.statusMessage(_fn, "Hierarchy for org_id " , org_id , " is: " , hierarchy);
 
     const parent_org_id = account_map.getParentForOrg(org_id);
-    common.statusMessage(fn, "Parent org id for org_id " , org_id , " is: " , parent_org_id);
+    common.statusMessage(_fn, "Parent org id for org_id " , org_id , " is: " , parent_org_id);
 
     const region = account_map.getOrgRegion(org_id);
-    common.statusMessage(fn, "Region for org_id " , org_id , " is: " , region);
+    common.statusMessage(_fn, "Region for org_id " , org_id , " is: " , region);
 
     const currency = account_map.getOrgCurrency(org_id);
-    common.statusMessage(fn, "Currency for org_id " , org_id , " is: " , currency);
+    common.statusMessage(_fn, "Currency for org_id " , org_id , " is: " , currency);
 
     const au_model = account_map.getAUModel(org_id);
-    common.statusMessage(fn, "Active user model for org_id " , org_id , " is: " , au_model);
+    common.statusMessage(_fn, "Active user model for org_id " , org_id , " is: " , au_model);
 
     const enterprise_billing_org_id = account_map.getEnterpriseBillingOrgId(org_id);
-    common.statusMessage(fn, "Enterprise billing org id for org_id " , org_id , " is: " , enterprise_billing_org_id);
+    common.statusMessage(_fn, "Enterprise billing org id for org_id " , org_id , " is: " , enterprise_billing_org_id);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_appendNewAccounts()
 {
     // Get the function name for logging
-    const fn = test_appendNewAccounts.name;
+    const _fn = test_appendNewAccounts.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -110,18 +110,18 @@ async function test_appendNewAccounts()
     ];
 
     await account_map.appendNewAccounts(new_account);
-    common.statusMessage(fn, "New accounts appended successfully !!!");
+    common.statusMessage(_fn, "New accounts appended successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_updateExistingAccounts()
 {
     // Get the function name for logging
-    const fn = test_updateExistingAccounts.name;
+    const _fn = test_updateExistingAccounts.name;
 
-    common.start_test(fn);    
+    common.start_test(_fn);    
     
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -157,18 +157,18 @@ async function test_updateExistingAccounts()
     ];
 
     await account_map.editExistingAccounts(existing_account);
-    common.statusMessage(fn, "Existing accounts edited successfully !!!");
+    common.statusMessage(_fn, "Existing accounts edited successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_changeAccountNames()
 {
     // Get the function name for logging
-    const fn = test_changeAccountNames.name;
+    const _fn = test_changeAccountNames.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -186,18 +186,18 @@ async function test_changeAccountNames()
     ];
 
     await account_map.changeAccountNames(account_names);
-    common.statusMessage(fn, "Account names changed successfully !!!");
+    common.statusMessage(_fn, "Account names changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_changeOrgNames()
 {
     // Get the function name for logging
-    const fn = test_changeOrgNames.name;
+    const _fn = test_changeOrgNames.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -215,18 +215,18 @@ async function test_changeOrgNames()
     ];
 
     await account_map.changeOrgNames(org_names);
-    common.statusMessage(fn, "Org names changed successfully !!!");
+    common.statusMessage(_fn, "Org names changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
     
 
 async function test_changeHierarchies()
 {
     // Get the function name for logging
-    const fn = test_changeHierarchies.name;
+    const _fn = test_changeHierarchies.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -244,18 +244,18 @@ async function test_changeHierarchies()
     ];
 
     await account_map.changeHierarchies(hierarchies);
-    common.statusMessage(fn, "Hierarchies changed successfully !!!");
+    common.statusMessage(_fn, "Hierarchies changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_changeParentOrgIDs()
 {
     // Get the function name for logging
-    const fn = test_changeParentOrgIDs.name;
+    const _fn = test_changeParentOrgIDs.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -273,18 +273,18 @@ async function test_changeParentOrgIDs()
     ];
 
     await account_map.changeParentOrgIDs(parent_org_ids);
-    common.statusMessage(fn, "Parent org IDs changed successfully !!!");
+    common.statusMessage(_fn, "Parent org IDs changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_changeCountries()
 {
     // Get the function name for logging
-    const fn = test_changeCountries.name;
+    const _fn = test_changeCountries.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -302,9 +302,9 @@ async function test_changeCountries()
     ];
 
     await account_map.changeCountries(countries);
-    common.statusMessage(fn, "Countries changed successfully !!!");
+    common.statusMessage(_fn, "Countries changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -312,9 +312,9 @@ async function test_changeCountries()
 async function test_changeRegions()
 {
     // Get the function name for logging
-    const fn = test_changeRegions.name;
+    const _fn = test_changeRegions.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -332,9 +332,9 @@ async function test_changeRegions()
     ];
 
     await account_map.changeRegions(regions);
-    common.statusMessage(fn, "Regions changed successfully !!!");
+    common.statusMessage(_fn, "Regions changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -342,9 +342,9 @@ async function test_changeRegions()
 async function test_changeCurrencies()
 {
     // Get the function name for logging
-    const fn = test_changeCurrencies.name;
+    const _fn = test_changeCurrencies.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
     
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -362,9 +362,9 @@ async function test_changeCurrencies()
     ];
 
     await account_map.changeCurrencies(currencies);
-    common.statusMessage(fn, "Currencies changed successfully !!!");
+    common.statusMessage(_fn, "Currencies changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -372,9 +372,9 @@ async function test_changeCurrencies()
 async function test_changeAUModels()
 {
     // Get the function name for logging
-    const fn = test_changeAUModels.name;
+    const _fn = test_changeAUModels.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -392,9 +392,9 @@ async function test_changeAUModels()
     ];
 
     await account_map.changeAUModels(au_models);
-    common.statusMessage(fn, "AU models changed successfully !!!");
+    common.statusMessage(_fn, "AU models changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -402,9 +402,9 @@ async function test_changeAUModels()
 async function test_changeEnterpriseBillingOrgID()
 {
     // Get the function name for logging
-    const fn = test_changeEnterpriseBillingOrgID.name;
+    const _fn = test_changeEnterpriseBillingOrgID.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_map = new account_mapping();
     await account_map.getAccountMappingData();
@@ -422,9 +422,9 @@ async function test_changeEnterpriseBillingOrgID()
     ];
 
     await account_map.changeEnterpriseBillingOrgIDs(enterprise_billing_org_ids);
-    common.statusMessage(fn, "Enterprise billing org IDs changed successfully !!!");
+    common.statusMessage(_fn, "Enterprise billing org IDs changed successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -432,7 +432,7 @@ async function test_changeEnterpriseBillingOrgID()
 async function test_account_mapping()
 {
     // Get the function name for logging
-    const fn = test_account_mapping.name;
+    const _fn = test_account_mapping.name;
     
     common.start_test_suite("Account Mapping functions");
 

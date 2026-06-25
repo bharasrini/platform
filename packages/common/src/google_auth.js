@@ -1,4 +1,6 @@
 const { google } = require('googleapis');
+const { statusMessage } = require("./logs");
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -8,12 +10,12 @@ const { google } = require('googleapis');
 Function: createGoogleAuth
 Purpose: Creates and returns a Google Auth object using environment variables
 Inputs: none
-Output: Google Auth object
+Output: Google Auth object on success, null on failure
 */
 function createGoogleAuth() 
 {
     // Get the function name for logging
-    const fn = createGoogleAuth.name;
+    const _fn = createGoogleAuth.name;
     
     // Read credentials from environment variables
     const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
@@ -35,14 +37,57 @@ function createGoogleAuth()
         project_id: projectId,
     };
 
-    // Create and return the Google Auth object
-    const auth = new google.auth.GoogleAuth
-    ({
-        credentials,
-        scopes: ['https://www.googleapis.com/auth/drive'],
-    });
+    try
+    {
+        // Create and return the Google Auth object
+        const auth = new google.auth.GoogleAuth
+        ({
+            credentials,
+            scopes: ['https://www.googleapis.com/auth/drive'],
+        });
 
-    return auth;
+        return auth;
+    }
+    catch (e)
+    {
+        statusMessage(_fn, "Error creating Google Auth object: ", e);
+        return null;
+    }
+}
+
+
+/* 
+Function: getOAuth2Client
+Purpose: Creates and returns a Google OAuth2 client using environment variables
+Inputs: none
+Output: Google OAuth2 client on success, null on failure
+*/
+async function getOAuth2Client()
+{
+    // Get the function name for logging
+    const _fn = getOAuth2Client.name;
+
+    try
+    {
+        // Get the OAuth2 client for Gmail API using the client ID, client secret, and refresh token from environment variables
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GMAIL_CLIENT_ID,
+            process.env.GMAIL_CLIENT_SECRET
+        );
+
+        // Set the credentials for the OAuth2 client using the refresh token from environment variables
+        oauth2Client.setCredentials(
+        {
+            refresh_token: process.env.GMAIL_REFRESH_TOKEN
+        });
+
+        return oauth2Client;
+    }
+    catch (e)
+    {
+        statusMessage(_fn, "Error creating OAuth2 client: ", e);
+        return null;
+    }
 }
 
 
@@ -53,5 +98,6 @@ function createGoogleAuth()
 // Exporting the functions
 module.exports = 
 {
-    createGoogleAuth
+    createGoogleAuth,
+    getOAuth2Client
 };

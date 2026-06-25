@@ -15,7 +15,7 @@ Output: Formatted FreshSuccess account object
 function buildFSAccount({this_account})
 {
     // Get the function name for logging
-    const fn = buildFSAccount.name;
+    const _fn = buildFSAccount.name;
     
     // Get period markers for the last 3 months
     const last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();

@@ -26,7 +26,7 @@ async function fetchFreshsuccessData(
 }) 
 {
     // Get the function name for logging purposes
-    const fn = fetchFreshsuccessData.name;
+    const _fn = fetchFreshsuccessData.name;
 
     // Read environment variables
     const api_key_orig = process.env.FRESHSUCCESS_API_KEY;
@@ -44,7 +44,7 @@ async function fetchFreshsuccessData(
     if (direction) url.searchParams.append("direction", direction);
     if (include) url.searchParams.append("include", include);
 
-    common.statusMessage(fn, "Freshsuccess Url = ", url.toString());
+    common.statusMessage(_fn, "Freshsuccess Url = ", url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -87,7 +87,7 @@ async function sendFreshsuccessData(
 }) 
 {
     // Get the function name for logging purposes
-    const fn = sendFreshsuccessData.name;
+    const _fn = sendFreshsuccessData.name;
     
     // Read environment variables
     const api_key_orig = process.env.FRESHSUCCESS_API_KEY;
@@ -97,7 +97,7 @@ async function sendFreshsuccessData(
     const url = new URL(`https://${this_host}/api/v2/${url_path}`);
     url.searchParams.append("api_key", api_key_orig);
 
-    common.statusMessage(fn, "Freshsuccess Url = ", url.toString());
+    common.statusMessage(_fn, "Freshsuccess Url = ", url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -132,7 +132,7 @@ async function sendFreshsuccessData(
         const data = await res.json();
         const req_status = (data.status_is_ok != true)? "status_not_ok":"status_is_ok";
         
-        if(data.status_is_ok != true)
+        if(req_status === "status_not_ok")
         {
             if(data.failed_results)
             {
@@ -146,8 +146,8 @@ async function sendFreshsuccessData(
                 }
 
                 // Log the error details
-                common.statusMessage(fn, status_detail, "");
-                common.statusMessage(fn, "Fatal error posting data to FS, exiting", "");
+                common.statusMessage(_fn, status_detail, "");
+                common.statusMessage(_fn, "Fatal error posting data to FS, exiting", "");
             }
 
             throw new Error("Error in response from Freshsuccess API, status_is_ok is false");
@@ -172,7 +172,7 @@ async function postFreshsuccessData(
 })
 {
     // Get the function name for logging purposes
-    const fn = postFreshsuccessData.name;
+    const _fn = postFreshsuccessData.name;
 
     return await sendFreshsuccessData(
     {
@@ -198,7 +198,7 @@ async function putFreshsuccessData(
 })
 {
     // Get the function name for logging purposes
-    const fn = putFreshsuccessData.name;
+    const _fn = putFreshsuccessData.name;
     
     return await sendFreshsuccessData(
     {
@@ -222,7 +222,7 @@ async function deleteFreshsuccessData(
 })
 {
     // Get the function name for logging purposes
-    const fn = deleteFreshsuccessData.name;
+    const _fn = deleteFreshsuccessData.name;
 
     return await sendFreshsuccessData(
     {

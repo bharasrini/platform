@@ -2,6 +2,8 @@
     "name": "@fyle-ops/common",
     "version": "0.1.0",
     "main": "src/index.js",
-    "type": "commonjs"
+    "type": "commonjs",
+    "dependencies": {
+        "nodemailer": "^9.0.0"
+    }
 }
-

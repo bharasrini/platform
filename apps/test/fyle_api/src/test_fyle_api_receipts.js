@@ -1,8 +1,5 @@
 const { formatInTimeZone } = require("date-fns-tz");
 const { fyle_account } = require("@fyle-ops/fyle_api");
-const mime = require("mime-types");
-const fs = require("fs/promises");
-const path = require("path");
 const common = require("@fyle-ops/common");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -13,9 +10,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_receipt_list()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_receipt_list.name;
+    const _fn = test_fyle_api_get_receipt_list.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -27,7 +24,7 @@ async function test_fyle_api_get_receipt_list()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const states = ["COMPLETE", "APPROVER_PENDING", "APPROVED", "PAYMENT_PROCESSING", "PAYMENT_PENDING", "PAID"];
     const users = ["usyXAERqjQGX", "usxGgLmlhGIn", "us08ojgOHURE", "ushhTRDSOLsw", "usFKjFhQxoaw", "usD2ChrJOftx", "usEcLMSeAEaW"];
@@ -38,12 +35,12 @@ async function test_fyle_api_get_receipt_list()
     const end_date_str = formatInTimeZone(new Date(before), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
 
     await fyle_acc.expense.getExpenses(users, states, event, start_date_str, end_date_str);
-    common.statusMessage(fn,"Expenses retrieved successfully !!!");
+    common.statusMessage(_fn,"Expenses retrieved successfully !!!");
 
     await fyle_acc.receipt.getReceiptList();
-    common.statusMessage(fn,"Receipts retrieved successfully !!!. Number of receipts retrieved: " + fyle_acc.receipts.num_receipts);
+    common.statusMessage(_fn,"Receipts retrieved successfully !!!. Number of receipts retrieved: " + fyle_acc.receipts.num_receipts);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -51,9 +48,9 @@ async function test_fyle_api_get_receipt_list()
 async function test_fyle_api_get_receipt_links()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_receipt_links.name;
+    const _fn = test_fyle_api_get_receipt_links.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -65,7 +62,7 @@ async function test_fyle_api_get_receipt_links()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const states = ["COMPLETE", "APPROVER_PENDING", "APPROVED", "PAYMENT_PROCESSING", "PAYMENT_PENDING", "PAID"];
     const users = ["usyXAERqjQGX", "usxGgLmlhGIn", "us08ojgOHURE", "ushhTRDSOLsw", "usFKjFhQxoaw", "usD2ChrJOftx", "usEcLMSeAEaW"];
@@ -76,24 +73,24 @@ async function test_fyle_api_get_receipt_links()
     const end_date_str = formatInTimeZone(new Date(before), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
 
     await fyle_acc.expense.getExpenses(users, states, event, start_date_str, end_date_str);
-    common.statusMessage(fn,"Expenses retrieved successfully !!!. Number of expenses retrieved: " + fyle_acc.expenses.num_expenses);
+    common.statusMessage(_fn,"Expenses retrieved successfully !!!. Number of expenses retrieved: " + fyle_acc.expenses.num_expenses);
 
     await fyle_acc.receipt.getReceiptList();
-    common.statusMessage(fn,"Receipts retrieved successfully !!!. Number of receipts retrieved: " + fyle_acc.receipts.num_receipts);
+    common.statusMessage(_fn,"Receipts retrieved successfully !!!. Number of receipts retrieved: " + fyle_acc.receipts.num_receipts);
 
     await fyle_acc.receipt.getReceiptLinks();
-    common.statusMessage(fn,"Receipt links retrieved successfully !!!");
+    common.statusMessage(_fn,"Receipt links retrieved successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fyle_api_get_receipt()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_receipt.name;
+    const _fn = test_fyle_api_get_receipt.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -105,7 +102,7 @@ async function test_fyle_api_get_receipt()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const states = ["COMPLETE", "APPROVER_PENDING", "APPROVED", "PAYMENT_PROCESSING", "PAYMENT_PENDING", "PAID"];
     const users = ["usyXAERqjQGX", "usxGgLmlhGIn", "us08ojgOHURE", "ushhTRDSOLsw", "usFKjFhQxoaw", "usD2ChrJOftx", "usEcLMSeAEaW"];
@@ -116,16 +113,16 @@ async function test_fyle_api_get_receipt()
     const end_date_str = formatInTimeZone(new Date(before), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
 
     await fyle_acc.expense.getExpenses(users, states, event, start_date_str, end_date_str);
-    common.statusMessage(fn,"Expenses retrieved successfully !!!");
+    common.statusMessage(_fn,"Expenses retrieved successfully !!!");
 
     await fyle_acc.receipt.getReceiptList();
-    common.statusMessage(fn,"Receipts retrieved successfully !!!");
+    common.statusMessage(_fn,"Receipts retrieved successfully !!!");
 
     const receipt_id = "fib4h01PgYUA";
     await fyle_acc.receipt.getReceiptFile(receipt_id);
-    common.statusMessage(fn,"Receipt File for: " + receipt_id + " retrieved successfully !!!");
+    common.statusMessage(_fn,"Receipt File for: " + receipt_id + " retrieved successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -135,7 +132,7 @@ async function test_fyle_api_get_receipt()
 async function test_fyle_api_receipts()
 {
     // Get function name for logging
-    const fn = test_fyle_api_receipts.name;
+    const _fn = test_fyle_api_receipts.name;
 
     common.start_test_suite("Fyle API - Receipts");
 

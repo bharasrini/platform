@@ -32,19 +32,17 @@ Output: Config settings updated
 async function readConfigSettings()
 {
     // Function name for logging
-    const fn = readConfigSettings.name;
+    const _fn = readConfigSettings.name;
 
-    // Billing data input sheet ID
-    const sheet_id = process.env.BILLING_DATA_INPUT_FILE_ID;
-
-    // Sheet that has billing data input
+    const folder_id = process.env.BILLING_DATA_INPUT_FOLDER_ID;
+    const file_name = process.env.BILLING_DATA_INPUT_FILE_NAME;
     const sheet_name = process.env.BILLING_DATA_INPUT_SHEET_NAME;
 
     // Read data from this sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
     
@@ -57,43 +55,43 @@ async function readConfigSettings()
     enterprise_org_id = common.checkandHandleBlank(data[org_id_row-1][settings_col-1]);
     if(enterprise_org_id == "")
     {
-        common.statusMessage(fn, "Invalid / Blank Org ID");
+        common.statusMessage(_fn, "Invalid / Blank Org ID");
         return -1;    
     }
 
     const this_start_month = common.checkandHandleBlank(data[start_month_row-1][settings_col-1]);
     if(this_start_month == "")
     {
-        common.statusMessage(fn, "Invalid / Blank Start Month");
+        common.statusMessage(_fn, "Invalid / Blank Start Month");
         return -1;    
     }
     start_month = common.googleSheetToUTCDate(this_start_month);
     if(isNaN(start_month.getTime()))
     {
-        common.statusMessage(fn, "Invalid Date Format for Start Month: " + this_start_month);
+        common.statusMessage(_fn, "Invalid Date Format for Start Month: " + this_start_month);
         return -1;    
     }
 
     const this_end_month = common.checkandHandleBlank(data[end_month_row-1][settings_col-1]);
     if(this_end_month == "")
     {
-        common.statusMessage(fn, "Invalid / Blank End Month");
+        common.statusMessage(_fn, "Invalid / Blank End Month");
         return -1;    
     }
     end_month = common.googleSheetToUTCDate(this_end_month);
     if(isNaN(end_month.getTime()))
     {
-        common.statusMessage(fn, "Invalid Date Format for End Month: " + this_end_month);
+        common.statusMessage(_fn, "Invalid Date Format for End Month: " + this_end_month);
         return -1;    
     }
 
     if(end_month.getTime() < start_month.getTime())
     {
-        common.statusMessage(fn, "End Month: " + this_end_month + " is earlier than Start Month: " + this_start_month);
+        common.statusMessage(_fn, "End Month: " + this_end_month + " is earlier than Start Month: " + this_start_month);
         return -1;    
     }
 
-    common.statusMessage(fn, "Finished reading config settings");
+    common.statusMessage(_fn, "Finished reading config settings");
 
     return 0;
 }
@@ -109,18 +107,18 @@ Output: Updates the active_user_list
 async function buildActiveUserList(period)
 {
     // Function name for logging
-    const fn = buildActiveUserList.name;
+    const _fn = buildActiveUserList.name;
 
     // Get the billing data for the requested period
     const billing = new billing_data();
     if(await billing.getBillingLinks() < 0)
     {
-        common.statusMessage(fn, "Error getting billing links");
+        common.statusMessage(_fn, "Error getting billing links");
         return -1;
     }
     if(await billing.getActiveUsers(period) < 0)
     {
-        common.statusMessage(fn, "Error getting active users for period: " + period);
+        common.statusMessage(_fn, "Error getting active users for period: " + period);
         return -1;
     }
 
@@ -147,7 +145,7 @@ Output: 0 on success, -1 on failure
 async function writeActiveUserList()
 {
     // Get the function name for logging purposes
-    const fn = writeActiveUserList.name;
+    const _fn = writeActiveUserList.name;
 
     // Construct the file name using the account name and billing period
     const start_period_str = formatInTimeZone(start_month, "UTC", "yyyy_MM");
@@ -164,20 +162,20 @@ async function writeActiveUserList()
     const spreadsheet_id = await common.GoogleSheet_createGoogleSpreadsheet(folder_id, file_name);
     if(spreadsheet_id == null)
     {
-        common.statusMessage(fn, "Failed to create spreadsheet for billing data with name: ", file_name);
+        common.statusMessage(_fn, "Failed to create spreadsheet for billing data with name: ", file_name);
         return -1;
     }
 
     // Write out the active user data to the sheet
-    if(await common.writeDataArrayToGoogleSheet(active_user_list, folder_id, file_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, file_name, sheet_name, active_user_list, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to write active user data to Google Sheet");
+        common.statusMessage(_fn, "Failed to write active user data to Google Sheet");
         return -1;
     }
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.BILLING_DATA_OUTPUT_DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
     return 0;
 }
@@ -187,17 +185,17 @@ async function writeActiveUserList()
 async function retrieve_billing_details()
 {
     // Get the function name for logging purposes
-    const fn = retrieve_billing_details.name;
+    const _fn = retrieve_billing_details.name;
     
-    common.statusMessage(fn, " ****************** Retrieve Billing Details Start ****************** ");
+    common.statusMessage(_fn, " ****************** Retrieve Billing Details Start ****************** ");
     
     // Read config settings
     if(await readConfigSettings() < 0)
     {
-        common.statusMessage(fn, "Failed to read config settings, exiting");
+        common.statusMessage(_fn, "Failed to read config settings, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished reading config settings, going to read account mapping info for org ID: " + enterprise_org_id);
+    common.statusMessage(_fn, "Finished reading config settings, going to read account mapping info for org ID: " + enterprise_org_id);
 
     // Next read in the account mapping sheet in preparation for getting the customer ID
     const account_map = new account_mapping();
@@ -206,8 +204,8 @@ async function retrieve_billing_details()
     // Get the Account name for this org (based on enterprise_org_id)
     account_name = account_map.getCustomerAccountName(enterprise_org_id);
     if(account_name == null || account_name == "") account_name = enterprise_org_id;
-    common.statusMessage(fn, "Finished reading account mapping settings, going to get active user data for: " + account_name);
-    common.statusMessage(fn, "Start Month: " + start_month.toISOString() + ", End Month: " + end_month.toISOString());
+    common.statusMessage(_fn, "Finished reading account mapping settings, going to get active user data for: " + account_name);
+    common.statusMessage(_fn, "Start Month: " + start_month.toISOString() + ", End Month: " + end_month.toISOString());
 
     // Loop through each month from start month to end month
     let this_month = start_month;
@@ -236,13 +234,13 @@ async function retrieve_billing_details()
 
     // Now we have the active users for all months. Lets write it out
     if(await writeActiveUserList() < 0)    {
-        common.statusMessage(fn, "Failed to write active user list to billing output sheet");
+        common.statusMessage(_fn, "Failed to write active user list to billing output sheet");
         return -1;
     }
 
-    common.statusMessage(fn, "Finished writing active user list to billing output sheet, exiting");
+    common.statusMessage(_fn, "Finished writing active user list to billing output sheet, exiting");
     
-    common.statusMessage(fn, " ****************** Retrieve Billing Details End ****************** ");
+    common.statusMessage(_fn, " ****************** Retrieve Billing Details End ****************** ");
 }
 
 module.exports = 

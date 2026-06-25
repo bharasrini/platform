@@ -14,7 +14,7 @@ Output: ticket_info object with all the required details in the required format
 async function buildTicketInfo({this_ticket, group, company, agent, business_hours, ticket_fields})
 {
     // Get the function name for logging
-    const fn = buildTicketInfo.name;
+    const _fn = buildTicketInfo.name;
 
     let tags = "";
     // Tags is an array

@@ -51,7 +51,7 @@ Output: 0 on success, -1 on failure
 function _initTickets(ticket)
 {
     // Get the function name for logging
-    const fn = _initTickets.name;
+    const _fn = _initTickets.name;
 
     // Nothing to do, return success
     return 0;
@@ -69,7 +69,7 @@ Output: List of tickets in ticket.ticket_list[]. Returns 0 on success, -1 on fai
 async function _getTickets(ticket, updated_since)
 {
     // Get the function name for logging
-    const fn = _getTickets.name;
+    const _fn = _getTickets.name;
 
     // URL path for fetching tickets
     const url_path = process.env.FRESHDESK_TICKETS_URL_PATH;
@@ -143,7 +143,7 @@ async function _getTickets(ticket, updated_since)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: " , page , ", tickets processed: " , ticket.num_tickets);
+                common.statusMessage(_fn, "Processing page: " , page , ", tickets processed: " , ticket.num_tickets);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -152,7 +152,7 @@ async function _getTickets(ticket, updated_since)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of tickets. Error: ", e.message);
+            common.statusMessage(_fn, "Failed to get list of tickets. Error: ", e.message);
             return -1;
         }        
         

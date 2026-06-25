@@ -44,7 +44,7 @@ Output: 0 on success, -1 on failure
 function _initFyleFeatureConfig(fyle_feature_config, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleFeatureConfig.name;
+    const _fn = _initFyleFeatureConfig.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_feature_config functions
     fyle_feature_config.fyle_acc = fyle_acc;
@@ -66,14 +66,14 @@ Output: 0 on success, -1 on failure
 async function _getFeatureConfig(fyle_feature_config, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getFeatureConfig.name;
+    const _fn = _getFeatureConfig.name;
     
     // Point back to the fyle_account instance
     const fyle_acc = fyle_feature_config.fyle_acc;
 
     const url_path = process.env.FYLE_FEATURE_CONFIGS_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     let offset = Number(process.env.FYLE_API_START_OFFSET);
     let limit = Number(process.env.FYLE_API_MAX_ITEMS);
@@ -107,7 +107,7 @@ async function _getFeatureConfig(fyle_feature_config, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -161,7 +161,7 @@ async function _getFeatureConfig(fyle_feature_config, event, after, before)
                 fyle_acc.feature_configs.num_feature_configs++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count , " feature configurations on page " , page , ", total feature configurations processed = " , fyle_acc.feature_configs.num_feature_configs);
+            common.statusMessage(_fn, "Finished processing " , this_count , " feature configurations on page " , page , ", total feature configurations processed = " , fyle_acc.feature_configs.num_feature_configs);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -172,13 +172,13 @@ async function _getFeatureConfig(fyle_feature_config, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get feature configurations. Error:" , e.message);
+            common.statusMessage(_fn, "Failed to get feature configurations. Error:" , e.message);
             return -1;
         }
 
     } while(fyle_acc.feature_configs.num_feature_configs < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved feature configurations. Total feature configurations retrieved = " , fyle_acc.feature_configs.num_feature_configs);
+    common.statusMessage(_fn, "Successfully retrieved feature configurations. Total feature configurations retrieved = " , fyle_acc.feature_configs.num_feature_configs);
 
     // As a test, export the feature configurations to an Excel file in the downloads folder
     const downloads_folder = process.env.DOWNLOADS_FOLDER;

@@ -7,9 +7,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_projects()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_projects.name;
+    const _fn = test_fyle_api_get_projects.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -21,20 +21,20 @@ async function test_fyle_api_get_projects()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     await fyle_acc.project.getProjects();
-    common.statusMessage(fn,"Projects retrieved successfully !!!. Number of projects retrieved: " + fyle_acc.projects.num_projects);
+    common.statusMessage(_fn,"Projects retrieved successfully !!!. Number of projects retrieved: " + fyle_acc.projects.num_projects);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 async function test_fyle_api_add_projects()
 {
     // Get function name for logging
-    const fn = test_fyle_api_add_projects.name;
+    const _fn = test_fyle_api_add_projects.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -46,7 +46,7 @@ async function test_fyle_api_add_projects()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const projects_list = 
     [
@@ -56,18 +56,18 @@ async function test_fyle_api_add_projects()
     ];
 
     await fyle_acc.project.addProjects(projects_list);
-    common.statusMessage(fn,"Projects added successfully !!!. Number of projects added: " + projects_list.length);
+    common.statusMessage(_fn,"Projects added successfully !!!. Number of projects added: " + projects_list.length);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fyle_api_get_project_id()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_project_id.name;
+    const _fn = test_fyle_api_get_project_id.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -79,7 +79,7 @@ async function test_fyle_api_get_project_id()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     // Get the list of projects
     await fyle_acc.project.getProjects();
@@ -88,14 +88,14 @@ async function test_fyle_api_get_project_id()
     const project_id = fyle_acc.project.getProjectId(project_name);
     if(project_id < 0)
     {
-        common.statusMessage(fn,"Failed to get project ID for name = " , project_name);
+        common.statusMessage(_fn,"Failed to get project ID for name = " , project_name);
     }
     else
     {
-        common.statusMessage(fn,"Project ID retrieved successfully for name = " , project_name , ". Project ID = " , project_id);
+        common.statusMessage(_fn,"Project ID retrieved successfully for name = " , project_name , ". Project ID = " , project_id);
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -105,7 +105,7 @@ async function test_fyle_api_get_project_id()
 async function test_fyle_api_projects()
 {
     // Get function name for logging
-    const fn = test_fyle_api_projects.name;
+    const _fn = test_fyle_api_projects.name;
 
     common.start_test_suite("Fyle API - Projects");
 

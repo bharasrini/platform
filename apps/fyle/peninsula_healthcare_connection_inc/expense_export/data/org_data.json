@@ -1,0 +1,239 @@
+[
+    {
+        "org_code": "ORG_1",
+        "after_date": "",
+        "before_date": "",
+        "expense_fields_to_report": "Selected",
+        "expense_states": "PAID",
+        "expense_event": "created_at",
+        "default_period": "Last Month",
+        "card_transaction_states": "POSTED",
+        "expense_fields":
+        [
+            {
+                "type": "NATIVE",
+                "hierarchy": "user",
+                "field_name": "full_name",
+                "display_name": "User",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "employee",
+                "field_name": "code",
+                "display_name": "User ID",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "cost_center",
+                "field_name": "name",
+                "display_name": "Departments",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "purpose",
+                "display_name": "Purpose",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "project",
+                "field_name": "name",
+                "display_name": "Project",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "category",
+                "field_name": "name",
+                "display_name": "Category",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "merchant",
+                "display_name": "Merchant",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "source_account",
+                "field_name": "type",
+                "display_name": "Payment Mode",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Sites",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "HMIS ID",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Client Initials",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "amount",
+                "display_name": "Amount",
+                "value": "",
+                "format": "NUMBER_2D"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "spent_at",
+                "display_name": "Expense Date",
+                "value": "",
+                "format": "DATE"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "distance",
+                "display_name": "Distance (Miles)",
+                "value": "",
+                "format": "NUMBER_2D"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "distance_unit",
+                "display_name": "Distance Unit",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "mileage_rate",
+                "field_name": "rate",
+                "display_name": "Mileage Rate",
+                "value": "",
+                "format": "NUMBER_2D"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Number of Stops",
+                "value": "",
+                "format": "INTEGER"
+            },
+            {
+                "type": "NATIVE",
+                "hierarchy": "",
+                "field_name": "mileage_is_round_trip",
+                "display_name": "Round Trip",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Start Address",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "End Address",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 1",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 2",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 3",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 4",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 5",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 6",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 7",
+                "value": "",
+                "format": "STRING"
+            },
+            {
+                "type": "DERIVED",
+                "hierarchy": "",
+                "field_name": "",
+                "display_name": "Stop 8",
+                "value": "",
+                "format": "STRING"
+            }
+        ]
+    }
+]

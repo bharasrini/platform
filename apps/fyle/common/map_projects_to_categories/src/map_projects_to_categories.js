@@ -14,19 +14,50 @@ Output: 0 on success, -1 on failure
 async function processInputOrgDetails(org_list, org_data)
 {
     // Get the function name for logging purposes
-    const fn = processInputOrgDetails.name;
+    const _fn = processInputOrgDetails.name;
 
     // Each element in the org_data represents an org
     for(let i = 0; i < org_data.length; i++)
     {
-        const this_org_code = org_data[i].org_code;
+        // Org code is mandatory
+        const org_code = org_data[i].org_code;
+        if(!org_code || org_code == "")
+        {
+            common.statusMessage(_fn, "Org code is missing for org at index: " + i);
+            return -1;
+        }
 
         // Org details from the .env file
-        const this_org_name = process.env[`${this_org_code}_NAME`];
-        const this_org_id = process.env[`${this_org_code}_ORG_ID`];
-        const this_client_id = process.env[`${this_org_code}_CLIENT_ID`];
-        const this_client_secret = process.env[`${this_org_code}_CLIENT_SECRET`];
-        const this_refresh_token = process.env[`${this_org_code}_REFRESH_TOKEN`];
+        const org_name = process.env[`${org_code}_NAME`];
+        if(!org_name || org_name == "")
+        {
+            common.statusMessage(_fn, "Org name is missing for org code: " + org_code);
+            return -1;
+        }
+        const org_id = process.env[`${org_code}_ORG_ID`];
+        if(!org_id || org_id == "")
+        {
+            common.statusMessage(_fn, "Org ID is missing for org code: " + org_code);
+            return -1;
+        }
+        const client_id = process.env[`${org_code}_CLIENT_ID`];
+        if(!client_id || client_id == "")
+        {
+            common.statusMessage(_fn, "Client ID is missing for org code: " + org_code);
+            return -1;
+        }
+        const client_secret = process.env[`${org_code}_CLIENT_SECRET`];
+        if(!client_secret || client_secret == "")
+        {
+            common.statusMessage(_fn, "Client Secret is missing for org code: " + org_code);
+            return -1;
+        }
+        const refresh_token = process.env[`${org_code}_REFRESH_TOKEN`];
+        if(!refresh_token || refresh_token == "")
+        {
+            common.statusMessage(_fn, "Refresh Token is missing for org code: " + org_code);
+            return -1;
+        }
 
         // Categories
         // Next read in the list of categories
@@ -38,21 +69,28 @@ async function processInputOrgDetails(org_list, org_data)
             categories.push(this_category);
         }
 
+        // If there were no categories, signal an error
+        if(categories.length == 0)
+        {
+            common.statusMessage(_fn, "No categories provided for org id: " + org_id + " org name: " + org_name);
+            return -1;
+        }
+
         // Put this into the org structure
         const this_org =
         {
             // Org details
-            org_name: this_org_name,
-            org_id: this_org_id,
+            org_name: org_name,
+            org_id: org_id,
             org_folder_id: "", // We'll populate this later based on the org's working folder within the main execution folder
 
             // Fyle Account Instance
             fyle_acc: null, // We'll populate this later when we setup the Fyle account instance for this org
 
             // Auth Info
-            client_id_str: this_client_id,
-            client_secret_str: this_client_secret,
-            refresh_token_str: this_refresh_token,
+            client_id_str: client_id,
+            client_secret_str: client_secret,
+            refresh_token_str: refresh_token,
 
             // Categories
             categories: categories,
@@ -99,12 +137,12 @@ Output: 0 on success, -1 on failure
 async function setupWorkingFolders(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = setupWorkingFolders.name;
+    const _fn = setupWorkingFolders.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -113,20 +151,20 @@ async function setupWorkingFolders(org_list, org_idx)
 
     // Locate the top level folder in the workspace
     let top_level_folder_id = process.env.FOLDER_ID;
-    const top_level_folder = await common.getGoogleDriveFolder(top_level_folder_id);
+    const top_level_folder = await common.GoogleDrive_getFolder(top_level_folder_id);
     if(!top_level_folder)
     {
-        common.statusMessage(fn, "Failed to get top level folder for id: " + top_level_folder_id);
+        common.statusMessage(_fn, "Failed to get top level folder for id: " + top_level_folder_id);
         return -1;
     }
 
     // This folder should be titled "Execution Runs". If not, create another folder within it
     const top_level_folder_name = process.env.TOP_LEVEL_FOLDER_NAME;
     // Let's create a folder with the name "Execution Runs" within the top level folder
-    const created_folder_id = await common.checkAndCreateFolderOnGoogleDrive(top_level_folder_id, top_level_folder_name);
+    const created_folder_id = await common.GoogleDrive_createFolder(top_level_folder_id, top_level_folder_name);
     if(created_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to get or create folder with name: " + top_level_folder_name + " in top level folder: " + top_level_folder.data.name);
+        common.statusMessage(_fn, "Failed to get or create folder with name: " + top_level_folder_name + " in top level folder: " + top_level_folder.data.name);
         return -1;
     }
     // Set the execution runs folder ID to the created folder ID
@@ -134,10 +172,10 @@ async function setupWorkingFolders(org_list, org_idx)
 
     // Now within the "Execution Runs" folder, create a folder for this org using the org name and org id
     const org_folder_name = this_org.org_id + "_" + common.replaceKnownSpecialCharsWithUnderscore(this_org.org_name);
-    const org_folder_id = await common.checkAndCreateFolderOnGoogleDrive(execution_runs_folder_id, org_folder_name);
+    const org_folder_id = await common.GoogleDrive_createFolder(execution_runs_folder_id, org_folder_name);
     if(org_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to get or create folder for org: " + this_org.org_id + " in Execution Runs folder: " + execution_runs_folder_id);
+        common.statusMessage(_fn, "Failed to get or create folder for org: " + this_org.org_id + " in Execution Runs folder: " + execution_runs_folder_id);
         return -1;
     }
 
@@ -146,10 +184,10 @@ async function setupWorkingFolders(org_list, org_idx)
 
     // Now the org folder is created. This will have the timestamp file, mapping file as well as logs folder. 
     // Setup the logs folder next
-    const logs_folder_id = await common.checkAndCreateFolderOnGoogleDrive(org_folder_id, "logs");
+    const logs_folder_id = await common.GoogleDrive_createFolder(org_folder_id, "logs");
     if(logs_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to get or create logs folder for org: " + this_org.org_id + " in org folder: " + org_folder_id);
+        common.statusMessage(_fn, "Failed to get or create logs folder for org: " + this_org.org_id + " in org folder: " + org_folder_id);
         return -1;
     }
 
@@ -175,49 +213,34 @@ Output: 0 on success, -1 on failure
 async function readPreviouslyUpdatedTimestamp(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = readPreviouslyUpdatedTimestamp.name;
+    const _fn = readPreviouslyUpdatedTimestamp.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
     // Get a reference to this org in the list
     const this_org = org_list[org_idx];
 
-    // Open the customer's org folder first
-    const org_folder_id = this_org.org_folder_id;
-    const org_folder =  await common.getGoogleDriveFolder(org_folder_id);
-    if(!org_folder)
-    {
-        common.statusMessage(fn, "Failed to get folder for id: " + org_folder_id);
-        return -1;
-    }
+    // Read the data from file
+    const folder_id = this_org.org_folder_id;
+    const file_name = process.env.TIMESTAMP_FILE_NAME;
+    const sheet_name = process.env.TIMESTAMP_SHEET_NAME;
 
-    // Next locate the Timestamp file in the customer's org folder
-    const timestamp_file_name = process.env.TIMESTAMP_FILE_NAME;
-    const timestamp_file_id = await common.getFileId(org_folder_id, timestamp_file_name);
-    if(timestamp_file_id == "")
-    {
-        common.statusMessage(fn, "Failed to get timestamp file in folder: " + org_folder_id);
-        return -1;
-    }
-
-    // Read data from this sheet. Set range to null to read the entire sheet
-    const timesheet_sheet_name = process.env.TIMESTAMP_SHEET_NAME;
-    const data = await common.readDataFromGoogleSheet(timestamp_file_id, timesheet_sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", timestamp_file_id, ", sheet name: ", timesheet_sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
 
     const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
     if(num_rows == 0 || num_cols == 0)
     {
-        common.statusMessage(fn, "Sheet: " + timesheet_sheet_name + " does not have any data");
+        common.statusMessage(_fn, "Sheet: " + sheet_name + " does not have any data");
         return -1;
     }
 
@@ -227,7 +250,7 @@ async function readPreviouslyUpdatedTimestamp(org_list, org_idx)
     const timestamp = common.checkandHandleBlank(data[timestamp_row-1][timestamp_col-1]);
     if(timestamp == "")
     {
-        common.statusMessage(fn, "Timestamp value is blank in sheet: " + timesheet_sheet_name);
+        common.statusMessage(_fn, "Timestamp value is blank in sheet: " + sheet_name);
         return -1;
     }
 
@@ -235,7 +258,7 @@ async function readPreviouslyUpdatedTimestamp(org_list, org_idx)
     const timestamp_date = common.googleSheetToUTCDate(timestamp);
     if(timestamp_date == "Invalid Date")
     {
-        common.statusMessage(fn, "Invalid timestamp format in sheet: " + timesheet_sheet_name);      
+        common.statusMessage(_fn, "Invalid timestamp format in sheet: " + sheet_name);      
         return -1;  
     }
 
@@ -258,49 +281,34 @@ Output: 0 on success, -1 on failure
 async function readPreviouslyUpdatedProjects(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = readPreviouslyUpdatedTimestamp.name;
+    const _fn = readPreviouslyUpdatedProjects.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
     // Get a reference to this org in the list
     const this_org = org_list[org_idx];
 
-    // Open the customer's org folder first
-    const org_folder_id = this_org.org_folder_id;
-    const org_folder =  await common.getGoogleDriveFolder(org_folder_id);
-    if(!org_folder)
-    {
-        common.statusMessage(fn, "Failed to get folder for id: " + org_folder_id);
-        return -1;
-    }
+    // Read the data from file
+    const folder_id = this_org.org_folder_id;
+    const file_name = process.env.MAPPING_FILE_NAME;
+    const sheet_name = process.env.MAPPING_SHEET_NAME;
 
-    // Next locate the Mapping file in the customer's org folder
-    const mapping_file_name = process.env.MAPPING_FILE_NAME;
-    const mapping_file_id = await common.getFileId(org_folder_id, mapping_file_name);
-    if(mapping_file_id == "")
-    {
-        common.statusMessage(fn, "Failed to get mapping file in folder: " + org_folder_id);
-        return -1;
-    }
-
-    // Read data from this sheet. Set range to null to read the entire sheet
-    const mapping_sheet_name = process.env.MAPPING_SHEET_NAME;
-    const data = await common.readDataFromGoogleSheet(mapping_file_id, mapping_sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", mapping_file_id, ", sheet name: ", mapping_sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
 
     const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
     if(num_rows == 0 || num_cols == 0)
     {
-        common.statusMessage(fn, "Sheet: " + mapping_sheet_name + " does not have any data");
+        common.statusMessage(_fn, "Sheet: " + sheet_name + " does not have any data");
         return -1;
     }
 
@@ -390,12 +398,12 @@ Output: 0 on success, -1 on failure
 async function setupFyleAccount(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = setupFyleAccount.name;
+    const _fn = setupFyleAccount.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -404,7 +412,7 @@ async function setupFyleAccount(org_list, org_idx)
 
     // Create a new Fyle Account Instance
     const fyle_acc = new fyle_account();
-    common.statusMessage(fn, "Successfully created a new Fyle account instance, going to get access token");
+    common.statusMessage(_fn, "Successfully created a new Fyle account instance, going to get access token");
 
     // Get the Access Token
     const client_id_str = this_org.client_id_str;
@@ -413,28 +421,28 @@ async function setupFyleAccount(org_list, org_idx)
 
     if(await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str) < 0)
     {
-        common.statusMessage(fn, "Failed to get access token for org: " + this_org.org_name);
+        common.statusMessage(_fn, "Failed to get access token for org: " + this_org.org_name);
         return -1;
     }
-    common.statusMessage(fn, "Successfully obtained access token for org: " + this_org.org_name + ", getting cluster domain next");
+    common.statusMessage(_fn, "Successfully obtained access token for org: " + this_org.org_name + ", getting cluster domain next");
 
 
     // Get the Cluster Endpoint
     if(await fyle_acc.auth.getClusterEndpoint() < 0)
     {
-        common.statusMessage(fn, "Failed to get cluster_domain for org: " + this_org.org_name);
+        common.statusMessage(_fn, "Failed to get cluster_domain for org: " + this_org.org_name);
         return -1;
     }
-    common.statusMessage(fn, "Successfully obtained cluster domain for org: " + this_org.org_name + ", validating cluster domain and getting org / user data next");
+    common.statusMessage(_fn, "Successfully obtained cluster domain for org: " + this_org.org_name + ", validating cluster domain and getting org / user data next");
 
 
     // Validate the cluster endpoint and get the user details
     if(await fyle_acc.auth.validateClusterEndpoint() < 0)
     {
-        common.statusMessage(fn, "Failed to validate cluster_domain for org: " + this_org.org_name);
+        common.statusMessage(_fn, "Failed to validate cluster_domain for org: " + this_org.org_name);
         return -1;
     }
-    common.statusMessage(fn, "Successfully validated cluster domain for org: " + this_org.org_name + ", setup of Fyle account instance is complete");
+    common.statusMessage(_fn, "Successfully validated cluster domain for org: " + this_org.org_name + ", setup of Fyle account instance is complete");
 
     // Store reference to the fyle account
     this_org.fyle_acc = fyle_acc;
@@ -454,12 +462,12 @@ Output: 0 on success, -1 on failure
 async function setupCategories(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = setupCategories.name;
+    const _fn = setupCategories.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -472,10 +480,10 @@ async function setupCategories(org_list, org_idx)
     // Get the master list of categories from the account
     if(await fyle_acc.category.getCategories(null, null, null) < 0)
     {
-        common.statusMessage(fn, "Failed to get list of categories for org: " + this_org.org_name + ", exiting");
+        common.statusMessage(_fn, "Failed to get list of categories for org: " + this_org.org_name + ", exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully got list of ", fyle_acc.categories.num_categories, " categories for org: " + this_org.org_name);
+    common.statusMessage(_fn, "Successfully got list of ", fyle_acc.categories.num_categories, " categories for org: " + this_org.org_name);
 
 
     // Check and ensure that the input categories are present in the org
@@ -507,7 +515,7 @@ async function setupCategories(org_list, org_idx)
 
         if(found == false)
         {
-            common.statusMessage(fn, "Failed to find category: " + input_cat_name + " in org: " + this_org.org_name);
+            common.statusMessage(_fn, "Failed to find category: " + input_cat_name + " in org: " + this_org.org_name);
             unresolved_categories.push(this_unresolved_cat);
             error = true;
         }
@@ -516,18 +524,18 @@ async function setupCategories(org_list, org_idx)
     // If there were unresolved category references, halt and signal to the user to resolve them
     if(error == true)
     {
-        common.statusMessage(fn, "Unresolved categories in org: "+ this_org.org_name + ", please resolve them - list shared in sheet 'unresolved_categories'");
+        common.statusMessage(_fn, "Unresolved categories in org: "+ this_org.org_name + ", please resolve them - list shared in sheet 'unresolved_categories'");
         const logs_folder_id = this_org.logs_folder_id;
         const logs_file_name = this_org.logs_file_name;
         const sheet_name = process.env.UNRESOLVED_CATEGORIES_SHEET_NAME;
 
-        if(await common.writeDataArrayToGoogleSheet(unresolved_categories, logs_folder_id, logs_file_name, sheet_name, true, true) < 0)
+        if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, unresolved_categories, true, true) < 0)
         {
-            common.statusMessage(fn, "Failed to write unresolved categories to Google Sheet");
+            common.statusMessage(_fn, "Failed to write unresolved categories to Google Sheet");
         }        
         return -1;
     }
-    common.statusMessage(fn, "Successfully validated list of categories for org: " + this_org.org_name);
+    common.statusMessage(_fn, "Successfully validated list of categories for org: " + this_org.org_name);
 
     return 0;
 }
@@ -544,12 +552,12 @@ Output: 0 on success, -1 on failure
 async function setupProjects(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = setupProjects.name;
+    const _fn = setupProjects.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -571,12 +579,12 @@ async function setupProjects(org_list, org_idx)
     {
         after_str = this_org.prev_timestamp;
     }
-    common.statusMessage(fn, "Going to retrieve projects created after: ", after_str, " for org: ", this_org.org_name);
+    common.statusMessage(_fn, "Going to retrieve projects created after: ", after_str, " for org: ", this_org.org_name);
 
     const this_event = process.env.FETCH_PROJECTS_EVENT;
     if(await fyle_acc.project.getProjects(this_event, after_str, null) < 0)
     {
-        common.statusMessage(fn, "Failed to get list of newly created projects for org: ", this_org.org_name);
+        common.statusMessage(_fn, "Failed to get list of newly created projects for org: ", this_org.org_name);
         return -1;
     }
 
@@ -586,10 +594,10 @@ async function setupProjects(org_list, org_idx)
     // Get the master list of projects next
     if(await fyle_acc.project.getProjects(null, null, null) < 0)
     {
-        common.statusMessage(fn, "Failed to get list of projects for org: ", this_org.org_name);
+        common.statusMessage(_fn, "Failed to get list of projects for org: ", this_org.org_name);
         return -1;
     }
-    common.statusMessage(fn, "Successfully got list of projects for org: ", this_org.org_name, ", going to get the list of recently created projects next");
+    common.statusMessage(_fn, "Successfully got list of projects for org: ", this_org.org_name, ", going to get the list of recently created projects next");
 
     return 0;
 }
@@ -607,12 +615,12 @@ Output: 0 on success, -1 on failure
 async function mapProjectsWithCategories(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = mapProjectsWithCategories.name;
+    const _fn = mapProjectsWithCategories.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -628,7 +636,11 @@ async function mapProjectsWithCategories(org_list, org_idx)
 
     // Associate the categories with these new projects
     const associations = [];
-    const final_project_list = [];
+    const category_ids = [];
+    for(let i = 0; i < categories.length; i++)
+    {
+        category_ids.push(categories[i].category_id);
+    }
 
     for(let i = 0; i < newly_created_projects.num_projects; i++)
     {
@@ -639,7 +651,7 @@ async function mapProjectsWithCategories(org_list, org_idx)
             project_name: newly_created_projects.project_list[i].name,
             project_id: newly_created_projects.project_list[i].id,
             project_created_at: newly_created_projects.project_list[i].created_at,
-            categories: categories
+            category_ids: category_ids
         };
 
         // Check if the combination of org_id + project_id has been updated in the sheet earlier, if so, lets skip
@@ -651,7 +663,7 @@ async function mapProjectsWithCategories(org_list, org_idx)
             const prev_org_id = prev_updated_projects[j].org_id;
             if((prev_org_id == fyle_acc.org_user_details.org_id) && (prev_project_id == newly_created_projects.project_list[i].id))
             {
-                common.statusMessage(fn, "Project: ", newly_created_projects.project_list[i].name, " ID: ", newly_created_projects.project_list[i].id, " was updated earlier, skipping this entry");
+                common.statusMessage(_fn, "Project: ", newly_created_projects.project_list[i].name, " ID: ", newly_created_projects.project_list[i].id, " was updated earlier, skipping this entry");
                 project_found = true;
             }
         }
@@ -659,29 +671,22 @@ async function mapProjectsWithCategories(org_list, org_idx)
         if(project_found == false)
         {
             associations.push(this_association);
-            final_project_list.push(newly_created_projects.project_list[i].name);
         }
     }
 
-    if(final_project_list.length == 0)
+    if(associations.length == 0)
     {
-        common.statusMessage(fn, "No new projects to be updated for org: ", this_org.org_name);
+        common.statusMessage(_fn, "No new projects to be updated for org: ", this_org.org_name);
         return 0;
     }
 
-    const final_category_list = [];
-    for(let i = 0; i < categories.length; i++)
+    if(await associateProjectsWithCategoriesInBulk(fyle_acc, associations) < 0)
     {
-        final_category_list.push(categories[i].category_name);
-    }
-
-    if(await associateProjectsWithCategoriesInBulk(fyle_acc, final_project_list, final_category_list) < 0)
-    {
-        common.statusMessage(fn, "Failed to update projects in bulk");
+        common.statusMessage(_fn, "Failed to update projects in bulk");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully associated categories with newly created projects for org: ", this_org.org_name);
+    common.statusMessage(_fn, "Successfully associated categories with newly created projects for org: ", this_org.org_name);
 
     // Store a copy of the associations in curr_updated_projects []
     const today_date = formatInTimeZone(new Date(), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX");
@@ -695,7 +700,7 @@ async function mapProjectsWithCategories(org_list, org_idx)
             project_name: associations[i].project_name,
             project_id: associations[i].project_id,
             project_created_at: formatInTimeZone(new Date(associations[i].project_created_at), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"),
-            categories: associations[i].categories
+            categories: categories
         };
 
         this_org.curr_updated_projects.push(this_project_entry);
@@ -720,12 +725,12 @@ Output: 0 on success, -1 on failure
 async function writeCurrentlyUpdatedProjects(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = writeCurrentlyUpdatedProjects.name;
+    const _fn = writeCurrentlyUpdatedProjects.name;
     
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -744,16 +749,16 @@ async function writeCurrentlyUpdatedProjects(org_list, org_idx)
     const sheet_name = process.env.MAPPING_SHEET_NAME;
     if(this_org.curr_updated_projects.length > 0)
     {
-        if(await common.writeDataArrayToGoogleSheet(this_org.curr_updated_projects, org_folder_id, file_name, sheet_name, true, true) < 0)
+        if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(org_folder_id, file_name, sheet_name, this_org.curr_updated_projects, true, true) < 0)
         {
-            common.statusMessage(fn, "Failed to write timestamp to Google Sheet");
+            common.statusMessage(_fn, "Failed to write timestamp to Google Sheet");
             return -1;
         }
     }
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(org_folder_id, file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(org_folder_id, file_name, sheet_to_delete);
 
     return 0;
 }
@@ -770,12 +775,12 @@ Output: 0 on success, -1 on failure
 async function writeCurrentTimestamp(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = writeCurrentTimestamp.name;
+    const _fn = writeCurrentTimestamp.name;
     
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -790,15 +795,15 @@ async function writeCurrentTimestamp(org_list, org_idx)
     const org_folder_id = this_org.org_folder_id;
     const timestamp_file_name = process.env.TIMESTAMP_FILE_NAME;
     const sheet_name = process.env.TIMESTAMP_SHEET_NAME;
-    if(await common.writeDataArrayToGoogleSheet(timestamp_array, org_folder_id, timestamp_file_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(org_folder_id, timestamp_file_name, sheet_name, timestamp_array, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to write timestamp to Google Sheet");
+        common.statusMessage(_fn, "Failed to write timestamp to Google Sheet");
         return -1;
     }
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(org_folder_id, timestamp_file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(org_folder_id, timestamp_file_name, sheet_to_delete);
 
     return 0;
 }
@@ -815,12 +820,12 @@ Output: 0 on success, -1 on failure
 async function writeLogs(org_list, org_idx)
 {
     // Get the function name for logging purposes
-    const fn = writeLogs.name;
+    const _fn = writeLogs.name;
 
     // Sanity check
     if((org_idx < 0) || (org_idx >= org_list.length))
     {
-        common.statusMessage(fn, "Invalid org index: " + org_idx);
+        common.statusMessage(_fn, "Invalid org index: " + org_idx);
         return -1;
     }
 
@@ -839,34 +844,33 @@ async function writeLogs(org_list, org_idx)
     // Write out the org user details to the log file
     let sheet_name = process.env.ORG_USER_DETAILS_SHEET_NAME;
     const org_details_arr = [fyle_acc.org_user_details];
-    await common.writeDataArrayToGoogleSheet(org_details_arr, logs_folder_id, logs_file_name, sheet_name);
+    await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, org_details_arr, true, true);
 
     // Write out the access params
     sheet_name = process.env.ACCESS_PARAMS_SHEET_NAME;
     const access_params_arr = [fyle_acc.access_params];
-    await common.writeDataArrayToGoogleSheet(access_params_arr, logs_folder_id, logs_file_name, sheet_name);
+    await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, access_params_arr, true, true);
 
     // Write out the list of all categories belonging to this org to the log file
     sheet_name = process.env.CATEGORIES_SHEET_NAME;
-    await common.writeDataArrayToGoogleSheet(fyle_acc.categories.category_list, logs_folder_id, logs_file_name, sheet_name);
+    await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, fyle_acc.categories.category_list, true, true);
 
     // Write out list of all projects belonging to this org to the log file
     sheet_name = process.env.PROJECTS_SHEET_NAME;
-    await common.writeDataArrayToGoogleSheet(fyle_acc.projects.project_list, logs_folder_id, logs_file_name, sheet_name);
+    await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, fyle_acc.projects.project_list, true, true);
 
     // Write out the list of new project category mapping associations that were created in this run
     sheet_name = process.env.PROJECT_CATEGORY_MAPPING_SHEET_NAME;
-    await common.writeDataArrayToGoogleSheet(this_org.associations, logs_folder_id, logs_file_name, sheet_name);
+    await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(logs_folder_id, logs_file_name, sheet_name, this_org.associations, true, true);
 
-    common.statusMessage(fn, "Finished writing out all logs for org: " + this_org.org_name);
+    common.statusMessage(_fn, "Finished writing out all logs for org: " + this_org.org_name);
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(logs_folder_id, logs_file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(logs_folder_id, logs_file_name, sheet_to_delete);
 
     return 0;
 }
-
 
 
 
@@ -880,9 +884,9 @@ Output: 0 on success, -1 on failure
 async function map_projects_to_categories(org_data)
 {
     // Get the function name for logging purposes
-    const fn = map_projects_to_categories.name;
+    const _fn = map_projects_to_categories.name;
 
-    common.statusMessage(fn, " ****************** Map Projects to Categories Start ****************** ");
+    common.statusMessage(_fn, " ****************** Map Projects to Categories Start ****************** ");
 
     // List of all orgs that are read from the data file and .env file
     const org_list = [];
@@ -890,114 +894,118 @@ async function map_projects_to_categories(org_data)
     // First read the list of all input org details from the data and .env file
     if(await processInputOrgDetails(org_list, org_data) < 0)
     {
-        common.statusMessage(fn, "Failed to process input org details, exiting");
+        common.statusMessage(_fn, "Failed to process input org details, exiting");
         return -1;
     }
 
     for(let i = 0; i < org_list.length; i++)
     {
-        common.statusMessage(fn, "**********************************************************************");
-        common.statusMessage(fn, "Map Projects to Categories for Org: ", org_list[i].org_name);
-        common.statusMessage(fn, "**********************************************************************");
+        common.statusMessage(_fn, "**********************************************************************");
+        common.statusMessage(_fn, "Map Projects to Categories for Org: ", org_list[i].org_name);
+        common.statusMessage(_fn, "**********************************************************************");
 
         // Setup working folders for this org
         if(await setupWorkingFolders(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to setup working folders for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to setup working folders for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully setup working folders for Org: ", org_list[i].org_name, " going to read previously updated timestamp");
+        common.statusMessage(_fn, "Successfully setup working folders for Org: ", org_list[i].org_name, " going to read previously updated timestamp");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await readPreviouslyUpdatedTimestamp(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to read previously updated timestamp for Org: ", org_list[i].org_name, " going to read previously updated projects");
+            common.statusMessage(_fn, "Failed to read previously updated timestamp for Org: ", org_list[i].org_name, " going to read previously updated projects");
             // This is a non-fatal error for this org, do nothing
         }
         else
         {
-            common.statusMessage(fn, "Successfully read previously updated timestamp for Org: ", org_list[i].org_name, " going to read previously updated projects");
+            common.statusMessage(_fn, "Successfully read previously updated timestamp for Org: ", org_list[i].org_name, " going to read previously updated projects");
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await readPreviouslyUpdatedProjects(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to read previously updated projects for Org: ", org_list[i].org_name, " going to setup Fyle account");
+            common.statusMessage(_fn, "Failed to read previously updated projects for Org: ", org_list[i].org_name, " going to setup Fyle account");
             // This is a non-fatal error for this org, do nothing
         }
         else
         {
-            common.statusMessage(fn, "Successfully read previously updated projects for Org: ", org_list[i].org_name, " going to setup Fyle account");
+            common.statusMessage(_fn, "Successfully read previously updated projects for Org: ", org_list[i].org_name, " going to setup Fyle account");
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await setupFyleAccount(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to setup Fyle account for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to setup Fyle account for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully setup Fyle account for Org: ", org_list[i].org_name, " going to setup categories next");
+        common.statusMessage(_fn, "Successfully setup Fyle account for Org: ", org_list[i].org_name, " going to setup categories next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await setupCategories(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to setup categories for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to setup categories for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully setup categories for Org: ", org_list[i].org_name, " going to setup projects next");
+        common.statusMessage(_fn, "Successfully setup categories for Org: ", org_list[i].org_name, " going to setup projects next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await setupProjects(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to setup projects for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to setup projects for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully setup projects for Org: ", org_list[i].org_name, " going to map projects with categories next");
+        common.statusMessage(_fn, "Successfully setup projects for Org: ", org_list[i].org_name, " going to map projects with categories next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await mapProjectsWithCategories(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to map projects with categories for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to map projects with categories for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully mapped projects with categories for Org: ", org_list[i].org_name, " going to write currently updated projects next");
+        common.statusMessage(_fn, "Successfully mapped projects with categories for Org: ", org_list[i].org_name, " going to write currently updated projects next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await writeCurrentlyUpdatedProjects(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to write currently updated projects for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to write currently updated projects for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully wrote currently updated projects for Org: ", org_list[i].org_name, " going to write out the current timestamp next");
+        common.statusMessage(_fn, "Successfully wrote currently updated projects for Org: ", org_list[i].org_name, " going to write out the current timestamp next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await writeCurrentTimestamp(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to write out the current timestamp for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to write out the current timestamp for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully wrote out the current timestamp for Org: ", org_list[i].org_name, " going to write out logs next");
+        common.statusMessage(_fn, "Successfully wrote out the current timestamp for Org: ", org_list[i].org_name, " going to write out logs next");
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         if(await writeLogs(org_list, i) < 0)
         {
-            common.statusMessage(fn, "Failed to write out logs for Org: ", org_list[i].org_name, " exiting");
+            common.statusMessage(_fn, "Failed to write out logs for Org: ", org_list[i].org_name, " exiting");
             continue;
         }
-        common.statusMessage(fn, "Successfully wrote out logs for Org: ", org_list[i].org_name);
+        common.statusMessage(_fn, "Successfully wrote out logs for Org: ", org_list[i].org_name);
 
     }
 
-    common.statusMessage(fn, " ****************** Map Projects to Categories End ****************** ");
+    // Send out the logs as email 
+    await common.sendLogsEmail();
+    common.statusMessage(_fn, "Successfully sent out logs email, going to exit");
+
+    common.statusMessage(_fn, " ****************** Map Projects to Categories End ****************** ");
 }
 
 module.exports =

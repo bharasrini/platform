@@ -6,17 +6,17 @@ const common = require("@fyle-ops/common");
 async function test_bl_getBillingData()
 {
     // Get the function name for logging purposes
-    const fn  = test_bl_getBillingData.name;
+    const _fn  = test_bl_getBillingData.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const billing = new billing_data();
     await billing.getBillingLinks();
     const test_date = new Date(2024, 8, 15); // 15-Sep-2024
     await billing.getBillingData(test_date);
-    common.statusMessage(fn, "Billing data read successfully !!!");
+    common.statusMessage(_fn, "Billing data read successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ async function test_bl_getBillingData()
 async function test_billing()
 {
     // Get the function name for logging purposes
-    const fn  = test_billing.name;
+    const _fn  = test_billing.name;
 
     common.start_test_suite("Billing functions");
     

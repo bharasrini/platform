@@ -56,7 +56,7 @@ Output: 0 on success, -1 on failure
 function _initEmailConfigs(email_config)
 {
     // Get the function name for logging
-    const fn = _initEmailConfigs.name;
+    const _fn = _initEmailConfigs.name;
 
     // Nothing else to do, return success
     return 0;
@@ -73,7 +73,7 @@ Output: List of email configs stored in email_config.email_config_list[]. Return
 async function _getEmailConfigs(email_config)
 {
     // Get the function name for logging
-    const fn = _getEmailConfigs.name;
+    const _fn = _getEmailConfigs.name;
 
     // URL path for fetching email configs from Freshdesk API
     const url_path = process.env.FRESHDESK_EMAIL_CONFIGS_URL_PATH;
@@ -131,7 +131,7 @@ async function _getEmailConfigs(email_config)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: ", page, ", email configs processed: ", email_config.num_email_configs);
+                common.statusMessage(_fn, "Processing page: ", page, ", email configs processed: ", email_config.num_email_configs);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -140,13 +140,13 @@ async function _getEmailConfigs(email_config)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of email configs. Error:", e.message);
+            common.statusMessage(_fn, "Failed to get list of email configs. Error:", e.message);
             return -1;
         }        
 
     }while(link);
 
-    common.statusMessage(fn, "Successfully fetched email configs. Number of email configs = ", email_config.num_email_configs);
+    common.statusMessage(_fn, "Successfully fetched email configs. Number of email configs = ", email_config.num_email_configs);
 
     return 0;
 }
@@ -162,14 +162,14 @@ Output: Email Config ID
 function _getEmailConfigID(email_config, reply_email)
 {
     // Get the function name for logging
-    const fn = _getEmailConfigID.name;
+    const _fn = _getEmailConfigID.name;
 
     let ret = 0;
 
     // Trivial check
     if(email_config.num_email_configs == 0)
     {
-        common.statusMessage(fn, "No email configs to read, possibly getEmailConfigs() not called ?");
+        common.statusMessage(_fn, "No email configs to read, possibly getEmailConfigs() not called ?");
         return ret;
     }
 
@@ -196,14 +196,14 @@ Output: Email Config ID
 function _getEmailConfigIDUsingGroupID(email_config, group_id)
 {
     // Get the function name for logging
-    const fn = _getEmailConfigIDUsingGroupID.name;
+    const _fn = _getEmailConfigIDUsingGroupID.name;
 
     let ret = 0;
 
     // Trivial check
     if(email_config.num_email_configs == 0)
     {
-        common.statusMessage(fn, "No email configs to read, possibly getEmailConfigs() not called ?");
+        common.statusMessage(_fn, "No email configs to read, possibly getEmailConfigs() not called ?");
         return ret;
     }
 

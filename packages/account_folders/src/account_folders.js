@@ -11,13 +11,13 @@ Output: Account folder hierarchy created for the account on Customer Success Int
 async function createAccountFolder(parent_folder_id, account_name, account_folders)
 {
     // Get the function name for logging purposes
-    const fn = createAccountFolder.name;
+    const _fn = createAccountFolder.name;
 
     // Create the account folder within the parent
-    const account_folder_id = await common.checkAndCreateFolderOnGoogleDrive(parent_folder_id, account_name);
+    const account_folder_id = await common.GoogleDrive_createFolder(parent_folder_id, account_name);
     if(account_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create account folder for: ", account_name, " in parent folder: ", parent_folder_id);
+        common.statusMessage(_fn, "Failed to create account folder for: ", account_name, " in parent folder: ", parent_folder_id);
         return "";
     }
 
@@ -27,10 +27,10 @@ async function createAccountFolder(parent_folder_id, account_name, account_folde
 
 
     // Create the Implementation folder within the account folder
-    const impl_folder_id = await common.checkAndCreateFolderOnGoogleDrive(account_folder_id, process.env.IMPL_FOLDER_NAME);
+    const impl_folder_id = await common.GoogleDrive_createFolder(account_folder_id, process.env.IMPL_FOLDER_NAME);
     if(impl_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create implementation folder for: ", account_name, " in account folder: ", account_folder_id);
+        common.statusMessage(_fn, "Failed to create implementation folder for: ", account_name, " in account folder: ", account_folder_id);
         return "";
     }
     // Save the implementation folder ID
@@ -39,10 +39,10 @@ async function createAccountFolder(parent_folder_id, account_name, account_folde
 
 
     // Create the Order Forms folder within the account folder
-    const order_forms_folder_id = await common.checkAndCreateFolderOnGoogleDrive(account_folder_id, process.env.ORDER_FORMS_FOLDER_NAME);
+    const order_forms_folder_id = await common.GoogleDrive_createFolder(account_folder_id, process.env.ORDER_FORMS_FOLDER_NAME);
     if(order_forms_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create order forms folder for: ", account_name, " in account folder: ", account_folder_id);
+        common.statusMessage(_fn, "Failed to create order forms folder for: ", account_name, " in account folder: ", account_folder_id);
         return "";
     }
     // Save the order forms folder ID
@@ -51,10 +51,10 @@ async function createAccountFolder(parent_folder_id, account_name, account_folde
 
 
     // Create the Contract folder within the account folder
-    const contract_folder_id = await common.checkAndCreateFolderOnGoogleDrive(account_folder_id, process.env.CONTRACT_FOLDER_NAME);
+    const contract_folder_id = await common.GoogleDrive_createFolder(account_folder_id, process.env.CONTRACT_FOLDER_NAME);
     if(contract_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create contract folder for: ", account_name, " in account folder: ", account_folder_id);
+        common.statusMessage(_fn, "Failed to create contract folder for: ", account_name, " in account folder: ", account_folder_id);
         return "";
     }
     // Save the contract folder ID
@@ -78,7 +78,7 @@ Output: Account folder hierarchy created for the account on Customer Success Int
 async function createDirectAccountFolder(region, account_name, account_folders)
 {
     // Get the function name for logging purposes
-    const fn = createDirectAccountFolder.name;
+    const _fn = createDirectAccountFolder.name;
 
     let parent_folder_id;
     if(region == "Americas")
@@ -91,7 +91,7 @@ async function createDirectAccountFolder(region, account_name, account_folders)
       parent_folder_id = process.env.DIRECT_APAC_FOLDER_ID;
     else
     {
-      common.statusMessage(fn, "Invalid region: ", region, ", unable to create folder");
+      common.statusMessage(_fn, "Invalid region: ", region, ", unable to create folder");
       return "";
     }
 
@@ -110,7 +110,7 @@ Output: Account folder hierarchy created for the account on Customer Success Int
 async function createPartnerAccountFolder(type, partner_name, account_name, account_folders)
 {
     // Get the function name for logging purposes
-    const fn = createPartnerAccountFolder.name;
+    const _fn = createPartnerAccountFolder.name;
 
     let parent_folder_id;
 
@@ -122,15 +122,15 @@ async function createPartnerAccountFolder(type, partner_name, account_name, acco
       parent_folder_id = process.env.PARTNER_WHOLESALE_FOLDER_ID;
     else
     {
-      common.statusMessage(fn, "Invalid type: ", type, ", unable to create folder");
+      common.statusMessage(_fn, "Invalid type: ", type, ", unable to create folder");
       return "";
     }
 
     // First lets create a folder for the partner within the relevant parent folder
-    const partner_folder_id = await common.checkAndCreateFolderOnGoogleDrive(parent_folder_id, partner_name);
+    const partner_folder_id = await common.GoogleDrive_createFolder(parent_folder_id, partner_name);
     if(partner_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create partner folder for: ", partner_name, " of type: ", type);
+        common.statusMessage(_fn, "Failed to create partner folder for: ", partner_name, " of type: ", type);
         return "";
     }
 
@@ -148,15 +148,15 @@ Output: Account folder hierarchy created for the account on Customer Success Int
 async function createWhiteLabelAccountFolder(white_label_principal_name, account_name, account_folders)
 {
     // Get the function name for logging purposes
-    const fn = createWhiteLabelAccountFolder.name;
+    const _fn = createWhiteLabelAccountFolder.name;
 
     const parent_folder_id = process.env.WHITE_LABEL_FOLDER_ID;
 
     // First lets create a folder for the white label principal within the relevant parent folder
-    const white_label_folder_id = await common.checkAndCreateFolderOnGoogleDrive(parent_folder_id, white_label_principal_name);
+    const white_label_folder_id = await common.GoogleDrive_createFolder(parent_folder_id, white_label_principal_name);
     if(white_label_folder_id == "")
     {
-        common.statusMessage(fn, "Failed to create white label folder for: ", white_label_principal_name);
+        common.statusMessage(_fn, "Failed to create white label folder for: ", white_label_principal_name);
         return "";
     }
 

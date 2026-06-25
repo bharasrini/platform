@@ -154,7 +154,7 @@ Output: 0 on success, -1 on failure
 function _initFyleAccount(fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleAccount.name;
+    const _fn = _initFyleAccount.name;
     
     // Initialize all the modules
     fyle_acc.auth = new fyle_auth(fyle_acc);

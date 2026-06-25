@@ -6,9 +6,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_auth_func()
 {
     // Get function name for logging
-    const fn = test_fyle_api_auth_func.name;
+    const _fn = test_fyle_api_auth_func.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -17,13 +17,13 @@ async function test_fyle_api_auth_func()
 
     const fyle_acc = new fyle_account();
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
-    common.statusMessage(fn,"Fyle API authentication successful !!!");
+    common.statusMessage(_fn,"Fyle API authentication successful !!!");
     await fyle_acc.auth.getClusterEndpoint();
-    common.statusMessage(fn,"Fyle API cluster endpoint retrieval successful !!!");
+    common.statusMessage(_fn,"Fyle API cluster endpoint retrieval successful !!!");
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Fyle API profile details retrieval successful !!!");
+    common.statusMessage(_fn,"Fyle API profile details retrieval successful !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,7 @@ async function test_fyle_api_auth_func()
 async function test_fyle_api_auth()
 {
     // Get function name for logging
-    const fn = test_fyle_api_auth.name;
+    const _fn = test_fyle_api_auth.name;
 
     common.start_test_suite("Fyle API - Auth");
 

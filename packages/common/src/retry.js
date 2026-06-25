@@ -16,7 +16,7 @@ Output: Returns the result of the function if successful, otherwise throws the l
 async function withRetry(func_to_call, retries = 3, delayMs = 1000) 
 {
     // Get the function name for logging
-    const fn = withRetry.name;
+    const _fn = withRetry.name;
 
     let lastError;
     for (let attempt = 0; attempt < retries; attempt++) 
@@ -29,7 +29,7 @@ async function withRetry(func_to_call, retries = 3, delayMs = 1000)
         catch (err)
         {
             lastError = err;
-            statusMessage(fn, `Attempt ${attempt + 1} failed: ${err.message}`);
+            statusMessage(_fn, `Attempt ${attempt + 1} failed: ${err.message}`);
 
             lastError = err;
 

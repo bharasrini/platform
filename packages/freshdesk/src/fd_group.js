@@ -56,7 +56,7 @@ Output: 0 on success, -1 on failure
 function _initGroups(group)
 {
     // Get the function name for logging
-    const fn = _initGroups.name;
+    const _fn = _initGroups.name;
 
     // Nothing else to do, return success
     return 0;
@@ -73,7 +73,7 @@ Output: List of groups stored in group.group_list[]. Returns 0 on success, -1 on
 async function _getGroups(group)
 {
     // Get the function name for logging
-    const fn = _getGroups.name;
+    const _fn = _getGroups.name;
 
     // URL path for fetching groups from Freshdesk API
     const url_path = process.env.FRESHDESK_GROUPS_URL_PATH;
@@ -131,7 +131,7 @@ async function _getGroups(group)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: ", page, ", groups processed: ", group.num_groups);
+                common.statusMessage(_fn, "Processing page: ", page, ", groups processed: ", group.num_groups);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -140,13 +140,13 @@ async function _getGroups(group)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of groups. Error:", e.message);
+            common.statusMessage(_fn, "Failed to get list of groups. Error:", e.message);
             return -1;
         }        
 
     }while(link);
 
-    common.statusMessage(fn, "Successfully fetched groups. Number of groups = ", group.num_groups);
+    common.statusMessage(_fn, "Successfully fetched groups. Number of groups = ", group.num_groups);
 
     return 0;
 }
@@ -163,14 +163,14 @@ Output: Freshdesk group name (string)
 function _getGroupName(group, group_id)
 {
     // Get the function name for logging
-    const fn = _getGroupName.name;
+    const _fn = _getGroupName.name;
     
     let ret = "";
 
     // Trivial check
     if(group.num_groups == 0)
     {
-        common.statusMessage(fn, "No Groups to read, possibly getGroups() not called ?");
+        common.statusMessage(_fn, "No Groups to read, possibly getGroups() not called ?");
         return ret;
     }
 
@@ -196,14 +196,14 @@ Output: Freshdesk group ID
 function _getGroupID(group, group_name)
 {
     // Get the function name for logging
-    const fn = _getGroupID.name;
+    const _fn = _getGroupID.name;
     
     let ret = "";
 
     // Trivial check
     if(group.num_groups == 0)
     {
-        common.statusMessage(fn, "No Groups to read, possibly getGroups() not called ?");
+        common.statusMessage(_fn, "No Groups to read, possibly getGroups() not called ?");
         return ret;
     }
 

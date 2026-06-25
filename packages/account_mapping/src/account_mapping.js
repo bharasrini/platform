@@ -1,5 +1,5 @@
 const common = require("@fyle-ops/common");
-const { convertFSUserDefToAccountMap, convertAccountMapUserDefToFS } = require("./user_def");
+const { convertFSUserDefToAccountMap } = require("./user_def");
 const { readAccountMapDataFromFile, flushAccountMapDataToFile } = require("./account_map_file");
 const { initializeAccountMapCols, getOrgOffset, getFieldValueFromAccountMap, updateAccountMap } = require("./account_map_data");
 
@@ -176,10 +176,10 @@ Purpose: Initializes the account mapping functionality
 Inputs: account mapping instance
 Output: 0 on success, -1 on failure
 */
-function _initAccountMapping(account_mapping)
+function _initAccountMapping(account_map)
 {
     // Get the function name for logging
-    const fn = _initAccountMapping.name;
+    const _fn = _initAccountMapping.name;
 
     // Nothing else to do, return success
     return 0;
@@ -196,19 +196,19 @@ Output: Account Mapping entries in account_map.map_list[]. Returns 0 on success,
 async function _getAccountMappingData(account_map)
 {
     // Get the function name for logging
-    const fn = _getAccountMappingData.name;
+    const _fn = _getAccountMappingData.name;
     
     // Check - if the function has already been invoked, just return success
     if(account_map.num_maps > 0)
     {
-        common.statusMessage(fn, "Already invoked, we have " , account_map.num_maps , " entries in the account map, returning success from here");
+        common.statusMessage(_fn, "Already invoked, we have " , account_map.num_maps , " entries in the account map, returning success from here");
         return 0;
     }
 
     // Read the account mapping data from file and populate account_map.data []
     if(await readAccountMapDataFromFile(account_map) < 0)
     {
-        common.statusMessage(fn, "Failed to read account mapping data from file");
+        common.statusMessage(_fn, "Failed to read account mapping data from file");
         return -1;
     }
 
@@ -220,7 +220,7 @@ async function _getAccountMappingData(account_map)
     // Initialize the columns in the account mapping sheet that we are interested in and store the column sequence in account_map.cols {}
     if(initializeAccountMapCols(account_map) < 0)
     {
-        common.statusMessage(fn, "Failed to initialize account map columns");
+        common.statusMessage(_fn, "Failed to initialize account map columns");
         return -1;
     }
 
@@ -266,7 +266,7 @@ async function _getAccountMappingData(account_map)
         account_map.num_maps++;
     }
 
-    common.statusMessage(fn, "Processed " , account_map.num_maps , " account mapping entries from file");
+    common.statusMessage(_fn, "Processed " , account_map.num_maps , " account mapping entries from file");
 
     return 0;
 
@@ -283,7 +283,7 @@ Output: Offset (number). -1 returned if not found
 function _getOrgOffset(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getOrgOffset.name;
+    const _fn = _getOrgOffset.name;
 
     return getOrgOffset(account_map, org_id);
 }
@@ -298,7 +298,7 @@ Output: Customer Account (string), "" is returned as the default if a match is n
 function _getCustomerAccountName(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getCustomerAccountName.name;
+    const _fn = _getCustomerAccountName.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "customer");
 }
@@ -314,7 +314,7 @@ Output: Org Name (string), "" is returned as the default if a match is not found
 function _getOrgName(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getOrgName.name;
+    const _fn = _getOrgName.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "org");
 }
@@ -330,7 +330,7 @@ Output: Hierarchy is returned as the default if a match is not found
 function _getHierarchyForOrg(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getHierarchyForOrg.name;
+    const _fn = _getHierarchyForOrg.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "hierarchy");
 }
@@ -346,7 +346,7 @@ Output: Parent Org ID (string), org_id (same ID) is returned as the default if a
 function _getParentForOrg(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getParentForOrg.name;
+    const _fn = _getParentForOrg.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "parent_org_id");
 }
@@ -362,7 +362,7 @@ Output: Country Name (string), "" is returned as the default if a match is not f
 function _getOrgCountry(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getOrgCountry.name;
+    const _fn = _getOrgCountry.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "country");
 }
@@ -378,7 +378,7 @@ Output: Region Name (string), "" is returned as the default if a match is not fo
 function _getOrgRegion(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getOrgRegion.name;
+    const _fn = _getOrgRegion.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "region");
 }
@@ -394,7 +394,7 @@ Output: Currency (string), "" is returned as the default if a match is not found
 function _getOrgCurrency(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getOrgCurrency.name;
+    const _fn = _getOrgCurrency.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "currency");
 }
@@ -409,7 +409,7 @@ Output: AU Model (string), "report_0" is the default if nothing found
 function _getAUModel(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getAUModel.name;
+    const _fn = _getAUModel.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "au_model");
 }
@@ -425,7 +425,7 @@ Output: Enterprise Billing Org ID (string), org_id is the default if nothing fou
 function _getEnterpriseBillingOrgId(account_map, org_id)
 {
     // Get the function name for logging
-    const fn = _getEnterpriseBillingOrgId.name;
+    const _fn = _getEnterpriseBillingOrgId.name;
 
     return getFieldValueFromAccountMap(account_map, org_id, "enterprise_billing_org_id");
 }
@@ -454,7 +454,7 @@ Output: 0 on success, -1 on failure
 async function _appendNewAccounts(account_map, new_accounts)
 {
     // Get the function name for logging
-    const fn = _appendNewAccounts.name;
+    const _fn = _appendNewAccounts.name;
     
     // Number of accounts to be appended
     let num_accounts_appended = 0;
@@ -462,7 +462,7 @@ async function _appendNewAccounts(account_map, new_accounts)
     // Sanity check
     if(account_map.num_maps == 0)
     {
-        common.statusMessage(fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
+        common.statusMessage(_fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
         return 0;
     }
 
@@ -475,7 +475,7 @@ async function _appendNewAccounts(account_map, new_accounts)
         const this_org_name = account_map.getOrgName(org_id);
         if(this_org_name != "")
         {
-            common.statusMessage(fn, "Org already exists, ID: " , org_id , ", org_name: "  , this_org_name , ", will not be appending");
+            common.statusMessage(_fn, "Org already exists, ID: " , org_id , ", org_name: "  , this_org_name , ", will not be appending");
             continue;
         }
 
@@ -510,17 +510,17 @@ async function _appendNewAccounts(account_map, new_accounts)
 
         num_accounts_appended++;
 
-        common.statusMessage(fn, "Including new account with org_id: " , org_id , " to be appended to the account mapping sheet");
+        common.statusMessage(_fn, "Including new account with org_id: " , org_id , " to be appended to the account mapping sheet");
     }
 
     // Flush all changes in account_map.data back to the sheet in one go. 
     if(await flushAccountMapDataToFile(account_map) < 0)
     {
-        common.statusMessage(fn, "Failed to flush account map data to the account mapping sheet");
+        common.statusMessage(_fn, "Failed to flush account map data to the account mapping sheet");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully appended " , num_accounts_appended , " new accounts to the account mapping sheet");
+    common.statusMessage(_fn, "Successfully appended " , num_accounts_appended , " new accounts to the account mapping sheet");
 
     return 0;
 }
@@ -549,7 +549,7 @@ Output: 0 on success, -1 on failure
 async function _editExistingAccounts(account_map, existing_accounts)
 {
     // Get the function name for logging
-    const fn = _editExistingAccounts.name;
+    const _fn = _editExistingAccounts.name;
     
     // Number of accounts that we will be editing in the account mapping sheet
     let num_accounts_to_edit = 0;
@@ -557,7 +557,7 @@ async function _editExistingAccounts(account_map, existing_accounts)
     // Sanity check
     if(account_map.num_maps == 0)
     {
-        common.statusMessage(fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
+        common.statusMessage(_fn, "No Account Map entries, possibly getAccountMappingData() needs to be invoked");
         return 0;
     }
 
@@ -569,7 +569,7 @@ async function _editExistingAccounts(account_map, existing_accounts)
         // Sanity check
         if(org_id.toString().trim() == "")
         {
-            common.statusMessage(fn, "Invalid org ID");
+            common.statusMessage(_fn, "Invalid org ID");
             continue;
         }
 
@@ -577,7 +577,7 @@ async function _editExistingAccounts(account_map, existing_accounts)
         let offset = -1;
         if((offset = account_map.getOrgOffset(org_id)) < 0)
         {
-            common.statusMessage(fn, "Failed to locate org with ID: " , org_id);
+            common.statusMessage(_fn, "Failed to locate org with ID: " , org_id);
             continue;
         }
 
@@ -609,7 +609,7 @@ async function _editExistingAccounts(account_map, existing_accounts)
             account_map.map_list[offset][key] = existing_accounts[i][key];
         }
 
-        common.statusMessage(fn, "Queuing account with org_id: " , org_id , " at row: " , (offset + 2) , " to be edited in the account mapping sheet");
+        common.statusMessage(_fn, "Queuing account with org_id: " , org_id , " at row: " , (offset + 2) , " to be edited in the account mapping sheet");
 
         // Increment the number of accounts to be edited
         num_accounts_to_edit++;
@@ -618,11 +618,11 @@ async function _editExistingAccounts(account_map, existing_accounts)
     // Flush all changes in account_map.data back to the sheet in one go. 
     if(await flushAccountMapDataToFile(account_map) < 0)
     {
-        common.statusMessage(fn, "Failed to flush account map data to the account mapping sheet");
+        common.statusMessage(_fn, "Failed to flush account map data to the account mapping sheet");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully edited " , num_accounts_to_edit , " accounts in the account mapping sheet");
+    common.statusMessage(_fn, "Successfully edited " , num_accounts_to_edit , " accounts in the account mapping sheet");
 
     return 0;
 }
@@ -643,7 +643,7 @@ Output: 0 on success, -1 on failure
 async function changeAccountField(account_map, account_data, key_to_update)
 {
     // Get the function name for logging
-    const fn = changeAccountField.name;
+    const _fn = changeAccountField.name;
     
     // Update the account map with the new values for the specified key
     const num_accounts_to_edit = updateAccountMap(account_map, account_data, key_to_update);
@@ -653,15 +653,15 @@ async function changeAccountField(account_map, account_data, key_to_update)
         // Write all changes in account_map.data back to the sheet in one go. 
         if(await flushAccountMapDataToFile(account_map) < 0)
         {
-            common.statusMessage(fn, "Failed to write edited account data back to the account mapping sheet");
+            common.statusMessage(_fn, "Failed to write edited account data back to the account mapping sheet");
             return -1;
         }
 
-        common.statusMessage(fn, "Successfully edited " , num_accounts_to_edit , " accounts in the account mapping sheet");
+        common.statusMessage(_fn, "Successfully edited " , num_accounts_to_edit , " accounts in the account mapping sheet");
     }
     else
     {
-        common.statusMessage(fn, "No accounts to edit");
+        common.statusMessage(_fn, "No accounts to edit");
     }
     
     return 0;
@@ -681,7 +681,7 @@ Output: 0 on success, -1 on failure
 async function _changeAccountNames(account_map, account_names)
 {
     // Get the function name for logging
-    const fn = _changeAccountNames.name;
+    const _fn = _changeAccountNames.name;
 
     return await changeAccountField(account_map, account_names, "customer");
 }
@@ -701,7 +701,7 @@ Output: 0 on success, -1 on failure
 async function _changeOrgNames(account_map, org_names)
 {
     // Get the function name for logging
-    const fn = _changeOrgNames.name;
+    const _fn = _changeOrgNames.name;
 
     return await changeAccountField(account_map, org_names, "org");
 }
@@ -720,7 +720,7 @@ Output: 0 on success, -1 on failure
 async function _changeHierarchies(account_map, hierarchies)
 {
     // Get the function name for logging
-    const fn = _changeHierarchies.name;
+    const _fn = _changeHierarchies.name;
 
     return await changeAccountField(account_map, hierarchies, "hierarchy");
 }
@@ -739,7 +739,7 @@ Output: 0 on success, -1 on failure
 async function _changeParentOrgIDs(account_map, parent_org_ids)
 {
     // Get the function name for logging
-    const fn = _changeParentOrgIDs.name;
+    const _fn = _changeParentOrgIDs.name;
 
     return await changeAccountField(account_map, parent_org_ids, "parent_org_id");
 }
@@ -758,7 +758,7 @@ Output: 0 on success, -1 on failure
 async function _changeCountries(account_map, countries)
 {
     /// Get the function name for logging
-    const fn = _changeCountries.name;
+    const _fn = _changeCountries.name;
 
     return await changeAccountField(account_map, countries, "country");
 }
@@ -777,7 +777,7 @@ Output: 0 on success, -1 on failure
 async function _changeRegions(account_map, regions)
 {
     // Get the function name for logging
-    const fn = _changeRegions.name;
+    const _fn = _changeRegions.name;
 
     return await changeAccountField(account_map, regions, "region");
 }
@@ -796,7 +796,7 @@ Output: 0 on success, -1 on failure
 async function _changeCurrencies(account_map, currencies)
 {
     // Get the function name for logging
-    const fn = _changeCurrencies.name;
+    const _fn = _changeCurrencies.name;
 
     return await changeAccountField(account_map, currencies, "currency");
 }
@@ -815,7 +815,7 @@ Output: 0 on success, -1 on failure
 async function _changeAUModels(account_map, au_models)
 {
     // Get the function name for logging
-    const fn = _changeAUModels.name;
+    const _fn = _changeAUModels.name;
 
     return await changeAccountField(account_map, au_models, "au_model");
 }
@@ -834,7 +834,7 @@ Output: 0 on success, -1 on failure
 async function _changeEnterpriseBillingOrgIDs(account_map, enterprise_billing_org_ids)
 {
     // Get the function name for logging
-    const fn = _changeEnterpriseBillingOrgIDs.name;
+    const _fn = _changeEnterpriseBillingOrgIDs.name;
 
     return await changeAccountField(account_map, enterprise_billing_org_ids, "enterprise_billing_org_id");
 }
@@ -849,7 +849,7 @@ Output: 0 on success, -1 on failure
 async function _flushAccountMappingChangesToFile(account_map)
 {
     // Get the function name for logging
-    const fn = _flushAccountMappingChangesToFile.name;
+    const _fn = _flushAccountMappingChangesToFile.name;
 
     return await flushAccountMapDataToFile(account_map);
 }

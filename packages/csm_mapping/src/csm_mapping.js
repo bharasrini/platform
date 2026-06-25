@@ -1,4 +1,3 @@
-const common = require("@fyle-ops/common");
 
 // Importing the CSM mapping from csm_mapping.json
 const CSM_MAP = require("../data/csm_mapping.json");
@@ -17,7 +16,7 @@ Output: CSM Name or blank if not found
 function returnFDCSMNameForEmail(email)
 {
     // Get the function name for logging
-    const fn = returnFDCSMNameForEmail.name;
+    const _fn = returnFDCSMNameForEmail.name;
 
     for(let i = 0; i < CSM_MAP.length; i++)
     {
@@ -40,7 +39,7 @@ Output: CSM Email or blank if not found
 function returnEmailForFDCSMName(csm_name)
 {
     // Get the function name for logging
-    const fn = returnEmailForFDCSMName.name;
+    const _fn = returnEmailForFDCSMName.name;
 
     for(let i = 0; i < CSM_MAP.length; i++)
     {

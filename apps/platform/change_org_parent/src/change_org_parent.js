@@ -35,19 +35,17 @@ Output: 0 on success, -1 on failure
 async function readConfigVariables()
 {
     // Get the function name for logging purposes
-    const fn = readConfigVariables.name;
+    const _fn = readConfigVariables.name;
 
-    // Create New accounts sheet ID
-    const sheet_id = process.env.CHANGE_ORG_PARENT_INPUT_FILE_ID;
-
-    // Sheet that has list of new accounts to be created along with the associated information
+    const folder_id = process.env.CHANGE_ORG_PARENT_FOLDER_ID;
+    const file_name = process.env.CHANGE_ORG_PARENT_FILE_NAME;
     const sheet_name = process.env.CHANGE_ORG_PARENT_INPUT_SHEET_NAME;
 
     // Read data from this sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
 
@@ -59,7 +57,7 @@ async function readConfigVariables()
     org_id = common.checkandHandleBlank(data[table_org_id_row-1][table_col-1]);
     if(org_id == "") 
     {
-        common.statusMessage(fn, "Invalid account ID");
+        common.statusMessage(_fn, "Invalid account ID");
         return -1;
     }
 
@@ -79,7 +77,7 @@ Output: 0 on success, -1 on failure
 async function identifyFieldsToUpdate()
 {
     // Get the function name for logging purposes
-    const fn = identifyFieldsToUpdate.name;
+    const _fn = identifyFieldsToUpdate.name;
 
     // Create a new FS account instance
     const fs_acc = new fs_account();
@@ -87,10 +85,10 @@ async function identifyFieldsToUpdate()
     // Get list of all accounts
     if(await fs_acc.getAccounts() < 0)
     {
-        common.statusMessage(fn, "Failed to retrieve accounts from FS, exiting");
+        common.statusMessage(_fn, "Failed to retrieve accounts from FS, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully retrieved all accounts from FS, going to get list of fields to update");
+    common.statusMessage(_fn, "Successfully retrieved all accounts from FS, going to get list of fields to update");
 
     // Update org_id and parent_org_id in fs_account_to_update and am_account_to_update
     fs_account_to_update.account_id = org_id;
@@ -210,16 +208,16 @@ Output: 0 on success, -1 on failure
 async function updateParentInFS()
 {
     // Get the function name for logging purposes
-    const fn = updateParentInFS.name;
+    const _fn = updateParentInFS.name;
 
     const record_container = [];
     record_container.push(fs_account_to_update);
     if(await postRecordsToFS(record_container) < 0)
     {
-        common.statusMessage(fn, "Failed to update parent information in FS");
+        common.statusMessage(_fn, "Failed to update parent information in FS");
         return -1;
     }
-    common.statusMessage(fn, "Successfully updated parent information in FS");
+    common.statusMessage(_fn, "Successfully updated parent information in FS");
     return 0;
 }
 
@@ -234,7 +232,7 @@ Output: 0 on success, -1 on failure
 async function updateParentInAM()
 {
     // Get the function name for logging purposes
-    const fn = updateParentInAM.name;
+    const _fn = updateParentInAM.name;
 
     // Create a new Account Mapping instance
     const account_map = new account_mapping();
@@ -242,16 +240,16 @@ async function updateParentInAM()
     // Read in the account mapping data
     if(await account_map.getAccountMappingData() < 0)
     {
-        common.statusMessage(fn, "Failed to retrieve account map, exiting");
+        common.statusMessage(_fn, "Failed to retrieve account map, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully retrieved account map, going to check and update Account Mapping data");
+    common.statusMessage(_fn, "Successfully retrieved account map, going to check and update Account Mapping data");
 
     // Check if the org exists
     const offset = account_map.getOrgOffset(am_account_to_update.org_id);
     if(offset < 0)
     {
-        common.statusMessage(fn, "Failed to locate org with ID: ", am_account_to_update.org_id, ", will not be changing any information");
+        common.statusMessage(_fn, "Failed to locate org with ID: ", am_account_to_update.org_id, ", will not be changing any information");
         return -1;
     }
 
@@ -261,7 +259,7 @@ async function updateParentInAM()
         const parent_offset = account_map.getOrgOffset(am_account_to_update.parent_org_id);
         if(parent_offset < 0)
         {
-            common.statusMessage(fn, "Failed to locate parent org with ID: ", am_account_to_update.parent_org_id, ", will not be changing any information");
+            common.statusMessage(_fn, "Failed to locate parent org with ID: ", am_account_to_update.parent_org_id, ", will not be changing any information");
             return -1;
         }
     }
@@ -284,11 +282,11 @@ async function updateParentInAM()
     // Flush the changes to the file
     if(await account_map.flushAccountMappingChangesToFile() < 0)
     {
-        common.statusMessage(fn, "Failed to flush changes to the file");
+        common.statusMessage(_fn, "Failed to flush changes to the file");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully updated parent information in Account Mapping");
+    common.statusMessage(_fn, "Successfully updated parent information in Account Mapping");
 
     return 0;
 }
@@ -304,44 +302,44 @@ Output: 0 on success, -1 on failure
 async function change_org_parent()
 {
     // Get the function name for logging purposes
-    const fn = change_org_parent.name;
+    const _fn = change_org_parent.name;
 
-    common.statusMessage(fn, " ****************** Change Org Parent Start ****************** ");
+    common.statusMessage(_fn, " ****************** Change Org Parent Start ****************** ");
 
     // Read the config variables from the README sheet
     if(await readConfigVariables() < 0)
     {
-        common.statusMessage(fn, "Failed to read config variables, exiting");
+        common.statusMessage(_fn, "Failed to read config variables, exiting");
         return -1;
     }
 
-    common.statusMessage(fn, "Finished reading config variables, going to identify fields to update next");
+    common.statusMessage(_fn, "Finished reading config variables, going to identify fields to update next");
 
     // Identify the fields to update in FS and AM
     if(await identifyFieldsToUpdate() < 0)
     {
-        common.statusMessage(fn, "Failed to identify fields to update, exiting");
+        common.statusMessage(_fn, "Failed to identify fields to update, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully identified fields to update, going to update parent info in FS and AM");
+    common.statusMessage(_fn, "Successfully identified fields to update, going to update parent info in FS and AM");
 
     // Update the parent information in FS
     if(await updateParentInFS() < 0)
     {
-        common.statusMessage(fn, "Failed to update parent information in FS, exiting");
+        common.statusMessage(_fn, "Failed to update parent information in FS, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully updated parent information in FS, going to update parent info in Account Mapping next");
+    common.statusMessage(_fn, "Successfully updated parent information in FS, going to update parent info in Account Mapping next");
 
     // Update the parent information in Account Mapping
     if(await updateParentInAM() < 0)
     {
-        common.statusMessage(fn, "Failed to update parent information in Account Mapping, exiting");
+        common.statusMessage(_fn, "Failed to update parent information in Account Mapping, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully updated parent information in Account Mapping, exiting");
+    common.statusMessage(_fn, "Successfully updated parent information in Account Mapping, exiting");
 
-    common.statusMessage(fn, " ****************** Change Org Parent End ****************** ");
+    common.statusMessage(_fn, " ****************** Change Org Parent End ****************** ");
 
 }
 

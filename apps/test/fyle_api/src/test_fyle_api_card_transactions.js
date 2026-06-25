@@ -8,9 +8,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_card_transactions()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_card_transactions.name;
+    const _fn = test_fyle_api_get_card_transactions.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -22,20 +22,18 @@ async function test_fyle_api_get_card_transactions()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const event = "created_at";
     const after = "01-Jan-2025";
     //const before = "28-Feb-2026";
-    const before = null;
     const start_date_str = formatInTimeZone(new Date(after), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
-    //const end_date_str = formatInTimeZone(new Date(before), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
     const end_date_str = null;
 
     await fyle_acc.card_transaction.getCardTransactions(event, start_date_str, end_date_str);
-    common.statusMessage(fn,"Card transactions retrieved successfully !!!. Number of card transactions retrieved: " + fyle_acc.card_transactions.num_card_transactions);
+    common.statusMessage(_fn,"Card transactions retrieved successfully !!!. Number of card transactions retrieved: " + fyle_acc.card_transactions.num_card_transactions);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -43,9 +41,9 @@ async function test_fyle_api_get_card_transactions()
 async function test_fyle_api_get_select_card_transactions()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_select_card_transactions.name;
+    const _fn = test_fyle_api_get_select_card_transactions.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -57,7 +55,7 @@ async function test_fyle_api_get_select_card_transactions()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const transaction_list = 
     [
@@ -83,9 +81,14 @@ async function test_fyle_api_get_select_card_transactions()
     ];
 
     const ret = await fyle_acc.card_transaction.getSelectCardTransactions(transaction_list);
-    common.statusMessage(fn,"Card transactions retrieved successfully !!!");
+    if(ret === null)
+    {
+        common.statusMessage(_fn,"Failed to retrieve card transactions !!!");
+        return;
+    }
+    common.statusMessage(_fn,"Card transactions retrieved successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -93,9 +96,9 @@ async function test_fyle_api_get_select_card_transactions()
 async function test_fyle_api_create_card_transaction()
 {
     // Get function name for logging
-    const fn = test_fyle_api_create_card_transaction.name;
+    const _fn = test_fyle_api_create_card_transaction.name;
 
-    common.start_test(fn); 
+    common.start_test(_fn); 
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -107,7 +110,7 @@ async function test_fyle_api_create_card_transaction()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const card_transaction = 
     {
@@ -166,9 +169,9 @@ async function test_fyle_api_create_card_transaction()
     }
 
     await fyle_acc.card_transaction.createCardTransaction(card_transaction);
-    common.statusMessage(fn,"Card transaction created successfully with id: " + card_transaction.id + " !!!");
+    common.statusMessage(_fn,"Card transaction created successfully with id: " + card_transaction.id + " !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -176,9 +179,9 @@ async function test_fyle_api_create_card_transaction()
 async function test_fyle_api_create_negative_card_transaction()
 {
     // Get function name for logging
-    const fn = test_fyle_api_create_negative_card_transaction.name;
+    const _fn = test_fyle_api_create_negative_card_transaction.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -190,7 +193,7 @@ async function test_fyle_api_create_negative_card_transaction()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const card_transaction = 
     {
@@ -249,9 +252,9 @@ async function test_fyle_api_create_negative_card_transaction()
     }
 
     await fyle_acc.card_transaction.createCardTransaction(card_transaction);
-    common.statusMessage(fn,"Card transaction created successfully with id: " + card_transaction.id + " !!!");
+    common.statusMessage(_fn,"Card transaction created successfully with id: " + card_transaction.id + " !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -259,9 +262,9 @@ async function test_fyle_api_create_negative_card_transaction()
 async function test_fyle_api_ignore_card_transactions()
 {
     // Get function name for logging
-    const fn = test_fyle_api_ignore_card_transactions.name;
+    const _fn = test_fyle_api_ignore_card_transactions.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -273,23 +276,23 @@ async function test_fyle_api_ignore_card_transactions()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const card_transaction_ids = ["btxntvnJZRvQIz"];
     const transaction_list = await fyle_acc.card_transaction.getSelectCardTransactions(card_transaction_ids);
     await fyle_acc.card_transaction.ignoreCardTransactions(transaction_list);
-    common.statusMessage(fn,"Card transactions ignored successfully for ids: " + card_transaction_ids + " !!!");
+    common.statusMessage(_fn,"Card transactions ignored successfully for ids: " + card_transaction_ids + " !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fyle_api_undo_ignore_card_transactions()
 {
     // Get function name for logging
-    const fn = test_fyle_api_undo_ignore_card_transactions.name;
+    const _fn = test_fyle_api_undo_ignore_card_transactions.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -301,14 +304,14 @@ async function test_fyle_api_undo_ignore_card_transactions()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const card_transaction_ids = ["btxntvnJZRvQIz"];
     const transaction_list = await fyle_acc.card_transaction.getSelectCardTransactions(card_transaction_ids);
     await fyle_acc.card_transaction.undoIgnoreCardTransactions(transaction_list);
-    common.statusMessage(fn,"Card transactions undo ignore successfully for ids: " + card_transaction_ids + " !!!");
+    common.statusMessage(_fn,"Card transactions undo ignore successfully for ids: " + card_transaction_ids + " !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -317,7 +320,7 @@ async function test_fyle_api_undo_ignore_card_transactions()
 async function test_fyle_api_card_transactions()
 {
     // Get function name for logging
-    const fn = test_fyle_api_card_transactions.name;
+    const _fn = test_fyle_api_card_transactions.name;
 
     common.start_test_suite("Fyle API - Card Transactions");
 

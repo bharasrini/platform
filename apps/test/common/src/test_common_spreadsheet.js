@@ -5,9 +5,9 @@ const common = require("@fyle-ops/common");
 async function test_common_spreadsheet_exportToExcel()
 {
     // Get function name for logging
-    const fn = test_common_spreadsheet_exportToExcel.name;
+    const _fn = test_common_spreadsheet_exportToExcel.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const data_array = 
     [
@@ -45,9 +45,9 @@ async function test_common_spreadsheet_exportToExcel()
     const sheet_name = "README";
 
     await common.exportToExcelFile(data_array, process.env.DOWNLOADS_FOLDER, file_name, sheet_name);
-    common.statusMessage(fn, "Exported data to Excel file: ", file_name);
+    common.statusMessage(_fn, "Exported data to Excel file: ", file_name);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ async function test_common_spreadsheet_exportToExcel()
 async function test_common_spreadsheet()
 {
     // Get function name for logging
-    const fn = test_common_spreadsheet.name;
+    const _fn = test_common_spreadsheet.name;
 
     common.start_test_suite("Spreadsheet functions");
 

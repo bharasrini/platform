@@ -7,24 +7,24 @@ const { fs_account, postContactsToFS } = require("@fyle-ops/freshsuccess");
 async function test_fs_get_contacts()
 {
     // Get function name for logging
-    const fn = test_fs_get_contacts.name;
+    const _fn = test_fs_get_contacts.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account = new fs_account();
     await account.getContacts();
-    common.statusMessage(fn,"Contacts read successfully !!!");
+    common.statusMessage(_fn,"Contacts read successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fs_post_contacts()
 {
     // Get function name for logging
-    const fn = test_fs_post_contacts.name;
+    const _fn = test_fs_post_contacts.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const record_container =
     [
@@ -46,14 +46,14 @@ async function test_fs_post_contacts()
 
     if(await postContactsToFS(record_container) < 0)
     {
-        common.statusMessage(fn,"Error posting records to Freshsuccess !!!");
+        common.statusMessage(_fn,"Error posting records to Freshsuccess !!!");
     }
     else
     {
-        common.statusMessage(fn,"Records posted to Freshsuccess successfully !!!");
+        common.statusMessage(_fn,"Records posted to Freshsuccess successfully !!!");
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
     
 }
 
@@ -63,7 +63,7 @@ async function test_fs_post_contacts()
 async function test_fs_contacts()
 {
     // Get the function name for logging
-    const fn = test_fs_contacts.name;
+    const _fn = test_fs_contacts.name;
 
     if(process.env.RUN_TEST_FS_GET_CONTACTS === "true") await test_fs_get_contacts();
     if(process.env.RUN_TEST_FS_POST_CONTACTS === "true") await test_fs_post_contacts();

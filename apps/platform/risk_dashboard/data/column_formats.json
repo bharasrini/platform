@@ -1,0 +1,11 @@
+    [
+        {"key": "row_title_col_1", "width": 200, "align": "LEFT", "type": "TEXT", "pattern": "@"},
+        {"key": "established_col_1", "width": 200, "align": "CENTER", "type": "NUMBER", "pattern": "#,###"},
+        {"key": "recently_onboarded_col_1", "width": 200, "align": "CENTER", "type": "NUMBER", "pattern": "#,###"},
+        {"key": "onboarding_col_1", "width": 200, "align": "CENTER", "type": "NUMBER", "pattern": "#,###"},
+        {"key": "gap_col", "width": 30, "align": "LEFT", "type": "TEXT", "pattern": "@"},
+        {"key": "row_title_col_2", "width": 200, "align": "LEFT", "type": "TEXT", "pattern": "@"},
+        {"key": "established_col_2", "width": 200, "align": "CENTER", "type": "CURRENCY", "pattern": "$#,###"},
+        {"key": "recently_onboarded_col_2", "width": 200, "align": "CENTER", "type": "CURRENCY", "pattern": "$#,###"},
+        {"key": "onboarding_col_2", "width": 200, "align": "CENTER", "type": "CURRENCY", "pattern": "$#,###"}
+    ]

@@ -7,9 +7,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_departments()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_departments.name;
+    const _fn = test_fyle_api_get_departments.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -21,12 +21,12 @@ async function test_fyle_api_get_departments()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     await fyle_acc.department.getDepartments(null, null, null);
-    common.statusMessage(fn,"Departments retrieved successfully !!! Number of departments retrieved: " + fyle_acc.departments.num_departments);
+    common.statusMessage(_fn,"Departments retrieved successfully !!! Number of departments retrieved: " + fyle_acc.departments.num_departments);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ async function test_fyle_api_get_departments()
 async function test_fyle_api_departments()
 {
     // Get function name for logging
-    const fn = test_fyle_api_departments.name;
+    const _fn = test_fyle_api_departments.name;
 
     common.start_test_suite("Fyle API - Departments");
 

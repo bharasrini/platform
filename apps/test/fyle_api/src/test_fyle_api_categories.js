@@ -6,9 +6,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_categories()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_categories.name;
+    const _fn = test_fyle_api_get_categories.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -20,21 +20,21 @@ async function test_fyle_api_get_categories()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     await fyle_acc.category.getCategories(null, null, null);
-    common.statusMessage(fn,"Categories retrieved successfully !!!. Number of categories retrieved: " , fyle_acc.categories.num_categories);
+    common.statusMessage(_fn,"Categories retrieved successfully !!!. Number of categories retrieved: " , fyle_acc.categories.num_categories);
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fyle_api_get_category_id()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_category_id.name;
+    const _fn = test_fyle_api_get_category_id.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -46,23 +46,23 @@ async function test_fyle_api_get_category_id()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     await fyle_acc.category.getCategories(null, null, null);
-    common.statusMessage(fn,"Categories retrieved successfully !!!. Number of categories retrieved: " , fyle_acc.categories.num_categories);
+    common.statusMessage(_fn,"Categories retrieved successfully !!!. Number of categories retrieved: " , fyle_acc.categories.num_categories);
 
     const category_name = "Mileage";
     const category_id = fyle_acc.category.getCategoryId(category_name);
     if(category_id === -1)
     {
-        common.statusMessage(fn, "Failed to get category ID for category name = " , category_name);
+        common.statusMessage(_fn, "Failed to get category ID for category name = " , category_name);
     }
     else
     {
-        common.statusMessage(fn, "Successfully got category ID for category name = " , category_name , ". Category ID = " , category_id);
+        common.statusMessage(_fn, "Successfully got category ID for category name = " , category_name , ". Category ID = " , category_id);
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ async function test_fyle_api_get_category_id()
 async function test_fyle_api_categories()
 {
     // Get function name for logging
-    const fn = test_fyle_api_categories.name;
+    const _fn = test_fyle_api_categories.name;
 
     common.start_test_suite("Fyle API - Categories");
 

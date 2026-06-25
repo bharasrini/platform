@@ -1,0 +1,15 @@
+[
+    {
+        "org_code": "ORG_1",
+        "after_date": "",
+        "before_date": "",
+        "expense_fields_to_report": "All",
+        "expense_states": "APPROVED",
+        "expense_event": "created_at",
+        "default_period": "Last 30 days",
+        "card_transaction_states": "POSTED",
+        "expense_fields":
+        [
+        ]
+    }
+]

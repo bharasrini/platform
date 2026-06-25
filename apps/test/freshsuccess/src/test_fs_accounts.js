@@ -6,40 +6,40 @@ const { fs_account, postRecordsToFS, removeCSMMappingfromFS } = require("@fyle-o
 async function test_fs_get_accounts()
 {
     // Get function name for logging
-    const fn = test_fs_get_accounts.name;
+    const _fn = test_fs_get_accounts.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account = new fs_account();
     await account.getAccounts();
-    common.statusMessage(fn,"Accounts read successfully !!!");
+    common.statusMessage(_fn,"Accounts read successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 async function test_fs_locate_org()
 {
     // Get function name for logging
-    const fn = test_fs_locate_org.name;
+    const _fn = test_fs_locate_org.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account = new fs_account();
     await account.getAccounts();
     const org_id = "or7llVvqUi5i"; // Suzanne & Walter Scott Foundation
     const org = account.locateOrg(org_id);
-    if(org) common.statusMessage(fn,"Org located successfully - org name : " + account.account_list[org]["id"]["account_name"] + " !!!");
-    else common.statusMessage(fn,"Org not found !!!");
+    if(org) common.statusMessage(_fn,"Org located successfully - org name : " + account.account_list[org]["id"]["account_name"] + " !!!");
+    else common.statusMessage(_fn,"Org not found !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 async function test_fs_post_accounts()
 {
     // Get function name for logging
-    const fn = test_fs_post_accounts.name;
+    const _fn = test_fs_post_accounts.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_info = 
     {
@@ -98,37 +98,37 @@ async function test_fs_post_accounts()
 
     if(await postRecordsToFS(record_container) < 0)
     {
-        common.statusMessage(fn,"Error posting records to Freshsuccess !!!");
+        common.statusMessage(_fn,"Error posting records to Freshsuccess !!!");
     }
     else
     {
-        common.statusMessage(fn,"Records posted to Freshsuccess successfully !!!");
+        common.statusMessage(_fn,"Records posted to Freshsuccess successfully !!!");
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
 async function test_fs_remove_csm_mapping()
 {
     // Get function name for logging
-    const fn = test_fs_remove_csm_mapping.name;
+    const _fn = test_fs_remove_csm_mapping.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account_id = "ortst9876543210";
     const csm_email = "bharadwaj.srinivasan@fyle.in";
 
     if(await removeCSMMappingfromFS(account_id, csm_email) < 0)
     {
-        common.statusMessage(fn,"Error deleting CSM mapping from Freshsuccess !!!");
+        common.statusMessage(_fn,"Error deleting CSM mapping from Freshsuccess !!!");
     }
     else
     {
-        common.statusMessage(fn,"CSM mapping removed from Freshsuccess successfully !!!");
+        common.statusMessage(_fn,"CSM mapping removed from Freshsuccess successfully !!!");
     }
     
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ async function test_fs_remove_csm_mapping()
 async function test_fs_accounts()
 {
     // Get the function name for logging
-    const fn = test_fs_accounts.name;
+    const _fn = test_fs_accounts.name;
 
     common.start_test_suite("Freshsuccess Accounts");
 

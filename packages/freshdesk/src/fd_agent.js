@@ -61,7 +61,7 @@ Output: 0 on success, -1 on failure
 function _initAgent(agent)
 {
     // Get the function name for logging
-    const fn = _initAgent.name;
+    const _fn = _initAgent.name;
 
     // Nothing else to do, return success
     return 0;
@@ -78,7 +78,7 @@ Output: List of agents stored in agent.agent_list[]. Returns 0 on success, -1 on
 async function _getAgents(agent)
 {
     // Get the function name for logging
-    const fn = _getAgents.name;
+    const _fn = _getAgents.name;
 
     // URL path for fetching agents
     const url_path = process.env.FRESHDESK_AGENT_URL_PATH;
@@ -129,7 +129,7 @@ async function _getAgents(agent)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: " , page + ", agents processed: " , agent.num_agents);
+                common.statusMessage(_fn, "Processing page: " , page + ", agents processed: " , agent.num_agents);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -137,13 +137,13 @@ async function _getAgents(agent)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of agents. Error: ", e.message);
+            common.statusMessage(_fn, "Failed to get list of agents. Error: ", e.message);
             return -1;
         }
 
     }while(link);
 
-    common.statusMessage(fn, "Successfully fetched agents. Number of agents = ", agent.num_agents);
+    common.statusMessage(_fn, "Successfully fetched agents. Number of agents = ", agent.num_agents);
 
     return 0;
 }
@@ -159,14 +159,14 @@ Output: agent name (string)
 function _getAgentName(agent, agent_id)
 {
     // Get the function name for logging
-    const fn = _getAgentName.name;
+    const _fn = _getAgentName.name;
     
     let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
     {
-        common.statusMessage(fn, "No agents to read, possibly getAgents() not called ?");
+        common.statusMessage(_fn, "No agents to read, possibly getAgents() not called ?");
         return ret;
     }
 
@@ -194,14 +194,14 @@ Output: agent email (string)
 function _getAgentEmail(agent, agent_id)
 {
     // Get the function name for logging
-    const fn = _getAgentEmail.name;
+    const _fn = _getAgentEmail.name;
     
     let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
     {
-        common.statusMessage(fn, "No agents to read, possibly getAgents() not called ?");
+        common.statusMessage(_fn, "No agents to read, possibly getAgents() not called ?");
         return ret;
     }
 
@@ -229,14 +229,14 @@ Output: agent email (string)
 function _getAgentId(agent, agent_email)
 {
     // Get the function name for logging
-    const fn = _getAgentId.name;
+    const _fn = _getAgentId.name;
     
     let ret = "";
 
     // Sanity check
     if(agent.num_agents == 0)
     {
-        common.statusMessage(fn, "No agents to read, possibly getAgents() not called ?");
+        common.statusMessage(_fn, "No agents to read, possibly getAgents() not called ?");
         return ret;
     }
 

@@ -14,7 +14,7 @@ Output: Billing data. Returns 0 on success, -1 on failure
 async function readLast3MonthsBillingData(account)
 {
     // Get the function name for logging purposes
-    const fn = readLast3MonthsBillingData.name;
+    const _fn = readLast3MonthsBillingData.name;
 
     // Get period markers for the last 3 months
     const last3MonthsDateMarkers = common.returnPrevious3MonthsPeriodMarkers();

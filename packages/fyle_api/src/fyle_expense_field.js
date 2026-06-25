@@ -53,7 +53,7 @@ Output: 0 on success, -1 on failure
 function _initFyleExpenseField(fyle_expense_field, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleExpenseField.name;
+    const _fn = _initFyleExpenseField.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_expense_field functions
     fyle_expense_field.fyle_acc = fyle_acc;
@@ -73,7 +73,7 @@ Output: 0 on success, -1 on failure
 async function _getExpenseFields(fyle_expense_field, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getExpenseFields.name;
+    const _fn = _getExpenseFields.name;
     
     // Point back to the fyle_account instance
     const fyle_acc = fyle_expense_field.fyle_acc;
@@ -81,7 +81,7 @@ async function _getExpenseFields(fyle_expense_field, event, after, before)
     // URL for fetching expense fields.
     const url_path = process.env.FYLE_EXPENSE_FIELDS_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Pagination variables
     let offset = Number(process.env.FYLE_API_START_OFFSET);
@@ -116,7 +116,7 @@ async function _getExpenseFields(fyle_expense_field, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -185,7 +185,7 @@ async function _getExpenseFields(fyle_expense_field, event, after, before)
                 fyle_acc.expense_fields.num_expense_fields++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count , " expense fields on page " , page , ", total expense fields processed = " , fyle_acc.expense_fields.num_expense_fields);
+            common.statusMessage(_fn, "Finished processing " , this_count , " expense fields on page " , page , ", total expense fields processed = " , fyle_acc.expense_fields.num_expense_fields);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -196,13 +196,13 @@ async function _getExpenseFields(fyle_expense_field, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get expense fields. Error:" , e.message);
+            common.statusMessage(_fn, "Failed to get expense fields. Error:" , e.message);
             return -1;
         }
 
     } while(fyle_acc.expense_fields.num_expense_fields < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved expense fields. Total expense fields retrieved = " , fyle_acc.expense_fields.num_expense_fields);
+    common.statusMessage(_fn, "Successfully retrieved expense fields. Total expense fields retrieved = " , fyle_acc.expense_fields.num_expense_fields);
 
     return 0;
     
@@ -220,7 +220,7 @@ Output: 0 on success, -1 on failure
 async function _getNamedExpenseField(fyle_expense_field, field_name, ret)
 {
     // Get the function name for logging
-    const fn = _getNamedExpenseField.name;
+    const _fn = _getNamedExpenseField.name;
     
     // Point back to the fyle_account instance
     const fyle_acc = fyle_expense_field.fyle_acc;
@@ -228,7 +228,7 @@ async function _getNamedExpenseField(fyle_expense_field, field_name, ret)
     // URL for fetching expense fields.
     const url_path = process.env.FYLE_EXPENSE_FIELDS_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Build the 'include' parameter for the API call based on the input parameters
     const include = [{"field_name": "eq." + field_name}];
@@ -267,11 +267,11 @@ async function _getNamedExpenseField(fyle_expense_field, field_name, ret)
     }
     catch(e)
     {
-        common.statusMessage(fn, "Failed to get expense fields for " , field_name , ". Error:" , e.message);
+        common.statusMessage(_fn, "Failed to get expense fields for " , field_name , ". Error:" , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully retrieved expense fields for: " , field_name);
+    common.statusMessage(_fn, "Successfully retrieved expense fields for: " , field_name);
 
     return 0;
     
@@ -289,7 +289,7 @@ Output: 0 on success, -1 on failure
 async function _setExpenseField(fyle_expense_field, id, field_name, type, options, default_value, is_enabled, is_mandatory)
 {
     // Get the function name for logging
-    const fn = _setExpenseField.name;
+    const _fn = _setExpenseField.name;
     
     // Point back to the fyle_account instance
     const fyle_acc = fyle_expense_field.fyle_acc;
@@ -321,7 +321,7 @@ async function _setExpenseField(fyle_expense_field, id, field_name, type, option
         const ret_field = data.data;
         if(ret_field.field_name !== field_name)
         {
-            common.statusMessage(fn, "Failed to set expense field. Expected field_name = " , field_name , ", returned field_name = " , ret_field.field_name);
+            common.statusMessage(_fn, "Failed to set expense field. Expected field_name = " , field_name , ", returned field_name = " , ret_field.field_name);
             return -1;
         }
         
@@ -329,35 +329,35 @@ async function _setExpenseField(fyle_expense_field, id, field_name, type, option
 
         if(common.sameStringSet(ret_field.options, options) === false)
         {
-            common.statusMessage(fn, "Failed to set expense field. Expected options differ from returned options.");
+            common.statusMessage(_fn, "Failed to set expense field. Expected options differ from returned options.");
             return -1;
         }
 
         if(ret_field.default_value !== default_value)
         {
-            common.statusMessage(fn, "Failed to set expense field. Expected default_value = " , default_value , ", returned default_value = " , ret_field.default_value);
+            common.statusMessage(_fn, "Failed to set expense field. Expected default_value = " , default_value , ", returned default_value = " , ret_field.default_value);
             return -1;
         }
 
         if(ret_field.is_enabled !== is_enabled)
         {
-            common.statusMessage(fn, "Failed to set expense field. Expected is_enabled = " , is_enabled , ", returned is_enabled = " , ret_field.is_enabled);
+            common.statusMessage(_fn, "Failed to set expense field. Expected is_enabled = " , is_enabled , ", returned is_enabled = " , ret_field.is_enabled);
             return -1;
         }
 
         if(ret_field.is_mandatory !== is_mandatory)
         {
-            common.statusMessage(fn, "Failed to set expense field. Expected is_mandatory = " , is_mandatory , ", returned is_mandatory = " , ret_field.is_mandatory);
+            common.statusMessage(_fn, "Failed to set expense field. Expected is_mandatory = " , is_mandatory , ", returned is_mandatory = " , ret_field.is_mandatory);
             return -1;
         }
     }
     catch (error)
     {
-        common.statusMessage(fn, "Failed to set expense field. Error:" , error.message);
+        common.statusMessage(_fn, "Failed to set expense field. Error:" , error.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully set expense field: " , id , ", field_name: " , field_name);
+    common.statusMessage(_fn, "Successfully set expense field: " , id , ", field_name: " , field_name);
 
     return 0;
 

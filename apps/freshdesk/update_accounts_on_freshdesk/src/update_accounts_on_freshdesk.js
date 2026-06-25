@@ -16,19 +16,17 @@ Output: 0 on success, -1 otherwise. List of charges populated in charges []
 async function readAccountList()
 {
     // Get the function name for logging purposes
-    const fn = readAccountList.name;
+    const _fn = readAccountList.name;
 
-    // Charges input sheet ID
-    const sheet_id = process.env.FRESHDESK_UPDATE_ACCOUNTS_DATA_SHEET_ID;
-
-    // Sheet that has billing data input
+    const folder_id = process.env.FRESHDESK_UPDATE_ACCOUNTS_DATA_FOLDER_ID;
+    const file_name = process.env.FRESHDESK_UPDATE_ACCOUNTS_DATA_FILE_NAME;
     const sheet_name = process.env.FRESHDESK_UPDATE_ACCOUNTS_DATA_SHEET_NAME;
 
     // Read data from this sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
     
@@ -39,8 +37,8 @@ async function readAccountList()
     let i = 1;
     const org_id_col = i; i++;
     const key_col = i; i++;
-    const value_col = i; i++;
-    const {lastRow: num_rows, lastColumn: num_cols} = common.getLastRowAndCol(data);
+    const value_col = i;
+    const {lastRow: num_rows, lastColumn: _num_cols} = common.getLastRowAndCol(data);
 
     // Read in the data rows
     for(let i = data_row; i < num_rows + 1; i++)
@@ -89,7 +87,7 @@ Output: 0 on success, -1 otherwise. List of charges populated in charges []
 async function updateAccounts()
 {
     // Get the function name for logging purposes
-    const fn = updateAccounts.name;
+    const _fn = updateAccounts.name;
 
     // Get the list of companies on Freshdesk
     const company = new fd_company();
@@ -101,7 +99,7 @@ async function updateAccounts()
         const key = accounts[i].key;
         const value = accounts[i].value;
 
-        common.statusMessage(fn, "Updating account: ", org_id, " key: ", key, "to value: ", value);
+        common.statusMessage(_fn, "Updating account: ", org_id, " key: ", key, "to value: ", value);
 
         // Get the appropriate function reference to update the key on Freshdesk based on the key name
         let func_ref = "";
@@ -119,7 +117,7 @@ async function updateAccounts()
         // If we were unable to find a function reference, continue
         if(func_ref == "")
         {
-            common.statusMessage(fn, "No function reference found for key: ", key, ", skipping update for org id: " + org_id);
+            common.statusMessage(_fn, "No function reference found for key: ", key, ", skipping update for org id: " + org_id);
             accounts[i].status = "Fail";
             continue;
         }
@@ -127,7 +125,7 @@ async function updateAccounts()
         // If this is not a valid function reference, continue
         if(typeof company[func_ref] !== "function")
         {
-            common.statusMessage(fn, "Invalid function reference for key: ", key, ", skipping update for org id: " + org_id);
+            common.statusMessage(_fn, "Invalid function reference for key: ", key, ", skipping update for org id: " + org_id);
             accounts[i].status = "Fail";
             continue;
         }
@@ -146,12 +144,12 @@ async function updateAccounts()
         if(await company[func_ref](org_id, final_value) < 0)
         {
             // Continue even if there is an error
-            common.statusMessage(fn, "Failed to update " + key + " with value: " + final_value + " for org id: " + org_id);
+            common.statusMessage(_fn, "Failed to update " + key + " with value: " + final_value + " for org id: " + org_id);
             accounts[i].status = "Fail";
             continue;
         }
 
-        common.statusMessage(fn, "Successfully updated " + key + " with value: " + final_value + " for org id: " + org_id);
+        common.statusMessage(_fn, "Successfully updated " + key + " with value: " + final_value + " for org id: " + org_id);
         accounts[i].status = "Success";
     }
 
@@ -169,7 +167,7 @@ Output: 0 on success, -1 on failure
 async function logUpdatedAccounts()
 {
     // Get the function name for logging purposes
-    const fn = logUpdatedAccounts.name;
+    const _fn = logUpdatedAccounts.name;
 
     // Update Accounts on Freshdesk Logs folder ID
     const folder_id = process.env.FRESHDESK_UPDATE_ACCOUNTS_LOGS_FOLDER_ID;
@@ -185,20 +183,20 @@ async function logUpdatedAccounts()
     const spreadsheet_id = await common.GoogleSheet_createGoogleSpreadsheet(folder_id, file_name);
     if(spreadsheet_id == null)
     {
-        common.statusMessage(fn, "Failed to create spreadsheet for billing data with name: ", file_name);
+        common.statusMessage(_fn, "Failed to create spreadsheet for billing data with name: ", file_name);
         return -1;
     }
 
     // Write out the accounts updated data to the sheet
-    if(await common.writeDataArrayToGoogleSheet(accounts, folder_id, file_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, file_name, sheet_name, accounts, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to write accounts updated data to Google Sheet");
+        common.statusMessage(_fn, "Failed to write accounts updated data to Google Sheet");
         return -1;
     }
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.FRESHDESK_UPDATE_ACCOUNTS_LOGS_DEFAULT_SHEET_TO_DELETE;    
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
     return 0;
 }
@@ -214,30 +212,30 @@ Output: 0 on success, -1 on failure
 async function update_accounts_on_freshdesk()
 {
     // Get the function name for logging purposes
-    const fn = update_accounts_on_freshdesk.name;
+    const _fn = update_accounts_on_freshdesk.name;
 
-    common.statusMessage(fn, " ****************** Update Accounts on Freshdesk Start ****************** ");
+    common.statusMessage(_fn, " ****************** Update Accounts on Freshdesk Start ****************** ");
 
     // First read the list of accounts
     if(await readAccountList() < 0)
     {
-        common.statusMessage(fn, "Failed to read list of accounts, exiting");
+        common.statusMessage(_fn, "Failed to read list of accounts, exiting");
         return -1;
     }
-    common.statusMessage(fn, "List of accounts to be updated on Freshdesk read successfully. Number of accounts to update: ", accounts.length);
-    common.statusMessage(fn, "Going to update them on Freshdesk");
+    common.statusMessage(_fn, "List of accounts to be updated on Freshdesk read successfully. Number of accounts to update: ", accounts.length);
+    common.statusMessage(_fn, "Going to update them on Freshdesk");
 
     if(await updateAccounts() < 0)
     {
-        common.statusMessage(fn, "Failed to update accounts on Freshdesk, exiting");
+        common.statusMessage(_fn, "Failed to update accounts on Freshdesk, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Accounts updated on Freshdesk successfully, going to log the details");
+    common.statusMessage(_fn, "Accounts updated on Freshdesk successfully, going to log the details");
 
     // Log details of the accounts updated on Freshdesk
     await logUpdatedAccounts();
 
-    common.statusMessage(fn, " ****************** Update Accounts on Freshdesk End ****************** ");
+    common.statusMessage(_fn, " ****************** Update Accounts on Freshdesk End ****************** ");
 
 }
 

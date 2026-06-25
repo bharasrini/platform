@@ -52,7 +52,7 @@ Output: 0 on success, -1 on failure
 */
 function _initFyleEmployee(fyle_employee, fyle_acc)
 {
-    const fn = _initFyleEmployee.name;
+    const _fn = _initFyleEmployee.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_employee functions
     fyle_employee.fyle_acc = fyle_acc;
@@ -72,7 +72,7 @@ Output: 0 on success, -1 on failure
 async function _getEmployees(fyle_employee, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getEmployees.name;
+    const _fn = _getEmployees.name;
     
     // Point back to fyle_account instance
     const fyle_acc = fyle_employee.fyle_acc;
@@ -80,7 +80,7 @@ async function _getEmployees(fyle_employee, event, after, before)
     // API endpoint to get employees
     const url_path = process.env.FYLE_EMPLOYEES_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     let offset = Number(process.env.FYLE_API_START_OFFSET);
     let limit = Number(process.env.FYLE_API_MAX_ITEMS);
@@ -115,7 +115,7 @@ async function _getEmployees(fyle_employee, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -168,7 +168,7 @@ async function _getEmployees(fyle_employee, event, after, before)
                 fyle_acc.employees.num_employees++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count + " employees on page " + page + ", total employees processed = " + fyle_acc.employees.num_employees);
+            common.statusMessage(_fn, "Finished processing " , this_count + " employees on page " + page + ", total employees processed = " + fyle_acc.employees.num_employees);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -179,13 +179,13 @@ async function _getEmployees(fyle_employee, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get employees. Error:" , e.message);
+            common.statusMessage(_fn, "Failed to get employees. Error:" , e.message);
             return -1;
         }
 
     } while(fyle_acc.employees.num_employees < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved employees. Total employees retrieved = " , fyle_acc.employees.num_employees);
+    common.statusMessage(_fn, "Successfully retrieved employees. Total employees retrieved = " , fyle_acc.employees.num_employees);
 
     return 0;
     
@@ -203,7 +203,7 @@ Output: user name on success, blank otherwise
 function _getEmployeeName(fyle_acc, user_id)
 {
     // Get the function name for logging
-    const fn = _getEmployeeName.name;
+    const _fn = _getEmployeeName.name;
 
     for(let i = 0; i < fyle_acc.employees.num_employees; i++)
     {
@@ -230,7 +230,7 @@ Output: user email on success, blank otherwise
 function _getEmployeeEmail(fyle_acc, user_id)
 {
     // Get the function name for logging
-    const fn = _getEmployeeEmail.name;
+    const _fn = _getEmployeeEmail.name;
     
     for(let i = 0; i < fyle_acc.employees.num_employees; i++)
     {

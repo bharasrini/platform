@@ -1,4 +1,3 @@
-const { formatInTimeZone } = require("date-fns-tz");
 const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -100,7 +99,7 @@ async function fetchStripeData(
 }) 
 {
     // Get the function name for logging
-    const fn = fetchStripeData.name;
+    const _fn = fetchStripeData.name;
 
     // Read environment variables
     const api_key_orig = process.env.STRIPE_API_KEY;
@@ -114,7 +113,7 @@ async function fetchStripeData(
     if(created_after) url.searchParams.append("created[gte]", String(created_after));
     if(include) url.searchParams.append("include", include);
 
-    common.statusMessage(fn, "Stripe URL = ", url.toString());
+    common.statusMessage(_fn, "Stripe URL = ", url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -156,7 +155,7 @@ async function sendStripeData(
 }) 
 {
     // Get the function name for logging
-    const fn = sendStripeData.name;
+    const _fn = sendStripeData.name;
 
     // Read environment variables
     const api_key_orig = process.env.STRIPE_API_KEY;
@@ -165,12 +164,12 @@ async function sendStripeData(
     const url = new URL(`https://${this_host}/v1/${url_path}`);
     const api_key_base64 = Buffer.from(`${api_key_orig}:X`).toString("base64");
 
-    common.statusMessage(fn, "Stripe URL = ", url.toString());
+    common.statusMessage(_fn, "Stripe URL = ", url.toString());
 
     // Post is form-encoded URL parameters
     const encoded_data_load = encodeForStripe(data_load);
 
-    common.statusMessage(fn, "Data being sent to Stripe: ", encoded_data_load);
+    common.statusMessage(_fn, "Data being sent to Stripe: ", encoded_data_load);
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -215,7 +214,7 @@ async function postStripeData(
 }) 
 {
     // Get the function name for logging
-    const fn = postStripeData.name;
+    const _fn = postStripeData.name;
 
     return await sendStripeData({url_path, method: "POST", data_load});
 }
@@ -236,7 +235,7 @@ async function putStripeData(
 }) 
 {
     // Get the function name for logging
-    const fn = putStripeData.name;
+    const _fn = putStripeData.name;
     
     return await sendStripeData({url_path, method: "PUT", data_load});
 }

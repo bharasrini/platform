@@ -54,7 +54,7 @@ Output: 0 on success, -1 on failure
 function _initBusinessHours(business_hours)
 {
     // Get the function name for logging
-    const fn = _initBusinessHours.name;
+    const _fn = _initBusinessHours.name;
 
     // Nothing else to do, return success
     return 0;
@@ -71,7 +71,7 @@ Output: List of business hours in business_hours.business_hours_list[]. Returns 
 async function _getBusinessHours(business_hours)
 {
     // Get the function name for logging
-    const fn = _getBusinessHours.name;
+    const _fn = _getBusinessHours.name;
 
     // URL path for fetching business hours
     const url_path = process.env.FRESHDESK_BUSINESS_HOURS_URL_PATH;
@@ -161,7 +161,7 @@ async function _getBusinessHours(business_hours)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: ", page, ", business hours processed: ", business_hours.num_business_hours);
+                common.statusMessage(_fn, "Processing page: ", page, ", business hours processed: ", business_hours.num_business_hours);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -170,13 +170,13 @@ async function _getBusinessHours(business_hours)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of business hours. Error:", e.message);
+            common.statusMessage(_fn, "Failed to get list of business hours. Error:", e.message);
             return -1;
         }
 
     }while(link);
 
-    common.statusMessage(fn, "Successfully fetched business hours. Number of business hours = ", business_hours.num_business_hours);
+    common.statusMessage(_fn, "Successfully fetched business hours. Number of business hours = ", business_hours.num_business_hours);
 
     return 0;
 }
@@ -193,7 +193,7 @@ Output: 0 on success, -1 on failure
 function _checkIfWithinBusinessHours(business_hours, support_group, time_instance)
 {
     // Get the function name for logging
-    const fn = _checkIfWithinBusinessHours.name;
+    const _fn = _checkIfWithinBusinessHours.name;
     
     let ret = false;
     let is_holiday = false;
@@ -224,7 +224,7 @@ function _checkIfWithinBusinessHours(business_hours, support_group, time_instanc
     // Check if we got a holiday
     if(is_holiday)
     {
-        //common.statusMessage(fn, "Provided date: ", time_instance, " falls on a holiday");
+        //common.statusMessage(_fn, "Provided date: ", time_instance, " falls on a holiday");
         ret = false;
         return ret;
     }
@@ -258,7 +258,7 @@ function _checkIfWithinBusinessHours(business_hours, support_group, time_instanc
             if(start_time == "" || end_time == "")
             {
                 // This is a weekend ticket
-                //common.statusMessage(fn, "Provided date: ", time_instance, " is a weekend ticket");
+                //common.statusMessage(_fn, "Provided date: ", time_instance, " is a weekend ticket");
                 ret = false;
                 break;
             }

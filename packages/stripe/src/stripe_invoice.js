@@ -11,7 +11,7 @@ Output: coupon ID (string) if successful, empty string if failed
 async function createCoupon(discount_type, discount, currency)
 {
     // Get the function name for logging
-    const fn = createCoupon.name;
+    const _fn = createCoupon.name;
 
     const url_path = process.env.STRIPE_COUPONS_PATH;
     let data_load = {};
@@ -41,7 +41,7 @@ async function createCoupon(discount_type, discount, currency)
     }
     else
     {
-        common.statusMessage(fn, "Invalid discount type: ", discount_type);
+        common.statusMessage(_fn, "Invalid discount type: ", discount_type);
         return "";
     }
 
@@ -52,11 +52,11 @@ async function createCoupon(discount_type, discount, currency)
     {
         const { headers, data } = await postStripeData({url_path, data_load});
         coupon_created = data.id;
-        common.statusMessage(fn, "Coupon created successfully: ", coupon_created, " with discount type: ", discount_type, " and discount: ", discount_name_for_display);
+        common.statusMessage(_fn, "Coupon created successfully: ", coupon_created, " with discount type: ", discount_type, " and discount: ", discount_name_for_display);
     }
     catch(e)
     {
-        common.statusMessage(fn, "Error creating coupon in Stripe - ", e.message);
+        common.statusMessage(_fn, "Error creating coupon in Stripe - ", e.message);
     }
 
     return coupon_created;
@@ -72,7 +72,7 @@ Output: invoice item ID (string) if successful, empty string if failed
 async function createInvoiceItem(customer_id, currency, quantity, unit_amount, discount_type, discount, description)
 {
     // Get the function name for logging
-    const fn = createInvoiceItem.name;
+    const _fn = createInvoiceItem.name;
     
     const data_load = 
     {
@@ -90,10 +90,10 @@ async function createInvoiceItem(customer_id, currency, quantity, unit_amount, d
         const coupon_code = await createCoupon(discount_type, discount, currency);
         if(coupon_code == "")
         {
-            common.statusMessage(fn, "Failed to create Coupon for discount type: ", discount_type, " and discount level: ", discount);
+            common.statusMessage(_fn, "Failed to create Coupon for discount type: ", discount_type, " and discount level: ", discount);
             return "";
         }
-        common.statusMessage(fn, "Coupon created: ", coupon_code, " for discount type: ", discount_type, " and discount level: ", discount);
+        common.statusMessage(_fn, "Coupon created: ", coupon_code, " for discount type: ", discount_type, " and discount level: ", discount);
         data_load.discounts = 
         [
           {
@@ -109,11 +109,11 @@ async function createInvoiceItem(customer_id, currency, quantity, unit_amount, d
     {
         const { headers, data } = await postStripeData({url_path, data_load});
         invoice_item_created = data.id;
-        common.statusMessage(fn, "Invoice item created successfully: ", invoice_item_created, " with discount type: ", discount_type, " and discount: ", discount);
+        common.statusMessage(_fn, "Invoice item created successfully: ", invoice_item_created, " with discount type: ", discount_type, " and discount: ", discount);
     }
     catch(e)
     {
-        common.statusMessage(fn, "Error creating invoice item in Stripe - ", e.message);
+        common.statusMessage(_fn, "Error creating invoice item in Stripe - ", e.message);
     }
 
     return invoice_item_created;
@@ -130,7 +130,7 @@ Output: invoice ID (string) if successful, empty string if failed
 async function createInvoice(customer_id)
 {
     // Get the function name for logging
-    const fn = createInvoice.name;
+    const _fn = createInvoice.name;
 
     const memo_desc = "Pay with ACH or wire transfer\n\
 Bank transfers, also known as ACH payments, can take up to five\n\
@@ -159,11 +159,11 @@ Routing Number - 026009593 (Domestic Wires) and 121000358 (ACH)"
     {
         const { headers, data } = await postStripeData({url_path, data_load});
         invoice_created = data.id;
-        common.statusMessage(fn, "Invoice created successfully: ", invoice_created);
+        common.statusMessage(_fn, "Invoice created successfully: ", invoice_created);
     }
     catch(e)
     {
-        common.statusMessage(fn, "Error creating invoice in Stripe - ", e.message);
+        common.statusMessage(_fn, "Error creating invoice in Stripe - ", e.message);
     }
 
     return invoice_created;

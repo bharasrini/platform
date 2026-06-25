@@ -9,9 +9,9 @@ const common = require("@fyle-ops/common");
 async function test_fyle_api_get_expenses()
 {
     // Get function name for logging
-    const fn = test_fyle_api_get_expenses.name;
+    const _fn = test_fyle_api_get_expenses.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -23,7 +23,7 @@ async function test_fyle_api_get_expenses()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     const states = ["COMPLETE", "APPROVER_PENDING", "APPROVED", "PAYMENT_PROCESSING", "PAYMENT_PENDING", "PAID"];
     const users = ["usyXAERqjQGX", "usxGgLmlhGIn", "us08ojgOHURE", "ushhTRDSOLsw", "usFKjFhQxoaw", "usD2ChrJOftx", "usEcLMSeAEaW"];
@@ -34,9 +34,9 @@ async function test_fyle_api_get_expenses()
     const end_date_str = formatInTimeZone(new Date(before), "UTC", "yyyy-MM-dd'T'HH:mm:ssXXX"); 
 
     await fyle_acc.expense.getExpenses(users, states, event, start_date_str, end_date_str);
-    common.statusMessage(fn,"Expenses retrieved successfully !!!");
+    common.statusMessage(_fn,"Expenses retrieved successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -46,7 +46,7 @@ async function test_fyle_api_get_expenses()
 async function test_fyle_api_expenses()
 {
     // Get function name for logging
-    const fn = test_fyle_api_expenses.name;
+    const _fn = test_fyle_api_expenses.name;
 
     common.start_test_suite("Fyle API - Expenses");
     

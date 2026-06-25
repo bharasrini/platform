@@ -49,7 +49,7 @@ Output: 0 on success, -1 on failure
 function _initFyleCategory(fyle_category, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleCategory.name;
+    const _fn = _initFyleCategory.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_category functions
     fyle_category.fyle_acc = fyle_acc;
@@ -68,7 +68,7 @@ Output: 0 on success, -1 on failure
 async function _getCategories(fyle_category, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getCategories.name;
+    const _fn = _getCategories.name;
     
     // Point back to fyle_account instance 
     const fyle_acc = fyle_category.fyle_acc;
@@ -76,7 +76,7 @@ async function _getCategories(fyle_category, event, after, before)
     // API endpoint to get categories
     const url_path = process.env.FYLE_CATEGORIES_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     let offset = Number(process.env.FYLE_API_START_OFFSET);
     const limit = Number(process.env.FYLE_API_MAX_ITEMS);
@@ -110,7 +110,7 @@ async function _getCategories(fyle_category, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -162,7 +162,7 @@ async function _getCategories(fyle_category, event, after, before)
                 fyle_acc.categories.num_categories++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count + " categories on page " + page + ", total categories processed = " + fyle_acc.categories.num_categories);
+            common.statusMessage(_fn, "Finished processing " , this_count + " categories on page " + page + ", total categories processed = " + fyle_acc.categories.num_categories);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -173,13 +173,13 @@ async function _getCategories(fyle_category, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get categories. Error:" , e.message);
+            common.statusMessage(_fn, "Failed to get categories. Error:" , e.message);
             return -1;
         }
 
     } while(fyle_acc.categories.num_categories < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved categories. Total categories retrieved = " , fyle_acc.categories.num_categories);
+    common.statusMessage(_fn, "Successfully retrieved categories. Total categories retrieved = " , fyle_acc.categories.num_categories);
 
     return 0;
     
@@ -196,7 +196,7 @@ Output: Category ID or -1 on failure
 function _getCategoryId(fyle_category, category_name)
 {
     // Get the function name for logging
-    const fn = _getCategoryId.name;
+    const _fn = _getCategoryId.name;
 
     // Point to the fyle_account instance
     const fyle_acc = fyle_category.fyle_acc;

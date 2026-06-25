@@ -47,7 +47,7 @@ Output: 0 on success, -1 on failure
 function _initStripeCustomer(customer) 
 {
     // Get the function name for logging
-    const fn = _initStripeCustomer.name;
+    const _fn = _initStripeCustomer.name;
 
     // Nothing else to do, return success
     return 0;
@@ -65,7 +65,7 @@ Output: List of customers stored in stripe_customer.customer_list[]. Returns 0 o
 async function _getStripeCustomers(customer, created_after)
 {
     // Get the function name for logging
-    const fn = _getStripeCustomers.name;
+    const _fn = _getStripeCustomers.name;
 
     // API endpoint and query params
     const url_path = process.env.STRIPE_CUSTOMERS_PATH || "customers";
@@ -102,7 +102,7 @@ async function _getStripeCustomers(customer, created_after)
             records_on_current_page = data.data.length;
 
             // Load all accounts received in this response to the account_list []
-            for(let i = 0; i < data.data.length; i++)
+            for(let i = 0; i < records_on_current_page; i++)
             {
                 const customer_info = 
                 {
@@ -168,13 +168,13 @@ async function _getStripeCustomers(customer, created_after)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Error fetching customers data from Stripe: ", e.message);
+            common.statusMessage(_fn, "Error fetching customers data from Stripe: ", e.message);
             return -1;
         }
             
     }while(has_more != false);
 
-    common.statusMessage(fn, "Successfully fetched total customers: " , customer.num_customers);
+    common.statusMessage(_fn, "Successfully fetched total customers: " , customer.num_customers);
         
     return 0;
 }

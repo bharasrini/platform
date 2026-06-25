@@ -24,7 +24,7 @@ async function fetchFyleData(
 }) 
 {
     // Get the function name for logging
-    const fn = fetchFyleData.name;
+    const _fn = fetchFyleData.name;
 
     // Construct the URL with query parameters
     const urlObj = new URL(url);
@@ -40,7 +40,7 @@ async function fetchFyleData(
         });
     }
 
-    common.statusMessage(fn, "Fyle URL = " , urlObj.toString());
+    common.statusMessage(_fn, "Fyle URL = " , urlObj.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -103,9 +103,9 @@ async function sendFyleData(
 }) 
 {
     // Get the function name for logging
-    const fn = sendFyleData.name;
+    const _fn = sendFyleData.name;
 
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Fetch data with retry logic
     return common.withRetry(async () => 
@@ -156,7 +156,7 @@ async function postFyleData(
 }) 
 {
     // Get the function name for logging
-    const fn = postFyleData.name;
+    const _fn = postFyleData.name;
 
     return await sendFyleData({url, access_token, method: "POST", data_load});
 }
@@ -178,7 +178,7 @@ async function putFyleData(
 }) 
 {
     // Get the function name for logging
-    const fn = putFyleData.name;
+    const _fn = putFyleData.name;
     
     return await sendFyleData({url, access_token, method: "PUT", data_load});
 }

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const common = require("@fyle-ops/common");
 const { fs_account } = require("@fyle-ops/freshsuccess");
 
 async function getAccountName(accountId)

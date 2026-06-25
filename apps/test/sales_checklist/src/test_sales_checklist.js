@@ -7,9 +7,9 @@ const { processSalesChecklist } = require("@fyle-ops/sales_checklist");
 async function test_read_sales_checklist()
 {
     // Get the function name for logging
-    const fn = test_read_sales_checklist.name;
+    const _fn = test_read_sales_checklist.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const checklist_file = "https://docs.google.com/spreadsheets/d/1whqsDy5vbLG9xjUkro-41G8Z9BAwByhAgedsYhen8Ro/edit?usp=drive_link";
     const checklist_format = "Format_2 (2023-07)";
@@ -25,14 +25,14 @@ async function test_read_sales_checklist()
     const result = await processSalesChecklist(record, checklist_file, checklist_format);
     if(result < 0)
     {
-        common.statusMessage(fn, "Failed to process sales checklist");
+        common.statusMessage(_fn, "Failed to process sales checklist");
     }
     else
     {
-        common.statusMessage(fn, "Successfully processed sales checklist.");
+        common.statusMessage(_fn, "Successfully processed sales checklist.");
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -41,7 +41,7 @@ async function test_read_sales_checklist()
 async function test_sales_checklist()
 {
     // Get function name for logging
-    const fn = test_sales_checklist.name;
+    const _fn = test_sales_checklist.name;
 
     common.start_test_suite("Sales Checklist");
 

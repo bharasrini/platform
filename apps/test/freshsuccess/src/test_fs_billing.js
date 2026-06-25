@@ -7,16 +7,16 @@ const { fs_account, } = require("@fyle-ops/freshsuccess");
 async function test_fs_read_billing()
 {
     // Get function name for logging
-    const fn = test_fs_read_billing.name;
+    const _fn = test_fs_read_billing.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const account = new fs_account();
     await account.getAccounts();
     await account.getBillingData();
-    common.statusMessage(fn,"Billing data read successfully !!!");
+    common.statusMessage(_fn,"Billing data read successfully !!!");
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -26,7 +26,7 @@ async function test_fs_read_billing()
 async function test_fs_billing()
 {
     // Get the function name for logging
-    const fn = test_fs_billing.name;
+    const _fn = test_fs_billing.name;
 
     common.start_test_suite("Freshsuccess Billing Functions");
 

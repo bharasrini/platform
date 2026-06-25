@@ -14,7 +14,7 @@ Output: Promise that resolves after ms milliseconds
 function sleep(ms) 
 {
     // Get the funtion name for logging purposes
-    const fn = sleep.name;
+    const _fn = sleep.name;
 
     return new Promise(r => setTimeout(r, ms)); 
 }
@@ -30,7 +30,7 @@ Source: ChatGPT
 function getIdFromUrl(url) 
 {
     // Get the funtion name for logging purposes
-    const fn = getIdFromUrl.name;
+    const _fn = getIdFromUrl.name;
     
     let id = "";
     const match = /[-\w]{25,}/.exec(url);
@@ -51,7 +51,7 @@ function getIdFromUrl(url)
     } else if (/view\?usp=sharing&id=(\w+)/.test(url)) {
         id = /view\?usp=sharing&id=(\w+)/.exec(url)[1];
     } else {
-        statusMessage(fn, "Invalid URL: " , url);
+        statusMessage(_fn, "Invalid URL: " , url);
     }
     return id;
 }
@@ -80,7 +80,7 @@ const entityMap =
 function escapeHtml (string) 
 {
     // Get the funtion name for logging purposes
-    const fn = escapeHtml.name;
+    const _fn = escapeHtml.name;
 
     return String(string).replace(/[&<>"'`=/]/g, function fromEntityMap (s)
     {
@@ -98,7 +98,7 @@ Output: true if the address is valid, false otherwise
 function validateEmailAddress(email_address)
 {
     // Get the funtion name for logging purposes
-    const fn = validateEmailAddress.name;
+    const _fn = validateEmailAddress.name;
 
     //let validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     const validRegex = /\S+@\S+\.\S+/;
@@ -120,7 +120,7 @@ Output: none
 function parseEmail(this_email, this_email_arr)
 {
     // Get the funtion name for logging purposes
-    const fn = parseEmail.name;
+    const _fn = parseEmail.name;
 
     let split_str = [];
 
@@ -165,14 +165,14 @@ Output: none
 function getNameFromEmail(email)
 {
     // Get the funtion name for logging purposes
-    const fn = getNameFromEmail.name;
+    const _fn = getNameFromEmail.name;
     
     let final = ""
 
     // Sanity check
     if(email.toString().trim() == "")
     {
-        statusMessage(fn, "Blank email");
+        statusMessage(_fn, "Blank email");
         return "";
     }
 
@@ -180,14 +180,14 @@ function getNameFromEmail(email)
     const offset = email.lastIndexOf("@");
     if(offset < 0)
     {
-        statusMessage(fn, "Invalid email: " , email);
+        statusMessage(_fn, "Invalid email: " , email);
         return "";
     }
 
     const name = email.substring(0, offset);
     if(name.toString().trim() == "")
     {
-        statusMessage(fn, "Failed to extract name from email: " , email);
+        statusMessage(_fn, "Failed to extract name from email: " , email);
         return "";
     }
 
@@ -218,7 +218,7 @@ Output: final string in which all special characters are replaced
 function replaceSpecialChars(string_to_replace, special_chars_list, char_to_replace_with)
 {
     // Get the funtion name for logging purposes
-    const fn = replaceSpecialChars.name;
+    const _fn = replaceSpecialChars.name;
 
     for(let i = 0; i < special_chars_list.length; i++)
     {
@@ -254,7 +254,7 @@ Output: final string in which all special characters are replaced
 function replaceKnownSpecialCharsWithUnderscore(string_to_replace)
 {
     // Get the funtion name for logging purposes
-    const fn = replaceKnownSpecialCharsWithUnderscore.name;
+    const _fn = replaceKnownSpecialCharsWithUnderscore.name;
 
     const special_chars_list = [' ', ',', ':', ';', '.', '(', ')', '{', '}', '/', '\\', '"', '<', '>', '?', '&', '-'];
     const char_to_replace_with = '_';
@@ -272,7 +272,7 @@ Output: true if they are percentage distance, false otherwise
 function matchWithinXPercent(num_a, num_b, perc)
 {
     // Get the funtion name for logging purposes
-    const fn = matchWithinXPercent.name;
+    const _fn = matchWithinXPercent.name;
 
     const num_a_plus_perc = num_a * (1 + perc);
     const num_a_minus_perc = num_a * (1 - perc);
@@ -298,7 +298,7 @@ Output: type of element (array, date, object, string, number)
 function checkType(element) 
 {
     // Get the funtion name for logging purposes
-    const fn = checkType.name;
+    const _fn = checkType.name;
 
     if (Array.isArray(element)) return "array";
     else if (element instanceof Date) return "date";
@@ -324,7 +324,7 @@ Source: ChatGPT
 function flattenStructure(structure, parentKey = '', result = {})
 {
     // Get the funtion name for logging purposes
-    const fn = flattenStructure.name;
+    const _fn = flattenStructure.name;
 
     // Sanity check
     if (structure === null || structure === undefined)
@@ -391,7 +391,7 @@ Output: 2D array with flattened headers and corresponding values
 function convertNestedDatato2DArray(data_array)
 {
     // Get the funtion name for logging purposes
-    const fn = convertNestedDatato2DArray.name;
+    const _fn = convertNestedDatato2DArray.name;
     
     // Sanity check
     if(!data_array || data_array.length === 0)
@@ -463,7 +463,7 @@ Output: Object with lastRow and lastColumn properties
 function getLastRowAndCol(sheet_data) 
 {
     // Get the funtion name for logging purposes
-    const fn = getLastRowAndCol.name;
+    const _fn = getLastRowAndCol.name;
 
     // Locate the last row
     const rows = sheet_data || [];
@@ -491,7 +491,7 @@ Source: ChatGPT
 function sameStringSet(a = [], b = [])
 {
     // Get the funtion name for logging purposes
-    const fn = sameStringSet.name;
+    const _fn = sameStringSet.name;
 
     if (a.length !== b.length) return false;
     
@@ -528,7 +528,7 @@ Source: Manoel Lemos / manoel@lemos.net / http://manoellemos.com
 function LevDis(s,t)
 {
     // Get the function name for logging purposes
-    const fn = LevDis.name;
+    const _fn = LevDis.name;
     
     // Workaround on Google Sheets rate-limit for external functions 
     //let sleep = Math.floor((Math.random() * 3000) + 1);

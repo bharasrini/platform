@@ -1,7 +1,6 @@
 // This module provides functions to convert between Freshdesk timezone labels and IANA timezone identifiers.
 
 const { formatInTimeZone } = require("date-fns-tz");
-const common = require("@fyle-ops/common");
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////// FUNCTIONS ////////////////////////////////////////////////////////////////
@@ -33,7 +32,7 @@ Output: IANA timezone identifier or null if not found
 function freshdeskToIana(label)
 {
     // Get the function name for logging
-    const fn = freshdeskToIana.name;
+    const _fn = freshdeskToIana.name;
 
     if (!label) return null;
     return FRESHDESK_TO_IANA_TZ[String(label).trim()] || null;
@@ -50,7 +49,7 @@ Output: Freshdesk timezone label(s) or null if not found
 function ianaToFreshdesk(ianaId, { all = false } = {})
 {
     // Get the function name for logging
-    const fn = ianaToFreshdesk.name;
+    const _fn = ianaToFreshdesk.name;
 
     if (!ianaId) return null;
     const list = IANA_TO_FRESHDESK_TZ[String(ianaId).trim()] || null;
@@ -68,7 +67,7 @@ Output: Freshdesk to IANA mapping object
 function getFreshdeskMap()
 {
     // Get the function name for logging
-    const fn = getFreshdeskMap.name;
+    const _fn = getFreshdeskMap.name;
 
     return FRESHDESK_TO_IANA_TZ;
 }
@@ -83,7 +82,7 @@ Output: IANA to Freshdesk mapping object
 function getIanaMap()
 {
     // Get the function name for logging
-    const fn = getIanaMap.name;
+    const _fn = getIanaMap.name;
 
     return IANA_TO_FRESHDESK_TZ;
 }
@@ -100,7 +99,7 @@ Output: UTC time string in "yyyy-MM-dd HH:mm:ss" format
 function convertTimeToUTC(timeStr, fdLabel, dateStr) 
 {
     // Get the function name for logging
-    const fn = convertTimeToUTC.name;
+    const _fn = convertTimeToUTC.name;
 
     // Validate inputs
     if (!timeStr) throw new Error("timeStr is required");

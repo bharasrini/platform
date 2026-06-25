@@ -52,7 +52,7 @@ Output: 0 on success, -1 on failure
 function _initFyleProject(fyle_project, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleProject.name;
+    const _fn = _initFyleProject.name;
 
     // Save a reference to the fyle_account instance in fyle_project so that we can access it in the fyle_project functions
     fyle_project.fyle_acc = fyle_acc;
@@ -71,7 +71,7 @@ Output: 0 on success, -1 on failure
 async function _getProjects(fyle_project, event, after, before)
 {
     // Get the function name for logging
-    const fn = _getProjects.name;
+    const _fn = _getProjects.name;
     
     // Point to the fyle_account instance
     const fyle_acc = fyle_project.fyle_acc;
@@ -79,7 +79,7 @@ async function _getProjects(fyle_project, event, after, before)
     // API endpoint for fetching projects
     const url_path = process.env.FYLE_PROJECTS_PATH || "/platform/v1/admin/projects";
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Pagination parameters
     let offset = Number(process.env.FYLE_API_START_OFFSET);
@@ -114,7 +114,7 @@ async function _getProjects(fyle_project, event, after, before)
         }
         if(found_event == false)
         {
-            common.statusMessage(fn, "Failed to find event: " , event , ", defaulting to created_at");
+            common.statusMessage(_fn, "Failed to find event: " , event , ", defaulting to created_at");
             event = "created_at";
         }
 
@@ -166,7 +166,7 @@ async function _getProjects(fyle_project, event, after, before)
                 fyle_acc.projects.num_projects++;
             }
 
-            common.statusMessage(fn, "Finished processing " , this_count , " projects on page " , page , ", total projects processed = " , fyle_acc.projects.num_projects);
+            common.statusMessage(_fn, "Finished processing " , this_count , " projects on page " , page , ", total projects processed = " , fyle_acc.projects.num_projects);
 
             // If records on the current page were greater or equal to the limit, then increment the offset
             if(this_count >= limit)
@@ -177,13 +177,13 @@ async function _getProjects(fyle_project, event, after, before)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get projects. Error: " , e.message);
+            common.statusMessage(_fn, "Failed to get projects. Error: " , e.message);
             return -1;
         }
 
     } while(fyle_acc.projects.num_projects < total_count);
 
-    common.statusMessage(fn, "Successfully retrieved projects. Total projects retrieved = " , fyle_acc.projects.num_projects);
+    common.statusMessage(_fn, "Successfully retrieved projects. Total projects retrieved = " , fyle_acc.projects.num_projects);
 
     return 0;
     
@@ -201,7 +201,7 @@ Output: 0 on success, -1 on failure
 async function _addProjects(fyle_project, projects_list)
 {
     // Get the function name for logging
-    const fn = _addProjects.name;
+    const _fn = _addProjects.name;
     
     // Point to the fyle_account instance
     const fyle_acc = fyle_project.fyle_acc;
@@ -209,7 +209,7 @@ async function _addProjects(fyle_project, projects_list)
     // API endpoint for adding projects
     const url_path = process.env.FYLE_ADD_PROJECTS_BULK_PATH;
     const url = new URL(fyle_acc.access_params.cluster_domain + url_path);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     // Setup the data load
     const data_load = 
@@ -242,11 +242,11 @@ async function _addProjects(fyle_project, projects_list)
     }
     catch(e)
     {
-        common.statusMessage(fn, "Failed to create projects. Error: " , e.message);
+        common.statusMessage(_fn, "Failed to create projects. Error: " , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully created projects. Total projects created = " , projects_list.length);
+    common.statusMessage(_fn, "Successfully created projects. Total projects created = " , projects_list.length);
 
     return 0;
     
@@ -263,7 +263,7 @@ Output: Project ID or -1 on failure
 function _getProjectId(fyle_project, project_name)
 {
     // Get the function name for logging
-    const fn = _getProjectId.name;
+    const _fn = _getProjectId.name;
 
     // Lets get the project ID for the given project name from fyle_acc.projects.project_list
     let project_id = -1;

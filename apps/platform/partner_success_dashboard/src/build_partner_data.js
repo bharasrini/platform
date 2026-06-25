@@ -178,7 +178,7 @@ Output: 0 on success, -1 on failure
 function addPartnerUsage(list)
 {
     // Get the function name for logging
-    const fn = addPartnerUsage.name;
+    const _fn = addPartnerUsage.name;
 
     for (let i = 0; i < list.length; i++)
     {
@@ -335,7 +335,7 @@ Output: 0 on success, -1 on failure
 async function buildPartnerLists(referral_list, reseller_list, wholesale_list)
 {
     // Get the function name for logging purposes
-    const fn = buildPartnerLists.name;
+    const _fn = buildPartnerLists.name;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -344,42 +344,42 @@ async function buildPartnerLists(referral_list, reseller_list, wholesale_list)
     const account = new fs_account();
     if(await account.getAccounts() < 0)
     {
-        common.statusMessage(fn, "Failed to get the list of accounts, exiting");
+        common.statusMessage(_fn, "Failed to get the list of accounts, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished getting list of all accounts, going to get billing data");
+    common.statusMessage(_fn, "Finished getting list of all accounts, going to get billing data");
 
     // Get the billing data
     if(await account.getBillingData() < 0)
     {
-        common.statusMessage(fn, "Failed to get the billing data, exiting");
+        common.statusMessage(_fn, "Failed to get the billing data, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished getting billing data, going to retrieve Invited User metrics, this might take a few minutes");
+    common.statusMessage(_fn, "Finished getting billing data, going to retrieve Invited User metrics, this might take a few minutes");
 
 
     // Get the Invited user metrics
     if(await account.getInvitedUsersMetrics() < 0)
     {
-        common.statusMessage(fn, "Failed to retrieve Invited User metrics, exiting");
+        common.statusMessage(_fn, "Failed to retrieve Invited User metrics, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished getting Invited User metrics, going to retrieve Verified User metrics, this might take a few minutes");
+    common.statusMessage(_fn, "Finished getting Invited User metrics, going to retrieve Verified User metrics, this might take a few minutes");
 
 
     // Get the Verified user metrics
     if(await account.getVerifiedUsersMetrics() < 0)
     {
-        common.statusMessage(fn, "Failed to retrieve Verified User metrics, exiting");
+        common.statusMessage(_fn, "Failed to retrieve Verified User metrics, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished getting Verified User metrics, going to build the partner list");
+    common.statusMessage(_fn, "Finished getting Verified User metrics, going to build the partner list");
 
 
     // Now populate the referral, reseller, and wholesale lists
     if(await populateLists(account, referral_list, reseller_list, wholesale_list) < 0)
     {
-        common.statusMessage(fn, "Failed to populate the partner lists, exiting");
+        common.statusMessage(_fn, "Failed to populate the partner lists, exiting");
         return -1;    
     }
 

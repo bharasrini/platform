@@ -1,16 +1,14 @@
 const common = require("@fyle-ops/common");
 const { fyle_account } = require("@fyle-ops/fyle_api");
-const { associateProjectWithCategories } = require("@fyle-ops/fyle_api");
-const { associateProjectsWithCategoriesInBulk } = require("@fyle-ops/fyle_api");
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 async function test_fyle_api_get_feature_config()
 {
     // Get function name for logging
-    const fn = test_fyle_api_feature_config.name;
+    const _fn = test_fyle_api_feature_config.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     // Account details - org ID: "or8TuR1VLwUj", org name: "Training Account", user email: "ashwathi.vinod@fyle.in"
     const client_id_str = "tpagISVKxnQMr";
@@ -22,20 +20,20 @@ async function test_fyle_api_get_feature_config()
     await fyle_acc.auth.getAccessToken(client_id_str, client_secret_str, refresh_token_str);
     await fyle_acc.auth.getClusterEndpoint();
     await fyle_acc.auth.validateClusterEndpoint();
-    common.statusMessage(fn,"Authentication successful !!!");
+    common.statusMessage(_fn,"Authentication successful !!!");
 
     // Get list of feature configs in the fyle org and store it in the fyle_account.feature_configs structure
     const ret = await fyle_acc.feature_config.getFeatureConfig(null, null, null);
     if(ret < 0)
     {
-        common.statusMessage(fn, "Failed to get feature config from fyle org");
+        common.statusMessage(_fn, "Failed to get feature config from fyle org");
     }
     else
     {
-        common.statusMessage(fn, "Successfully retrieved feature config from fyle org. Number of feature configs retrieved: " + fyle_acc.feature_configs.num_feature_configs);
+        common.statusMessage(_fn, "Successfully retrieved feature config from fyle org. Number of feature configs retrieved: " + fyle_acc.feature_configs.num_feature_configs);
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -45,7 +43,7 @@ async function test_fyle_api_get_feature_config()
 async function test_fyle_api_feature_config()
 {
     // Get function name for logging
-    const fn = test_fyle_api_feature_config.name;
+    const _fn = test_fyle_api_feature_config.name;
 
     common.start_test_suite("Fyle API - Feature Config");
 

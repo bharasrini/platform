@@ -35,7 +35,13 @@ export default defineConfig([
 		{
 			"@typescript-eslint/no-floating-promises": "error",
 			"no-useless-assignment": "off",
-			"no-unused-vars": "off"
+			"no-unused-vars": 
+			["error", 
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_"
+			}]
 		}
 	},
 	{

@@ -52,7 +52,7 @@ Output: 0 on success, -1 on failure
 function _initFyleAuth(fyle_auth, fyle_acc)
 {
     // Get the function name for logging
-    const fn = _initFyleAuth.name;
+    const _fn = _initFyleAuth.name;
 
     // Save a reference to the fyle_account instance so that we can access it in the fyle_auth functions
     fyle_auth.fyle_acc = fyle_acc;
@@ -71,7 +71,7 @@ Output: 0 on success, -1 on failure
 async function _getAccessToken(fyle_auth, client_id_str, client_secret_str, refresh_token_str)
 {
     // Get the function name for logging
-    const fn = _getAccessToken.name;
+    const _fn = _getAccessToken.name;
     
     // Get a reference to the fyle_account instance from fyle_auth
     const fyle_acc = fyle_auth.fyle_acc;
@@ -81,7 +81,7 @@ async function _getAccessToken(fyle_auth, client_id_str, client_secret_str, refr
     const url_path = process.env.FYLE_OAUTH_TOKEN_PATH;
 
     const url = new URL(`https://${host}${url_path}`);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     try
     {
@@ -117,11 +117,11 @@ async function _getAccessToken(fyle_auth, client_id_str, client_secret_str, refr
     }
     catch(e)
     {
-        common.statusMessage(fn, "Failed to get access token. Error:" , e.message);
+        common.statusMessage(_fn, "Failed to get access token. Error:" , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Access token retrieval successful !!!");
+    common.statusMessage(_fn, "Access token retrieval successful !!!");
 
     return 0;
 
@@ -139,7 +139,7 @@ Output: 0 on success, -1 on failure
 async function _getClusterEndpoint(fyle_auth)
 {
     // Get the function name for logging
-    const fn = _getClusterEndpoint.name;
+    const _fn = _getClusterEndpoint.name;
 
     // Get a reference to the fyle_account instance from fyle_auth
     const fyle_acc = fyle_auth.fyle_acc;
@@ -147,10 +147,10 @@ async function _getClusterEndpoint(fyle_auth)
     // URL path for authentication
     const host = process.env.FYLE_HOST;
     const url_path = process.env.FYLE_OAUTH_CLUSTER_PATH;
-    let access_token = null;
+    const access_token = fyle_acc.access_params.access_token;
 
     const url = new URL(`https://${host}${url_path}`);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     try
     {
@@ -158,7 +158,7 @@ async function _getClusterEndpoint(fyle_auth)
         const {headers,data} = await postFyleData(
         {
             url: url.toString(),
-            access_token: fyle_acc.access_params.access_token,
+            access_token: access_token,
             data_load: null
         });
 
@@ -172,17 +172,17 @@ async function _getClusterEndpoint(fyle_auth)
         fyle_acc.access_params.cluster_domain = (fyle_acc.access_params.cluster_domain   ?? "").toString().trim();
         if(!fyle_acc.access_params.cluster_domain)
         {
-            common.statusMessage(fn, "Failed to locate cluster_domain");
+            common.statusMessage(_fn, "Failed to locate cluster_domain");
             return -1;
         }
     }
     catch(e)
     {
-        common.statusMessage(fn, "Failed to get cluster endpoint. Error:" , e.message);
+        common.statusMessage(_fn, "Failed to get cluster endpoint. Error:" , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Cluster endpoint retrieval successful : " , fyle_acc.access_params.cluster_domain);
+    common.statusMessage(_fn, "Cluster endpoint retrieval successful : " , fyle_acc.access_params.cluster_domain);
 
     return 0;
 
@@ -200,7 +200,7 @@ Output: 0 on success, -1 on failure
 async function _validateClusterEndpoint(fyle_auth)
 {
     // Get the function name for logging
-    const fn = _validateClusterEndpoint.name;
+    const _fn = _validateClusterEndpoint.name;
     
     // Get a reference to the fyle_account instance from fyle_auth
     const fyle_acc = fyle_auth.fyle_acc;
@@ -208,7 +208,7 @@ async function _validateClusterEndpoint(fyle_auth)
     const host = fyle_acc.access_params.cluster_domain;
     const url_path = process.env.FYLE_MY_PROFILE_PATH;
     const url = new URL(`${host}${url_path}`);
-    common.statusMessage(fn, "Fyle URL = " , url.toString());
+    common.statusMessage(_fn, "Fyle URL = " , url.toString());
 
     try
     {
@@ -237,11 +237,11 @@ async function _validateClusterEndpoint(fyle_auth)
     }
     catch(e)
     {
-        common.statusMessage(fn, "Failed to get profile details. Error:" , e.message);
+        common.statusMessage(_fn, "Failed to get profile details. Error:" , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully validated cluster endpoint and retrieved user and org details !!!");
+    common.statusMessage(_fn, "Successfully validated cluster endpoint and retrieved user and org details !!!");
 
     return 0;
 

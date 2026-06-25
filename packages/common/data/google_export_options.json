@@ -1,0 +1,72 @@
+{
+    "application/vnd.google-apps.spreadsheet":
+    {
+        "xlsx":
+        {
+            "mime_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "extension": ".xlsx"
+        },
+        "pdf": 
+        {
+            "mime_type": "application/pdf",
+            "extension": ".pdf"
+        },
+        "csv":
+        {
+            "mime_type": "text/csv",
+            "extension": ".csv"
+        }
+    },
+
+    "application/vnd.google-apps.document":
+    {
+        "pdf": 
+        {
+            "mime_type": "application/pdf",
+            "extension": ".pdf"
+        },
+        "docx": 
+        {
+            "mime_type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "extension": ".docx"
+        },
+        "txt": 
+        {
+            "mime_type": "text/plain",
+            "extension": ".txt"
+        }
+    },
+
+    "application/vnd.google-apps.presentation": 
+    {
+        "pdf": 
+        {
+            "mime_type": "application/pdf",
+            "extension": ".pdf"
+        },
+        "pptx": 
+        {
+            "mime_type": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "extension": ".pptx"
+        }
+    },
+
+    "application/vnd.google-apps.drawing": 
+    {
+        "png": 
+        {
+            "mime_type": "image/png",
+            "extension": ".png"
+        },
+        "jpeg": 
+        {
+            "mime_type": "image/jpeg",
+            "extension": ".jpg"
+        },
+        "pdf": 
+        {
+            "mime_type": "application/pdf",
+            "extension": ".pdf"
+        }
+    }
+}

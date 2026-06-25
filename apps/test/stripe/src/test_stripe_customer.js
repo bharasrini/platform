@@ -7,9 +7,9 @@ const { stripe_customer } = require("@fyle-ops/stripe");
 async function test_get_stripe_customers()
 {
     // Get the function name for logging
-    const fn = test_get_stripe_customers.name;
+    const _fn = test_get_stripe_customers.name;
 
-    common.start_test(fn);
+    common.start_test(_fn);
 
     const created_after = "2026-01-01T00:00:00Z"
 
@@ -18,14 +18,14 @@ async function test_get_stripe_customers()
 
     if(result < 0)
     {
-        common.statusMessage(fn, "Failed to fetch Stripe customers");
+        common.statusMessage(_fn, "Failed to fetch Stripe customers");
     }
     else
     {
-        common.statusMessage(fn, "Successfully fetched Stripe customers.");
+        common.statusMessage(_fn, "Successfully fetched Stripe customers.");
     }
 
-    common.end_test(fn);
+    common.end_test(_fn);
 }
 
 
@@ -34,7 +34,7 @@ async function test_get_stripe_customers()
 async function test_stripe_customer()
 {
     // Get function name for logging
-    const fn = test_stripe_customer.name;
+    const _fn = test_stripe_customer.name;
 
     common.start_test_suite("Stripe Customer");
 

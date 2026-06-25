@@ -51,22 +51,20 @@ Output: 0 on success, -1 on failure
 async function processInputData()
 {
     // Get the function name for logging purposes
-    const fn = create_new_accounts.name;
+    const _fn = create_new_accounts.name;
 
     // Array to store the attributes of input parameters
     const input_vars = [];
 
-    // Create New accounts sheet ID
-    const sheet_id = process.env.CREATE_NEW_ACCOUNTS_SHEET_ID;
-
-    // Sheet that has list of new accounts to be created along with the associated information
+    const folder_id = process.env.CREATE_NEW_ACCOUNTS_FOLDER_ID;
+    const file_name = process.env.CREATE_NEW_ACCOUNTS_FILE_NAME;
     const sheet_name = process.env.CREATE_NEW_ACCOUNTS_SHEET_NAME;
 
     // Read data from this sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
 
@@ -130,7 +128,7 @@ async function processInputData()
             if(parameter == "account_id")
             {
                 org_id = val;
-                common.statusMessage(fn, "[" , (i-data_start_row) , "]. Processing account: " , val);
+                common.statusMessage(_fn, "[" , (i-data_start_row) , "]. Processing account: " , val);
             }
 
             // If its the account api, addd it directly to the account structure
@@ -213,7 +211,7 @@ Output: 0 on success, -1 on failure
 async function readSalesChecklists()
 {
     // Get the function name for logging purposes
-    const fn = readSalesChecklists.name;
+    const _fn = readSalesChecklists.name;
     
     for(let i = 0; i < record_container.length; i++)
     {
@@ -248,17 +246,17 @@ async function readSalesChecklists()
                 // Now read in all the dimensions from the checklist file in the new format
                 if(await processSalesChecklist(checklist_file, record_container[i], format) < 0)
                 {
-                    common.statusMessage(fn, "Failed to process Sales Checklist for org ID: ", account_id, ", Checklist file: ", checklist_file);
+                    common.statusMessage(_fn, "Failed to process Sales Checklist for org ID: ", account_id, ", Checklist file: ", checklist_file);
                 }
             }
             else
             {
-                common.statusMessage(fn, "Failed to locate format for org ID: ", account_id);
+                common.statusMessage(_fn, "Failed to locate format for org ID: ", account_id);
             }
         }
         else
         {
-            common.statusMessage(fn, "Failed to locate Sales Checklist file for org ID: ", account_id);
+            common.statusMessage(_fn, "Failed to locate Sales Checklist file for org ID: ", account_id);
         }
     }
 
@@ -277,7 +275,7 @@ Output: 0 on success, -1 on failure
 async function createAccountFolders()
 {
     // Get the function name for logging purposes
-    const fn = createAccountFolders.name;
+    const _fn = createAccountFolders.name;
     
     for(let i = 0; i < record_container.length; i++)
     {
@@ -354,7 +352,7 @@ async function createAccountFolders()
         }
         else
         {
-            common.statusMessage(fn, "Invalid Customer Source: " + source + " for org: " + crm_account_id);
+            common.statusMessage(_fn, "Invalid Customer Source: " + source + " for org: " + crm_account_id);
             return -1;
         }
 
@@ -368,10 +366,14 @@ async function createAccountFolders()
         if(checklist_file != "")
         {
             const file_name_to_use = createSalesChecklistFileName(crm_account_id);
-            const copied_checklist_file_url = await common.copyFileOnGoogleDrive(checklist_file, account_folders.impl_folder_ID, file_name_to_use, false);
+            const copied_checklist_file_url = await common.GoogleDrive_copyFileToFolder(checklist_file, account_folders.impl_folder_ID, file_name_to_use, false);
+            if(copied_checklist_file_url == "")
+            {
+                common.statusMessage(_fn, "Failed to copy checklist file: ", checklist_file, " to implementation folder for org ID: ", crm_account_id);
+                return -1;
+            }
 
-            // Store the new url back in the record
-            const final_checklist_file_url = copied_checklist_file_url != ""? copied_checklist_file_url: checklist_file;
+            // Store the implementation folder url back in the record
             record_container[i]["custom_label_dimensions"][checklist_file_index].value = account_folders.impl_folder_url;
 
             // Get the ID of the checklist file
@@ -381,12 +383,16 @@ async function createAccountFolders()
         // Make a copy of the order form in the order forms folder (don't copy if it already exists)
         if(order_form_file != "")
         {
-            //common.statusMessage(fn, "Processing order form file. Join date is: ", join_date, " for org ID: ", crm_account_id);
+            //common.statusMessage(_fn, "Processing order form file. Join date is: ", join_date, " for org ID: ", crm_account_id);
             const file_name_to_use = createOrderFormFileName(crm_account_id, join_date)
-            const copied_order_form_file_url = await common.copyFileOnGoogleDrive(order_form_file, account_folders.order_forms_folder_ID, file_name_to_use, false);
+            const copied_order_form_file_url = await common.GoogleDrive_copyFileToFolder(order_form_file, account_folders.order_forms_folder_ID, file_name_to_use, false);
+            if(copied_order_form_file_url == "")
+            {
+                common.statusMessage(_fn, "Failed to copy order form file: ", order_form_file, " to order forms folder for org ID: ", crm_account_id);
+                return -1;
+            }
 
-            // Store the new url back in the record
-            const final_order_form_url = copied_order_form_file_url != ""? copied_order_form_file_url: order_form_file;;
+            // Store the order form folder url back in the record
             record_container[i]["custom_label_dimensions"][order_form_file_index].value = account_folders.order_forms_folder_url;
 
             // Get the ID of the order form file
@@ -400,13 +406,13 @@ async function createAccountFolders()
             if((checklist_file_id != "") || (order_form_file_id != ""))
             {
                 const id_to_use = checklist_file_id != "" ? checklist_file_id : order_form_file_id;
-                const parent_folder = await common.getParentFolderId(id_to_use);
+                const parent_folder = await common.GoogleDrive_getParentFolderId(id_to_use);
                 if(parent_folder)
                 {
-                    let folder_name = await common.getFileOrFolderName(parent_folder);
+                    let folder_name = await common.GoogleDrive_getFileOrFolderNameGivenId(parent_folder);
                     if(folder_name.indexOf("(archived)") < 0) folder_name = folder_name + " (archived)";
-                    const ret = await common.renameFileOrFolder(parent_folder, folder_name);
-                    common.statusMessage(fn, "Set folder name to archived: ", ret);
+                    const ret = await common.GoogleDrive_renameFileOrFolder(parent_folder, folder_name);
+                    common.statusMessage(_fn, "Set folder name to archived: ", ret);
                 }
             }
         }
@@ -426,7 +432,7 @@ Output: 0 on success, -1 on failure
 function accountDataSanityCheck()
 {
     // Get the function name for logging purposes
-    const fn = accountDataSanityCheck.name;
+    const _fn = accountDataSanityCheck.name;
 
     for(let i = 0; i < record_container.length; i++)
     {
@@ -466,7 +472,7 @@ function accountDataSanityCheck()
         {
             if(required_fields[key] == "")
             {
-                common.statusMessage(fn, "Invalid value for parameter: ", key, " in index: ", i);
+                common.statusMessage(_fn, "Invalid value for parameter: ", key, " in index: ", i);
                 return -1;
             }
         }
@@ -476,7 +482,7 @@ function accountDataSanityCheck()
         const join_date = new Date(record_container[i]["join_date"]).toISOString().split("T")[0];
         if(common.isValidDate(join_date) == false)
         {
-            common.statusMessage(fn, "Invalid join date: ", join_date, " in index: " + i);
+            common.statusMessage(_fn, "Invalid join date: ", join_date, " in index: " + i);
             return -1;
         }
 
@@ -485,7 +491,7 @@ function accountDataSanityCheck()
         const this_csm = record_container[i]["assigned_csms"][0]["email"];
         if(csm_mapping.returnFDCSMNameForEmail(this_csm) == "")
         {
-            common.statusMessage(fn, "Unable to find CSM in CSM mapping table: ", this_csm, " in index: " + i);
+            common.statusMessage(_fn, "Unable to find CSM in CSM mapping table: ", this_csm, " in index: " + i);
             return -1;
         }
 
@@ -512,7 +518,7 @@ function accountDataSanityCheck()
              
             if(param_len > 400)
             {
-                common.statusMessage(fn, "Parameter: ", key, " is longer than 400 characters, length = ", param_len);
+                common.statusMessage(_fn, "Parameter: ", key, " is longer than 400 characters, length = ", param_len);
                 return -1;
             }
         }
@@ -526,7 +532,7 @@ function accountDataSanityCheck()
              
             if(param_len > 400)
             {
-                common.statusMessage(fn, "Parameter: ", param_name, " is longer than 400 characters, length = ", param_len);
+                common.statusMessage(_fn, "Parameter: ", param_name, " is longer than 400 characters, length = ", param_len);
                 return -1;
             }
         }
@@ -535,12 +541,12 @@ function accountDataSanityCheck()
 /*
     for(let i = 0; i < record_container.length; i++)
     {
-        common.statusMessage(fn, "Account ID: ", record_container[i]["account_id"]);
+        common.statusMessage(_fn, "Account ID: ", record_container[i]["account_id"]);
         for(let j = 0; j < record_container[i]["custom_label_dimensions"].length; j++)
         {
             const loc_key = record_container[i]["custom_label_dimensions"][j].key;
             const loc_val = record_container[i]["custom_label_dimensions"][j].value;
-            common.statusMessage(fn, "Parameter: ", loc_key, ", Len = ", loc_val.toString().length, ", Value = ", loc_val);
+            common.statusMessage(_fn, "Parameter: ", loc_key, ", Len = ", loc_val.toString().length, ", Value = ", loc_val);
         }
     }
 */
@@ -559,7 +565,7 @@ Output: 0 on success, -1 on failure
 async function createAccountLogFile()
 {
     // Get the function name for logging purposes
-    const fn = createAccountLogFile.name;
+    const _fn = createAccountLogFile.name;
 
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     log_spreadsheet_name = "Account_Creation_Log_File_" + formatInTimeZone(new Date(), "UTC", "yyyy_MM_dd");
@@ -567,10 +573,10 @@ async function createAccountLogFile()
     log_spreadsheet_id = await common.GoogleSheet_createGoogleSpreadsheet(folder_id, log_spreadsheet_name);
     if(log_spreadsheet_id == null)
     {
-        common.statusMessage(fn, "Failed to create log spreadsheet in folder with ID: ", folder_id);
+        common.statusMessage(_fn, "Failed to create log spreadsheet in folder with ID: ", folder_id);
         return -1;
     }
-    common.statusMessage(fn, "Spreadsheet created with ID: ", log_spreadsheet_id, " in folder with ID: ", folder_id, " and name: ", log_spreadsheet_name);
+    common.statusMessage(_fn, "Spreadsheet created with ID: ", log_spreadsheet_id, " in folder with ID: ", folder_id, " and name: ", log_spreadsheet_name);
 
     return 0;
 }
@@ -586,19 +592,24 @@ Output: 0 on success, -1 on failure
 async function copyInputSheet()
 {
     // Get the function name for logging purposes
-    const fn = copyInputSheet.name;
+    const _fn = copyInputSheet.name;
 
-    const input_spreadsheet = process.env.CREATE_NEW_ACCOUNTS_SHEET_ID;
-    const input_sheet_name = process.env.CREATE_NEW_ACCOUNTS_SHEET_NAME;
+    const src_folder_id = process.env.CREATE_NEW_ACCOUNTS_FOLDER_ID;
+    const src_file_name = process.env.CREATE_NEW_ACCOUNTS_FILE_NAME;
+    const src_sheet_name = process.env.CREATE_NEW_ACCOUNTS_SHEET_NAME;
 
-    const res = await common.copyInputGoogleSheet(input_spreadsheet, input_sheet_name, log_spreadsheet_id, input_sheet_name + "_log");
+    const dst_folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
+    const dst_file_name = log_spreadsheet_name;
+    const dst_sheet_name = src_sheet_name + "_log";
+
+    const res = await common.GoogleSheet_copySheet(src_folder_id, src_file_name, src_sheet_name, dst_folder_id, dst_file_name, dst_sheet_name);
     if(res < 0)
     {
-        common.statusMessage(fn, "Failed to copy input sheet to log file");
+        common.statusMessage(_fn, "Failed to copy input sheet to log file");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully copied input sheet to log file");
+    common.statusMessage(_fn, "Successfully copied input sheet to log file");
 
     return 0;
 }
@@ -615,7 +626,7 @@ Output: 0 on success, -1 on failure
 async function logFSInputData()
 {
     // Get the function name for logging purposes
-    const fn = logFSInputData.name;
+    const _fn = logFSInputData.name;
 
     const this_record = {};
     const fs_input_data = [];
@@ -689,13 +700,13 @@ async function logFSInputData()
     // Log a copy of what we sent to FS
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     const sheet_name = process.env.FS_INPUT_LOG_SHEET_NAME;
-    if(await common.writeDataArrayToGoogleSheet(fs_input_data, folder_id, log_spreadsheet_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, log_spreadsheet_name, sheet_name, fs_input_data, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to log FS input data to Google Sheet");
+        common.statusMessage(_fn, "Failed to log FS input data to Google Sheet");
         return -1;
     }
 
-    common.statusMessage(fn, "Successfully logged FS input data to Google Sheet");
+    common.statusMessage(_fn, "Successfully logged FS input data to Google Sheet");
 
     return 0;
 }
@@ -710,7 +721,7 @@ Output: 0 on success, -1 on failure
 async function addAccountsToFD()
 {
     // Get the function name for logging purposes
-    const fn = addAccountsToFD.name;
+    const _fn = addAccountsToFD.name;
 
     const change_rec = [];
 
@@ -755,7 +766,7 @@ async function addAccountsToFD()
         {
             if(company.company_list[j]["org_id"] == account_id)
             {
-                common.statusMessage(fn, "This org already exists on FD - org ID: ", account_id, ", Name: ", crm_account_id);
+                common.statusMessage(_fn, "This org already exists on FD - org ID: ", account_id, ", Name: ", crm_account_id);
                 company_found = true;
                 break;
             }
@@ -783,7 +794,7 @@ async function addAccountsToFD()
         // Add this account entry to FD
         if(await addAccountToFD(company, company_details) < 0)
         {
-            common.statusMessage(fn, "Failed to add account to FD for org ID: ", account_id, ", Name: ", crm_account_id);
+            common.statusMessage(_fn, "Failed to add account to FD for org ID: ", account_id, ", Name: ", crm_account_id);
             continue;
         }
 
@@ -799,9 +810,9 @@ async function addAccountsToFD()
         br_link.value = "https://fyle.freshdesk.com/a/tickets/filters/search?orderBy=created_at&orderType=desc&q[]=ticket_type:[\"Question(How to)\",\"Login/Invite/Verification Req.\",\"Clarification(Why)\",\"Problem/Bug Report\",\"Product Clarification\",\"Process\",\"To be determined\",\"Incident\"]&q[]=customers:[" + company_details.id + "]&ref=all_tickets";
         sr_link.value = "https://fyle.freshdesk.com/a/tickets/filters/search?orderBy=created_at&orderType=desc&q[]=ticket_type:[\"Service Request\"]&q[]=customers:["+ company_details.id +"]&ref=all_tickets";
 
-        common.statusMessage(fn, "FR link: " + fr_link.value);
-        common.statusMessage(fn, "BR link: " + br_link.value);
-        common.statusMessage(fn, "SR link: " + sr_link.value);
+        common.statusMessage(_fn, "FR link: " + fr_link.value);
+        common.statusMessage(_fn, "BR link: " + br_link.value);
+        common.statusMessage(_fn, "SR link: " + sr_link.value);
 
         // These labels are not present, push this to the record
         record_container[i]["custom_label_dimensions"].push(fr_link);
@@ -813,14 +824,14 @@ async function addAccountsToFD()
     // Log a copy of what we sent to FD
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     const sheet_name = process.env.FD_INPUT_LOG_SHEET_NAME;
-    if(await common.writeDataArrayToGoogleSheet(change_rec, folder_id, log_spreadsheet_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, log_spreadsheet_name, sheet_name, change_rec, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to log FD input data to Google Sheet");
+        common.statusMessage(_fn, "Failed to log FD input data to Google Sheet");
         // harmless error
         return 0;
     }
 
-    common.statusMessage(fn, "Successfully logged FD input data to Google Sheet");
+    common.statusMessage(_fn, "Successfully logged FD input data to Google Sheet");
 
     return 0;
 }
@@ -836,14 +847,14 @@ Output: 0 on success, -1 on failure
 async function addAccountToFD(company, company_details)
 {
     // Get the function name for logging purposes
-    const fn = addAccountToFD.name;
+    const _fn = addAccountToFD.name;
 
-    common.statusMessage(fn, "Org ID: ", company_details.org_id, ", Parent Org ID: ", company_details.parent_org_id, ", Name: ", company_details.crm_account_id, ", Domain: ", company_details.org_domain[0], ", CSM: ", company_details.csm_name, ", Tier: ", company_details.account_tier, ", ARR = ", company_details.arr, ", Source = ", company_details.source, ", Partner = ", company_details.partner);
+    common.statusMessage(_fn, "Org ID: ", company_details.org_id, ", Parent Org ID: ", company_details.parent_org_id, ", Name: ", company_details.crm_account_id, ", Domain: ", company_details.org_domain[0], ", CSM: ", company_details.csm_name, ", Tier: ", company_details.account_tier, ", ARR = ", company_details.arr, ", Source = ", company_details.source, ", Partner = ", company_details.partner);
 
     // First check if this is a sub-org. For Direct accounts, org_id and parent_org_id differ and hierarchy is set to "Secondary". For partners, the org_id and parent_org_id differ, but hierarchy will be set to "Primary"
     if((company_details.org_id != company_details.parent_org_id) && (company_details.hierarchy_label != "Primary"))
     {
-        common.statusMessage(fn, "This is a sub-org, lets check if we need to update the domain for the parent");
+        common.statusMessage(_fn, "This is a sub-org, lets check if we need to update the domain for the parent");
 
         let parent_found = false;
         let parent_id = "";
@@ -869,7 +880,7 @@ async function addAccountToFD(company, company_details)
                 {
                     if(parent_domain.includes(company_details.org_domain[j]) == false)
                     {
-                        common.statusMessage(fn, "We need to update the domain, parent domain = : ", parent_domain, ", domain to be added = : ", company_details.org_domain[j]);
+                        common.statusMessage(_fn, "We need to update the domain, parent domain = : ", parent_domain, ", domain to be added = : ", company_details.org_domain[j]);
                         final_domains.push(company_details.org_domain[j]);
                         update_domain = true;
                     }
@@ -886,7 +897,7 @@ async function addAccountToFD(company, company_details)
         // If we were unable to find the parent org, exit with an error
         if(parent_found == false)
         {
-            common.statusMessage(fn, "Failed to find parent for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
+            common.statusMessage(_fn, "Failed to find parent for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
             return -1;
         }
 
@@ -898,12 +909,12 @@ async function addAccountToFD(company, company_details)
         {
             if(company.updateAccountDomains(company_details.parent_org_id, final_domains) < 0)
             {
-                common.statusMessage(fn, "Failed to update domain to FD for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
+                common.statusMessage(_fn, "Failed to update domain to FD for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
                 company.company_list[parent_index].domains += "," + company_details.org_domain[0];
             }
             else
             {
-                common.statusMessage(fn, "Successfully updated domain to FD for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
+                common.statusMessage(_fn, "Successfully updated domain to FD for org ID: ", company_details.org_id, ", Name: ", company_details.crm_account_id);
             }
         }
 
@@ -922,7 +933,7 @@ async function addAccountToFD(company, company_details)
     const fd_csm_name = csm_mapping.returnFDCSMNameForEmail(company_details.csm_name);
     if(fd_csm_name == "")
     {
-        common.statusMessage(fn, "Failed to get FD CSM Name for: ", company_details.csm_name);
+        common.statusMessage(_fn, "Failed to get FD CSM Name for: ", company_details.csm_name);
         return -1;
     }
 
@@ -933,7 +944,7 @@ async function addAccountToFD(company, company_details)
     // Create the company on FD, this also updates the id in company_details {}
     if(await createNewCompanyonFD(company_details) < 0)
     {
-        common.statusMessage(fn, "Failed to add company to FD");
+        common.statusMessage(_fn, "Failed to add company to FD");
         return -1;
     }
 
@@ -950,7 +961,7 @@ Output: 0 on success, -1 on failure
 async function createAccountMapping()
 {
     // Get the function name for logging purposes
-    const fn = createAccountMapping.name;
+    const _fn = createAccountMapping.name;
 
     // Array to store the account mapping entries
     const account_mapping_info = [];
@@ -959,7 +970,7 @@ async function createAccountMapping()
     const account_map = new account_mapping();
     if(await account_map.getAccountMappingData() < 0)
     {
-        common.statusMessage(fn, "Failed to get account mapping data");
+        common.statusMessage(_fn, "Failed to get account mapping data");
         return -1;
     }
 
@@ -1011,9 +1022,9 @@ async function createAccountMapping()
     // Log a copy of what we have appended to the account map
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     const sheet_name = process.env.AM_INPUT_LOG_SHEET_NAME;
-    if(await common.writeDataArrayToGoogleSheet(account_mapping_info, folder_id, log_spreadsheet_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, log_spreadsheet_name, sheet_name, account_mapping_info, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to log AM input data to Google Sheet");
+        common.statusMessage(_fn, "Failed to log AM input data to Google Sheet");
         // harmless error
         return 0;
     }
@@ -1031,7 +1042,7 @@ Output: 0 on success, -1 on failure
 async function checkPlatformAccountCreation()
 {
     // Get the function name for logging purposes
-    const fn = checkPlatformAccountCreation.name;
+    const _fn = checkPlatformAccountCreation.name;
 
     const account_check = [];
 
@@ -1039,7 +1050,7 @@ async function checkPlatformAccountCreation()
     const account_map = new account_mapping();
     if(await account_map.getAccountMappingData() < 0)
     {
-        common.statusMessage(fn, "Failed to get account mapping data");
+        common.statusMessage(_fn, "Failed to get account mapping data");
         return -1;
     }
 
@@ -1047,7 +1058,7 @@ async function checkPlatformAccountCreation()
     const fs_acc = new fs_account();
     if(await fs_acc.getAccounts() < 0)
     {
-        common.statusMessage(fn, "Failed to get FS account data");
+        common.statusMessage(_fn, "Failed to get FS account data");
         return -1;
     }
 
@@ -1055,7 +1066,7 @@ async function checkPlatformAccountCreation()
     const fd_comp = new fd_company();
     if(await fd_comp.getCompanies() < 0)
     {
-        common.statusMessage(fn, "Failed to get FD company data");
+        common.statusMessage(_fn, "Failed to get FD company data");
         return -1;
     }
 
@@ -1078,7 +1089,7 @@ async function checkPlatformAccountCreation()
             }
         }
 
-        common.statusMessage(fn, "Checking org_id: ", org_id, ", Customer: ", customer);
+        common.statusMessage(_fn, "Checking org_id: ", org_id, ", Customer: ", customer);
 
         let this_account_check =
         {
@@ -1207,9 +1218,9 @@ async function checkPlatformAccountCreation()
     // Log a copy of what we have appended to the account_check
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     const sheet_name = process.env.ACCOUNT_CHECK_LOG_SHEET_NAME;
-    if(await common.writeDataArrayToGoogleSheet(account_check, folder_id, log_spreadsheet_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, log_spreadsheet_name, sheet_name, account_check, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to log account check data to Google Sheet");
+        common.statusMessage(_fn, "Failed to log account check data to Google Sheet");
         // harmless error
         return 0;
     }
@@ -1227,104 +1238,104 @@ Output: 0 on success, -1 on failure
 async function create_new_accounts()
 {
     // Get the function name for logging purposes
-    const fn = create_new_accounts.name;
+    const _fn = create_new_accounts.name;
 
-    common.statusMessage(fn, " ****************** Create New Accounts Start ****************** ");
+    common.statusMessage(_fn, " ****************** Create New Accounts Start ****************** ");
 
     // First read in the input data
     if(await processInputData() < 0)
     {
-        common.statusMessage(fn, "Error processing input data, exiting.");
+        common.statusMessage(_fn, "Error processing input data, exiting.");
         return -1;
     }
-    common.statusMessage(fn, "Finished processing input data, going to create read Sales Checklists");
+    common.statusMessage(_fn, "Finished processing input data, going to create read Sales Checklists");
 
     // Read Sales Checklists
     if(await readSalesChecklists() < 0)
     {
-        common.statusMessage(fn, "Failed to read Sales Checklists, exiting");
+        common.statusMessage(_fn, "Failed to read Sales Checklists, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished reading Sales Checklists, going to create Account Folders");
+    common.statusMessage(_fn, "Finished reading Sales Checklists, going to create Account Folders");
 
     // Create Account Folders and update the record with the folder URLs
     if(await createAccountFolders() < 0)
     {
-        common.statusMessage(fn, "Failed to create Account Folders, exiting");
+        common.statusMessage(_fn, "Failed to create Account Folders, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished creating Account Folders, going to do a sanity check on the data");
+    common.statusMessage(_fn, "Finished creating Account Folders, going to do a sanity check on the data");
 
     // At this point, we have all information required to create the accounts, lets do a sanity check
     if(accountDataSanityCheck() < 0)
     {
-        common.statusMessage(fn, "Account Data Sanity Check failed, exiting");
+        common.statusMessage(_fn, "Account Data Sanity Check failed, exiting");
         return;
     }
-    common.statusMessage(fn, "Sanity check successfully passed, going to create account log file");
+    common.statusMessage(_fn, "Sanity check successfully passed, going to create account log file");
 
     // Create the log file
     if(await createAccountLogFile() < 0)
     {
-        common.statusMessage(fn, "Failed to create account log file, exiting");
+        common.statusMessage(_fn, "Failed to create account log file, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished creating account log file, going to create a copy of the input sheet");
+    common.statusMessage(_fn, "Finished creating account log file, going to create a copy of the input sheet");
 
     // Create a copy of the input sheet
     if(await copyInputSheet() < 0)
     {
-        common.statusMessage(fn, "Failed to create a copy of the input sheet, exiting");
+        common.statusMessage(_fn, "Failed to create a copy of the input sheet, exiting");
         return -1;    
     }
-    common.statusMessage(fn, "Finished creating copy of the input sheet, going to log all the input data sent to Freshsuccess");
+    common.statusMessage(_fn, "Finished creating copy of the input sheet, going to log all the input data sent to Freshsuccess");
 
     // Log all of the input data that we are sending to Freshsuccess
     if(await logFSInputData() < 0)
     {
-        common.statusMessage(fn, "Failed to log input data sent to Freshsuccess, exiting");
+        common.statusMessage(_fn, "Failed to log input data sent to Freshsuccess, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished logging input data sent to Freshsuccess, going to add accounts to Freshdesk");
+    common.statusMessage(_fn, "Finished logging input data sent to Freshsuccess, going to add accounts to Freshdesk");
 
     // Add accounts to Freshdesk
     if(await addAccountsToFD() < 0)
     {
-        common.statusMessage(fn, "Failed to add accounts to Freshdesk, exiting");
+        common.statusMessage(_fn, "Failed to add accounts to Freshdesk, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully added accounts to Freshdesk, going to do add accounts to FreshSuccess");
+    common.statusMessage(_fn, "Successfully added accounts to Freshdesk, going to do add accounts to FreshSuccess");
 
     // Post Data to FreshSuccess
     if(await postRecordsToFS(record_container) < 0)
     {
-        common.statusMessage(fn, "Failed to post data to FreshSuccess, exiting");
+        common.statusMessage(_fn, "Failed to post data to FreshSuccess, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Successfully posted data to FreshSuccess, going to create Account Mapping");
+    common.statusMessage(_fn, "Successfully posted data to FreshSuccess, going to create Account Mapping");
 
     // Create the account mapping
     if(await createAccountMapping() < 0)
     {
-        common.statusMessage(fn, "Failed to create Account Mapping, exiting");
+        common.statusMessage(_fn, "Failed to create Account Mapping, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished creating Account Mapping, going to check platform account creation !");
+    common.statusMessage(_fn, "Finished creating Account Mapping, going to check platform account creation !");
 
     // Check if accounts have been created across platforms and log results
     if(await checkPlatformAccountCreation() < 0)
     {
-        common.statusMessage(fn, "Failed to check platform account creation, exiting");
+        common.statusMessage(_fn, "Failed to check platform account creation, exiting");
         return -1;
     }
-    common.statusMessage(fn, "Finished checking platform account creation, cleaning up and exiting");
+    common.statusMessage(_fn, "Finished checking platform account creation, cleaning up and exiting");
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const folder_id = process.env.ACCOUNT_CREATION_LOGS_FOLDER_ID;
     const sheet_to_delete = process.env.ACCOUNT_CREATION_DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, log_spreadsheet_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, log_spreadsheet_name, sheet_to_delete);
 
-    common.statusMessage(fn, " ****************** Create New Accounts End ****************** ");
+    common.statusMessage(_fn, " ****************** Create New Accounts End ****************** ");
 
     return 0;
 }

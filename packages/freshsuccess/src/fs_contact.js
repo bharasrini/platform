@@ -15,7 +15,7 @@ Output: List of contacts for the account. Returns 0 on success, -1 on failure
 async function getFSContacts(account)
 {
     // Get the function name for logging purposes
-    const fn = getFSContacts.name;
+    const _fn = getFSContacts.name;
 
     // API endpoint and query params
     const url_path = process.env.FRESHSUCCESS_CONTACTS_URL_PATH || "account_contacts";
@@ -123,13 +123,13 @@ async function getFSContacts(account)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Error fetching contacts data from Freshsuccess: " , e.message);
+            common.statusMessage(_fn, "Error fetching contacts data from Freshsuccess: " , e.message);
             return -1;
         }
             
     }while(records_on_current_page >= max_page_size);
 
-    common.statusMessage(fn, "Successfully fetched total contacts: " , account.num_contacts);
+    common.statusMessage(_fn, "Successfully fetched total contacts: " , account.num_contacts);
         
     return 0;
 }
@@ -144,7 +144,7 @@ Output: 0 on success, -1 on failure
 async function postContactsToFS(record_container)
 {
     // Get the function name for logging purposes
-    const fn = postContactsToFS.name;
+    const _fn = postContactsToFS.name;
     
     // API endpoint and query params
     const url_path = process.env.FRESHSUCCESS_CONTACTS_URL_PATH;
@@ -158,11 +158,11 @@ async function postContactsToFS(record_container)
     }
     catch (e)
     {
-        common.statusMessage(fn, "Error posting contacts to Freshsuccess - " , e.message);
+        common.statusMessage(_fn, "Error posting contacts to Freshsuccess - " , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Contact records posted to Freshsuccess successfully !!!", "");
+    common.statusMessage(_fn, "Contact records posted to Freshsuccess successfully !!!", "");
     return 0;
 
 }

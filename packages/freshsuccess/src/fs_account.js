@@ -87,7 +87,7 @@ Output: 0 on success, -1 on failure
 function _initAccounts(account) 
 {
     // Get the function name for logging
-    const fn = _initAccounts.name;
+    const _fn = _initAccounts.name;
 
     // Nothing else to do, return success
     return 0;
@@ -103,7 +103,7 @@ Output: List of accounts stored in account.account_list[]. Returns 0 on success,
 async function _getAccounts(account)
 {
     // Get the function name for logging
-    const fn = _getAccounts.name;
+    const _fn = _getAccounts.name;
 
     // API endpoint and query params
     const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH;
@@ -144,15 +144,9 @@ async function _getAccounts(account)
             for(let i = 0; i < data.results.length; i++)
             {
                 const org_id = data.results[i]["account_id"];
-                let account_churn = false;
 
                 // If we dont't have a valid org ID, skip
                 if(org_id == "") continue;
-
-                if(data.results[i]["is_churned"] == true)
-                {
-                    account_churn = true;
-                }
 
                 // Build the account info in the required format
                 const account_info = buildFSAccount({this_account: data.results[i]});
@@ -172,13 +166,13 @@ async function _getAccounts(account)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Error fetching accounts data from Freshsuccess: " , e.message);
+            common.statusMessage(_fn, "Error fetching accounts data from Freshsuccess: " , e.message);
             return -1;
         }
             
     }while(records_on_current_page >= max_page_size);
 
-    common.statusMessage(fn, "Successfully fetched total accounts: " , account.num_accounts);
+    common.statusMessage(_fn, "Successfully fetched total accounts: " , account.num_accounts);
         
     return 0;
 }
@@ -193,14 +187,14 @@ Output: index of the org if found, -1 if not found
 function _locateOrg(account, org_id)
 {
     // Get the function name for logging
-    const fn = _locateOrg.name;
+    const _fn = _locateOrg.name;
     
     let ret = -1;
 
     // Sanity check
     if(account.num_accounts == 0)
     {
-        common.statusMessage(fn, "No account entries, possibly Freshsuccess getAccounts() needs to be called ?");
+        common.statusMessage(_fn, "No account entries, possibly Freshsuccess getAccounts() needs to be called ?");
         return -1;
     }
 
@@ -228,7 +222,7 @@ Output: Billing data. Returns 0 on success, -1 on failure
 async function _getBillingData(account)
 {
     // Get the function name for logging
-    const fn = _getBillingData.name;
+    const _fn = _getBillingData.name;
 
     await readLast3MonthsBillingData(account);
     return 0;
@@ -245,7 +239,7 @@ Output: List of metrics for "product_db.num_invited_users". Returns 0 on success
 async function _getInvitedUsersMetrics(account)
 {
     // Get the function name for logging
-    const fn = _getInvitedUsersMetrics.name;
+    const _fn = _getInvitedUsersMetrics.name;
 
     // Metric name
     const metric_name = "product_db.num_invited_users";
@@ -262,7 +256,7 @@ Output: List of metrics for "product_db.num_verified_users". Returns 0 on succes
 async function _getVerifiedUsersMetrics(account)
 {
     // Get the function name for logging
-    const fn = _getVerifiedUsersMetrics.name;
+    const _fn = _getVerifiedUsersMetrics.name;
 
     // Metric name
     const metric_name = "product_db.num_verified_users";
@@ -279,7 +273,7 @@ Output: List of contacts for the account. Returns 0 on success, -1 on failure
 async function _getContacts(account)
 {
     // Get the function name for logging
-    const fn = _getContacts.name;
+    const _fn = _getContacts.name;
 
     return await getFSContacts(account);
 }
@@ -295,7 +289,7 @@ Output: 0 on success, -1 on failure
 async function postRecordsToFS(record_container)
 {
     // Get the function name for logging
-    const fn = postRecordsToFS.name;
+    const _fn = postRecordsToFS.name;
     
     // API endpoint and query params
     const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH;
@@ -309,11 +303,11 @@ async function postRecordsToFS(record_container)
     }
     catch (e)
     {
-        common.statusMessage(fn, "Error posting account records to Freshsuccess - " , e.message);
+        common.statusMessage(_fn, "Error posting account records to Freshsuccess - " , e.message);
         return -1;
     }
 
-    common.statusMessage(fn, "Account records posted to Freshsuccess successfully !!!", "");
+    common.statusMessage(_fn, "Account records posted to Freshsuccess successfully !!!", "");
     return 0;
 }
 
@@ -328,7 +322,7 @@ Output: 0 on success, -1 on failure
 async function removeCSMMappingfromFS(account_id, csm_email)
 {
     // Get the function name for logging
-    const fn = removeCSMMappingfromFS.name;
+    const _fn = removeCSMMappingfromFS.name;
     
     const url_path = process.env.FRESHSUCCESS_ACCOUNTS_URL_PATH + "/" + account_id + "/assigned_csms/" + encodeURIComponent(csm_email);
 
@@ -338,11 +332,11 @@ async function removeCSMMappingfromFS(account_id, csm_email)
     }
     catch (e)
     {
-        common.statusMessage(fn, "Error deleting CSM mapping from Freshsuccess - " , e.message);
+        common.statusMessage(_fn, "Error deleting CSM mapping from Freshsuccess - " , e.message);
         return -1;    
     }
 
-    common.statusMessage(fn, "Mapping for CSM " + csm_email + " deleted from account: " + account_id + " on Freshsuccess successfully !!!", "");
+    common.statusMessage(_fn, "Mapping for CSM " + csm_email + " deleted from account: " + account_id + " on Freshsuccess successfully !!!", "");
 
     return 0;
 }

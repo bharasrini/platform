@@ -18,19 +18,17 @@ Output: 0 on success, -1 otherwise. List of charges populated in charges []
 async function readCharges()
 {
     // Get the function name for logging purposes
-    const fn = readCharges.name;
+    const _fn = readCharges.name;
 
-    // Charges input sheet ID
-    const sheet_id = process.env.STRIPE_CHARGES_TO_CREATE_FILE_ID;
-
-    // Sheet that has billing data input
+    const folder_id = process.env.STRIPE_CHARGES_TO_CREATE_FOLDER_ID;
+    const file_name = process.env.STRIPE_CHARGES_TO_CREATE_FILE_NAME;
     const sheet_name = process.env.STRIPE_CHARGES_TO_CREATE_SHEET_NAME;
 
     // Read data from this sheet. Set range to null to read the entire sheet
-    const data = await common.readDataFromGoogleSheet(sheet_id, sheet_name, null);
+    const data = await common.GoogleSheet_readDataFromGoogleSheet(folder_id, file_name, sheet_name, null);
     if(data == null)
     {
-        common.statusMessage(fn, "Error reading data from Google Sheet id: ", sheet_id, ", sheet name: ", sheet_name);
+        common.statusMessage(_fn, "Error reading data from Google sheet name: ", sheet_name, " in file: ", file_name, " in folder with ID: ", folder_id);
         return -1;
     }
     
@@ -82,7 +80,7 @@ async function readCharges()
         if(cols[key] < 0)
         {
             found_cols = false;
-            common.statusMessage(fn, "Unable to locate column for : " + key);
+            common.statusMessage(_fn, "Unable to locate column for : " + key);
             break;
         }
     }
@@ -90,7 +88,7 @@ async function readCharges()
     // Exit if we were not able to find all columns
     if(found_cols == false)
     {
-        common.statusMessage(fn, "Unable to locate column, exiting");
+        common.statusMessage(_fn, "Unable to locate column, exiting");
         return -1;
     }
 
@@ -132,7 +130,7 @@ Output: 0 on success, -1 on failure
 async function logInvoicesCreated()
 {
     // Get the function name for logging purposes
-    const fn = logInvoicesCreated.name;
+    const _fn = logInvoicesCreated.name;
 
     // Construct the file name using the account name
     const today_date = formatInTimeZone(new Date(), "UTC", "yyyy_MM_dd");
@@ -148,20 +146,20 @@ async function logInvoicesCreated()
     const spreadsheet_id = await common.GoogleSheet_createGoogleSpreadsheet(folder_id, file_name);
     if(spreadsheet_id == null)
     {
-        common.statusMessage(fn, "Failed to create spreadsheet for billing data with name: ", file_name);
+        common.statusMessage(_fn, "Failed to create spreadsheet for billing data with name: ", file_name);
         return -1;
     }
 
     // Write out the invoices created data to the sheet
-    if(await common.writeDataArrayToGoogleSheet(charges, folder_id, file_name, sheet_name, true, true) < 0)
+    if(await common.GoogleSheet_writeStructuredDataArrayToGoogleSheet(folder_id, file_name, sheet_name, charges, true, true) < 0)
     {
-        common.statusMessage(fn, "Failed to write invoices created data to Google Sheet");
+        common.statusMessage(_fn, "Failed to write invoices created data to Google Sheet");
         return -1;
     }
 
     // Delete 'Sheet1' that was created by default in the output spreadsheet
     const sheet_to_delete = process.env.STRIPE_CREATE_INVOICE_LOGS_DEFAULT_SHEET_TO_DELETE;
-    await common.deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
+    await common.GoogleSheet_deleteSheetInGoogleSpreadsheet(folder_id, file_name, sheet_to_delete);
 
     return 0;
 }
@@ -176,14 +174,14 @@ Output: Creates draft invoices on Stripe
 async function create_stripe_invoices()
 {
     // Get the function name for logging purposes
-    const fn = create_stripe_invoices.name;
+    const _fn = create_stripe_invoices.name;
 
-    common.statusMessage(fn, " ****************** Create Stripe Invoices Start ****************** ");
+    common.statusMessage(_fn, " ****************** Create Stripe Invoices Start ****************** ");
 
     // Read all charges from the 'charges' sheet
     if(await readCharges() < 0)
     {
-        common.statusMessage(fn, "Failed to read charges, exiting");
+        common.statusMessage(_fn, "Failed to read charges, exiting");
         return -1;
     }
 
@@ -230,14 +228,14 @@ async function create_stripe_invoices()
         const invoice_item = await createInvoiceItem(customer_id, currency, quantity, unit_amount, discount_type, discount, description);
         if(invoice_item == "")
         {
-            common.statusMessage(fn, "createInvoiceItem failed for customer_id" + customer_id + ", currency: " + currency + ", quantity: " + quantity + ", unit_amount: " + unit_amount + ", discount_type: " + discount_type + ", discount: " + discount);
+            common.statusMessage(_fn, "createInvoiceItem failed for customer_id" + customer_id + ", currency: " + currency + ", quantity: " + quantity + ", unit_amount: " + unit_amount + ", discount_type: " + discount_type + ", discount: " + discount);
             continue;
         }
         
         const invoice_id = await createInvoice(customer_id);
         if(invoice_id == "")
         {
-            common.statusMessage(fn, "createInvoice failed for customer_id" + customer_id + ", currency: " + currency + ", quantity: " + quantity + ", unit_amount: " + unit_amount + ", discount_type: " + discount_type + ", discount: " + discount);
+            common.statusMessage(_fn, "createInvoice failed for customer_id" + customer_id + ", currency: " + currency + ", quantity: " + quantity + ", unit_amount: " + unit_amount + ", discount_type: " + discount_type + ", discount: " + discount);
             continue;
         }
 
@@ -250,9 +248,9 @@ async function create_stripe_invoices()
     // Log details of the invoices created
     await logInvoicesCreated();
 
-    common.statusMessage(fn, "Status: Draft invoices created for ", num_charges, " charges detailed in the 'charges' sheet");
+    common.statusMessage(_fn, "Status: Draft invoices created for ", num_charges, " charges detailed in the 'charges' sheet");
 
-    common.statusMessage(fn, " ****************** Create Stripe Invoices End ****************** ");
+    common.statusMessage(_fn, " ****************** Create Stripe Invoices End ****************** ");
 
     return 0;
 }

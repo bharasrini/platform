@@ -45,7 +45,7 @@ Output: 0 on success, -1 on failure
 function _initRatings(ratings)
 {
     // Get the function name for logging
-    const fn = _initRatings.name;
+    const _fn = _initRatings.name;
 
     // Nothing else to do, return success
     return 0;
@@ -62,7 +62,7 @@ Output: Rating string
 function getRatingString(rating_val)
 {
     // Get the function name for logging
-    const fn = getRatingString.name;
+    const _fn = getRatingString.name;
 
     let rating_string = "";
 
@@ -116,7 +116,7 @@ Output: List of ratings stored in ratings.ratings_list[]. Returns 0 on success, 
 async function _getRatings(ratings, created_since)
 {
     // Get the function name for logging
-    const fn = _getRatings.name;
+    const _fn = _getRatings.name;
 
     // URL path for fetching ratings
     const url_path = process.env.FRESHDESK_RATINGS_URL_PATH + "?created_since=" + created_since;
@@ -178,7 +178,7 @@ async function _getRatings(ratings, created_since)
     /*
             if((page % 5) == 0)
             {
-                common.statusMessage(fn, "Processing page: ", page, ", ratings processed: ", ratings.num_ratings);
+                common.statusMessage(_fn, "Processing page: ", page, ", ratings processed: ", ratings.num_ratings);
             }
     */
             // set a sleep here for 100 ms so that we don't exceed the throttle
@@ -186,13 +186,13 @@ async function _getRatings(ratings, created_since)
         }
         catch(e)
         {
-            common.statusMessage(fn, "Failed to get list of ratings. Error:", e.message);
+            common.statusMessage(_fn, "Failed to get list of ratings. Error:", e.message);
             return -1;
         }
 
     }while(link);
 
-    common.statusMessage(fn, "Successfully fetched ratings. Number of ratings = ", ratings.num_ratings);
+    common.statusMessage(_fn, "Successfully fetched ratings. Number of ratings = ", ratings.num_ratings);
 
     return 0;
 }
